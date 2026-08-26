@@ -1,0 +1,49 @@
+# llms.txt
+
+## Table of contents
+
+ - [ObservePoint API Data Model Overview](https://api-docs.observepoint.com/sections/data-model.md): Overview of audits, audit runs, pages, cookies, and tags within the ObservePoint API data model.
+ - [ObservePoint Grid API Filters](https://api-docs.observepoint.com/sections/grid-api-filters.md): Using filters and operators to refine Grid API results with examples for string matching.
+ - [ObservePoint Grid API: Paginating Resuts](https://api-docs.observepoint.com/sections/grid-api-pagination.md): Control batch size and paginate large datasets using the page and size fields.
+ - [ObservePoint Grid API: Sorting Results](https://api-docs.observepoint.com/sections/grid-api-sorting.md): Specify sort order and multiple sort columns in Grid API requests.
+ - [ObservePoint API Rate Limiting](https://api-docs.observepoint.com/sections/rate-limiting.md): Understand API rate limit policies and how to handle 429 responses with retries.
+ - [grid-api-info-description-override.md](https://api-docs.observepoint.com/openapi/grid-api-info-description-override.md)
+ - [reporting-api-info-description-override.md](https://api-docs.observepoint.com/openapi/reporting-api-info-description-override.md)
+ - [v3-api-info-description-override.md](https://api-docs.observepoint.com/openapi/v3-api-info-description-override.md)
+ - [OpenAPI Utils](https://api-docs.observepoint.com/openapi-utils/readme.md)
+ - [ObservePoint Grid API Columns and Types](https://api-docs.observepoint.com/sections/grid-api-columns.md): Understand the available columns, schema endpoints, and column types used by the Grid API.
+ - [ObservePoint Grid API Entities Explained](https://api-docs.observepoint.com/sections/grid-api-entities.md): List and description of entities such as Audit Runs, Web Journey Runs, Pages, Cookies, Tags, and more.
+ - [ObservePoint Grid API: Exporting Data](https://api-docs.observepoint.com/sections/grid-api-exports.md): Requesting exports of Grid API data as Excel or other file formats, and downloading the results.
+ - [grid-api-operation-description-override-createSavedReport.md](https://api-docs.observepoint.com/openapi/grid-api-operation-description-override-createsavedreport.md)
+ - [ObservePoint API: Choosing Endpoints](https://api-docs.observepoint.com/sections/choosing-api-endpoints.md): Guide to selecting which ObservePoint API endpoints to use for data retrieval, configuration, and running audits or journeys.
+ - [ObservePoint Grid API Examples](https://api-docs.observepoint.com/sections/grid-api-examples.md): Practical examples of using the ObservePoint Grid API.
+ - [ObservePoint Grid API: Grouping Data](https://api-docs.observepoint.com/sections/grid-api-grouping.md): How to enable group mode and use aggregate functions to summarize data.
+ - [ObservePoint Grid API: Introduction](https://api-docs.observepoint.com/sections/grid-api-intro.md): Learn how the Grid API provides rows and columns of ObservePoint report data with filtering, sorting, and exports.
+ - [ObservePoint API: v2 Reference](https://api-docs.observepoint.com/sections/v2-index.md)
+ - [Getting Started with the ObservePoint API](https://api-docs.observepoint.com/index.html.md): Learn how to get started with the ObservePoint API.
+ - [ObservePoint API: v3 Reference](https://api-docs.observepoint.com/sections/v3-index.md)
+ - [ObservePoint Webhooks](https://api-docs.observepoint.com/sections/webhook.md): Learn how to use ObservePoint webhooks to receive HTTPS notifications when audits or journeys complete.
+ - [Create LiveConnect Journeys](https://api-docs.observepoint.com/sections/api-recipes/create-liveconnect-journey.md): Use the ObservePoint API to create LiveConnect Journeys.
+ - [HAR File Processing](https://api-docs.observepoint.com/sections/api-recipes/har-file-processing.md): Use the ObservePoint API to process a HAR file.
+ - [ObservePoint API Recipes](https://api-docs.observepoint.com/sections/api-recipes.md): This section of the API docs provides step-by-step guides for using the ObservePoint API to achieve example tasks.
+ - [ObservePoint Grid API Example: Console Log Inventory from Recent Pages](https://api-docs.observepoint.com/sections/grid-api-examples/all-console-logs.md): List all console logs from the most recent page scans.
+ - [Update Audit Starting URLs](https://api-docs.observepoint.com/sections/api-recipes/update-starting-urls.md): Updating an audit with a list of URLs that you want to be scanned.
+ - [ObservePoint Grid API Example: Network Request Inventory from Recent Pages](https://api-docs.observepoint.com/sections/grid-api-examples/all-network-requests.md): List all network requests from the most recent page scans within the last 30 days.
+ - [ObservePoint Grid API Example: Most Common Cookies](https://api-docs.observepoint.com/sections/grid-api-examples/cookie-prevelance.md): How to query cookie prevalence using grouping and filtering with the Grid API.
+ - [ObservePoint Grid API Example: Cookies with Every Attribute](https://api-docs.observepoint.com/sections/grid-api-examples/cookies-with-every-attribute.md): How to query all cookies on your website, with every attribute
+ - [ObservePoint Grid API Example: Most Recent Journey Runs With Failures](https://api-docs.observepoint.com/sections/grid-api-examples/journey-statuses.md): Query the latest run for each Journey and surface status, rule failures, action errors, and folder context using the Grid API.
+ - [ObservePoint Grid API Example: Most Recent Audit Run IDs](https://api-docs.observepoint.com/sections/grid-api-examples/most-recent-audit-run-ids.md): Querying the latest audit run IDs for each audit in your account using the Grid API.
+ - [ObservePoint Grid API Example: Simple Audit Runs Report](https://api-docs.observepoint.com/sections/grid-api-examples/simple-audit-runs.md): Retrieve audit runs from the last 30 days with pages scanned and completion times.
+ - [ObservePoint Grid API Example: Tag Inventory by Category](https://api-docs.observepoint.com/sections/grid-api-examples/tag-inventory-by-category.md): How to query all tags on all your websites, for certain categories
+ - [ObservePoint Grid API Example: Tag Inventory for a Domain](https://api-docs.observepoint.com/sections/grid-api-examples/tag-inventory-by-domain.md): Get a complete inventory of tags on a domain, and determine how prevelant they are throughout that web property.
+ - [ObservePoint Grid API Example: Pull Data from Saved Report Configuration](https://api-docs.observepoint.com/sections/grid-api-examples/use-saved-report-configruation.md): How to dynamically retrieve data from a saved report configuration using the Grid API.
+ - [Data Collection API](https://api-docs.observepoint.com/openapi/data-collection-api.openapi.md): V3 Data Collection API's
+ - [Data Dictionary API by Observepoint](https://api-docs.observepoint.com/openapi/data-dictionary-api.openapi.md): This section documents the API endpoints for using the ObservePoint Data Dictionary API
+ - [Grid reports API by Observepoint](https://api-docs.observepoint.com/openapi/grid-api.openapi.md): This section documents the API endpoints for using the ObservePoint Grid API, which provides access to ObservePoint data in row/column format.
+ - [V2 API](https://api-docs.observepoint.com/openapi/scala-api.openapi.md)
+ - [Reporting API by Observepoint](https://api-docs.observepoint.com/openapi/reporting-api.openapi.md): This is the API document for reporting microservice of the ObservePoint application. The content of this document is subject to change and not officially open/supported for public use.
+ - [Web Journey Starter API by Observepoint](https://api-docs.observepoint.com/openapi/web-journey-starter-api.openapi.md): API for starting Web Journey runs in the ObservePoint application. This API allows users to trigger web journey executions either individually or in bulk.
+ - [Test](https://api-docs.observepoint.com/openapi-utils/src/test/resources/spec-invalid.md)
+ - [Test](https://api-docs.observepoint.com/openapi-utils/src/test/resources/spec-valid.md)
+ - [V3 API](https://api-docs.observepoint.com/openapi/combined.openapi.md): This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+

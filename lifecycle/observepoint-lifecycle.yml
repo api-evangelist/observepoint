@@ -1,0 +1,97 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://api-docs.observepoint.com/ (Versioning), https://news.observepoint.com/,
+  https://help.observepoint.com/en/articles/13161465-observepoint-data-retention,
+  https://help.observepoint.com/en/articles/9251132-customer-success-support-levels; deprecated
+  operations derived from openapi/observepoint-v3-api-openapi.yml
+versioning:
+  scheme: major-version-in-path
+  current_version: v3
+  supported_versions:
+  - v2
+  - v3
+  base_urls:
+    v3: https://api.observepoint.com (paths prefixed /v3)
+    v2: https://api.observepoint.com/v2
+  policy_published: true
+  quote: >-
+    "ObservePoint currently has two supported versions of its API: v2 and v3. The two versions use the
+    same authentication and rate limiting. Both versions of the API are fully supported and have no plans
+    for deprecation. ... The v3 endpoints are generally preferred because they give you better control
+    over pagination and filtering."
+  source: https://api-docs.observepoint.com/
+  note: >-
+    Some capabilities exist only on one version — e.g. audit and journey CONFIGURATION is documented
+    against v2 paths while most reporting lives on v3, and the webhook configuration doc still writes to
+    POST/PUT /v2/web-audits and /v2/web-journeys. v2 is legacy in name only.
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  notice_period: null
+  note: >-
+    ObservePoint publishes a statement that neither API version is planned for deprecation, but there is
+    NO deprecation POLICY: no notice window, no Sunset/Deprecation response headers (RFC 8594), no
+    deprecation register or migration guide. Two v3 operations are flagged `deprecated: true` inside the
+    spec with no replacement named and no removal date. Because no policy exists, no `Deprecation`
+    pointer is emitted in apis.yml.
+  deprecated_operations:
+  - method: GET
+    path: /v3/web-audits/latest-runs
+    operationId: getWebAuditLatestRuns
+    spec: openapi/observepoint-v3-api-openapi.yml
+    replacement_documented: false
+    sunset_date: null
+  - method: POST
+    path: /v3/consent-categories/export
+    operationId: exportConsentCategories
+    spec: openapi/observepoint-v3-api-openapi.yml
+    replacement_documented: false
+    sunset_date: null
+status_page:
+  published: false
+  note: >-
+    No public status page found. status.observepoint.com does not resolve (DNS failure);
+    observepoint.statuspage.io is not an ObservePoint page (it redirects to a Google sign-in);
+    no status link appears in the site footer, the help centre or the API docs. No `StatusPage`
+    pointer is emitted.
+  probes:
+  - url: https://status.observepoint.com/
+    status: 0
+    note: DNS resolution failed
+  - url: https://observepoint.statuspage.io/
+    status: 200
+    note: Redirects to accounts.google.com — not an ObservePoint status page
+sla:
+  published: false
+  support_tiers:
+  - Self Support
+  - Live Support
+  - Named Support
+  note: >-
+    Three named support levels are published but carry no response-time targets, no uptime commitment and
+    no coverage hours. Any SLA lives in the Service Agreement / order form, not on a public page.
+  source: https://help.observepoint.com/en/articles/9251132-customer-success-support-levels
+  service_agreement: https://www.observepoint.com/service-agreement/
+change_communication:
+  changelog_published: true
+  url: https://news.observepoint.com/
+  cadence: irregular, dated product-release posts
+  in_app: >-
+    Product Updates/Feedback under the Support menu, plus an Announcements panel in the app; the Help
+    Center "Release Notes" article is an index that points at those surfaces rather than a dated list.
+  source: https://help.observepoint.com/en/articles/10490980-release-notes
+data_lifecycle:
+  results_retention_default: 13 months
+  results_retention_options:
+  - 3 years + 1 month
+  - 5 years + 1 month
+  - 7 years + 1 month
+  configuration_retention: indefinite while the subscription is active
+  post_cancellation: access-only read-only subscription available for retained results
+  source: https://help.observepoint.com/en/articles/13161465-observepoint-data-retention
+  note: >-
+    This is the closest thing ObservePoint publishes to a data-lifecycle guarantee, and it bounds every
+    reporting call: an agent querying runs older than the account's retention window gets nothing back.

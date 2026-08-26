@@ -1,0 +1,145 @@
+generated: '2026-08-26'
+method: derived
+status: candidate
+source: >-
+  Derived from openapi/observepoint-v3-api-openapi.yml and openapi/observepoint-grid-reports-api-openapi.yml.
+  SEARCH first: no ObservePoint MCP server exists.
+search_result:
+  found: false
+  checked:
+  - https://api-docs.observepoint.com/ and its full llms.txt table of contents — no MCP page, no tool list
+  - https://api-docs.observepoint.com/llms.txt — 200, lists 40+ doc pages, none about MCP or agents
+  - https://help.observepoint.com/ — no MCP article
+  - https://api.github.com/orgs/observepoint/repos — 8 repos, none an MCP server
+  - npm / PyPI registry search for observepoint — no packages at all
+  - web search for "ObservePoint MCP server" — only unrelated Observe Inc. and OpenObserve results
+  note: >-
+    ObservePoint ships no hosted MCP endpoint and no stdio package. Nothing below is an endpoint anyone
+    can call; it is a candidate tool surface derived from the published REST contract so the gap is legible.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: api-key
+  verified: derived
+  note: >-
+    mode is `none` because no server exists. If ObservePoint were to build one, auth would be the same
+    user-level API key the REST API uses (Authorization: api_key <key>) — there is no OAuth surface to
+    delegate to.
+candidate_tools:
+- name: observepoint_list_audits
+  description: List the web audits the API key's user can see.
+  rest: [getWebAudits]
+  spec: openapi/observepoint-v3-api-openapi.yml
+  method: GET
+  path: /v3/web-audits
+  consequence: read
+- name: observepoint_get_audit
+  description: Fetch one web audit's configuration.
+  rest: [getWebAudit]
+  spec: openapi/observepoint-v2-api-openapi.yml
+  method: GET
+  path: /web-audits/{webAuditId}
+  consequence: read
+- name: observepoint_list_audit_runs
+  description: List the runs of a web audit.
+  rest: [getRuns]
+  spec: openapi/observepoint-v2-api-openapi.yml
+  method: GET
+  path: /web-audits/{webAuditId}/runs
+  consequence: read
+- name: observepoint_get_audit_run_scores
+  description: Get the headline scores for one audit run.
+  rest: [getAuditRunScores]
+  spec: openapi/observepoint-v3-api-openapi.yml
+  method: GET
+  path: /v3/web-audits/{auditId}/runs/{runId}/scores
+  consequence: read
+- name: observepoint_list_audit_run_pages
+  description: List the pages visited in one audit run.
+  rest: [getAuditRunPages]
+  spec: openapi/observepoint-v3-api-openapi.yml
+  method: GET
+  path: /v3/web-audits/{auditId}/runs/{runId}/pages
+  consequence: read
+- name: observepoint_list_audit_run_cookies
+  description: List the cookies observed in one audit run.
+  rest: [getCookies]
+  spec: openapi/observepoint-v3-api-openapi.yml
+  method: GET
+  path: /v3/web-audits/{auditId}/runs/{runId}/cookies
+  consequence: read
+- name: observepoint_get_tag_inventory
+  description: Tag inventory summary for an audit run.
+  rest: [getAuditRunTagInventorySummary]
+  spec: openapi/observepoint-v3-api-openapi.yml
+  method: POST
+  path: /v3/web-audits/{auditId}/runs/{runId}/reports/tag-inventory
+  consequence: read
+- name: observepoint_get_cookie_privacy
+  description: Cookie-privacy compliance findings for an audit run.
+  rest: [getAuditRunCookiePrivacyCompliance]
+  spec: openapi/observepoint-v3-api-openapi.yml
+  method: POST
+  path: /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-privacy/compliance
+  consequence: read
+- name: observepoint_get_rule_results
+  description: Rule (tag and variable assertion) results for an audit run.
+  rest: [getAuditRunAllRuleResultsOverview]
+  spec: openapi/observepoint-v3-api-openapi.yml
+  method: POST
+  path: /v3/web-audits/{auditId}/runs/{runId}/reports/rule-summary/rule-results
+  consequence: read
+- name: observepoint_grid_schema
+  description: List the available columns and types for a Grid entity, so a query can be composed.
+  rest: [getGridSchema]
+  spec: openapi/observepoint-grid-reports-api-openapi.yml
+  method: GET
+  path: /v3/reports/grid/{gridEntityType}/schema
+  consequence: read
+- name: observepoint_grid_query
+  description: >-
+    Query any ObservePoint report as rows and columns with filters, sorting, grouping and pagination.
+    The single highest-leverage candidate tool — it subsumes most of the read surface.
+  rest: [getGridData]
+  spec: openapi/observepoint-grid-reports-api-openapi.yml
+  method: POST
+  path: /v3/reports/grid/{gridEntityType}
+  consequence: read
+- name: observepoint_run_audit
+  description: Start an audit run now.
+  rest: [runAuditNow]
+  spec: openapi/observepoint-v2-api-openapi.yml
+  method: POST
+  path: /web-audits/{webAuditId}/runs
+  consequence: write
+  escalation: confirm
+  note: Consumes subscription run quota; reversible only by stopping the run before it completes (stopAuditRun).
+- name: observepoint_run_web_journey
+  description: Start a web journey run now.
+  rest: [runWebJourney]
+  spec: openapi/observepoint-v3-api-openapi.yml
+  method: POST
+  path: /v3/web-journeys/{webJourneyId}/runs
+  consequence: write
+  escalation: confirm
+  note: Returns 409 AlreadyRunning (code 33) if a run is in flight; 34 if the usage limit is exceeded.
+- name: observepoint_stop_audit_run
+  description: Stop and discard an in-flight audit run.
+  rest: [stopAuditRun]
+  spec: openapi/observepoint-v2-api-openapi.yml
+  method: DELETE
+  path: /web-audits/{webAuditId}/runs/{runId}
+  consequence: write
+  escalation: confirm
+coverage:
+  candidate_tool_count: 14
+  rest_operations_available: 381
+  note: >-
+    381 published operations across the three specs (283 v3, 88 v2, 10 Grid). The candidate set above is
+    deliberately small and read-heavy; the Grid query tool covers most reporting on its own.
+gaps:
+- No MCP server, so no live tools/list and no real inputSchema — the schemas above would come from the OpenAPI parameters.
+- No OAuth surface, so a hosted server would have to accept a raw user API key.
+- No tool crosswalk is emitted (mcp/observepoint-tool-crosswalk.yml is absent) because there is no MCP or GraphQL surface to bind REST operations to.

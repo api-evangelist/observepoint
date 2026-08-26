@@ -1,0 +1,97 @@
+generated: '2026-08-26'
+method: probed
+source: live GET probes of /.well-known/* on every ObservePoint host in apis.yml and in the OpenAPI servers[] blocks
+note: >-
+  ObservePoint serves no /.well-known documents on any host. api.observepoint.com answers every path with
+  its normal JSON 404 envelope ({"message":"Requested resource not found","errorCode":0}); www.observepoint.com
+  returns the WordPress 404 page (or an nginx 404 for security.txt); api-docs.observepoint.com returns the
+  Redocly SPA 404 shell; app.observepoint.com is an S3-backed origin that answers 403 AccessDenied for every
+  /.well-known path. No security.txt, no api-catalog, no OAuth/OIDC metadata, no agent card. Because nothing
+  returned a real document, NO WellKnown / SecurityTxt / APICatalog pointer is emitted in apis.yml — this file
+  records a measured absence, not a served surface.
+hosts:
+- host: api.observepoint.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: www.observepoint.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: api-docs.observepoint.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: app.observepoint.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+  - path: /.well-known/openid-configuration
+    status: 403
+  - path: /.well-known/oauth-authorization-server
+    status: 403
+  - path: /.well-known/oauth-protected-resource
+    status: 403
+  - path: /.well-known/api-catalog
+    status: 403
+  - path: /.well-known/ai-plugin.json
+    status: 403
+  - path: /.well-known/agent-card.json
+    status: 403
+  - path: /.well-known/agent.json
+    status: 403
+llms_txt:
+  note: >-
+    ObservePoint does publish llms.txt (two of them), but not under /.well-known — they sit at the site root.
+    Both are saved verbatim in llms/ and wired as type LLMsTxt.
+  documents:
+  - url: https://api-docs.observepoint.com/llms.txt
+    status: 200
+    file: ../llms/observepoint-llms.txt
+  - url: https://www.observepoint.com/llms.txt
+    status: 200
+    file: ../llms/observepoint-site-llms.txt
+  - url: https://api-docs.observepoint.com/llms-full.txt
+    status: 404

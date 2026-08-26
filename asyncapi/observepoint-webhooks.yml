@@ -1,0 +1,130 @@
+generated: '2026-08-26'
+method: searched
+source: https://api-docs.observepoint.com/sections/webhook
+docs: https://api-docs.observepoint.com/sections/webhook
+asyncapi_published: false
+note: >-
+  ObservePoint publishes NO AsyncAPI document and no event-catalog spec — a full probe of the docs host,
+  the API host and the GitHub org found nothing (/asyncapi.yaml, /asyncapi.json and the org repo list all
+  miss). It DOES publish a real, well-specified webhook surface with HMAC-SHA256 request signing, so this
+  file captures the webhook catalog and apis.yml carries `type: Webhooks` (not `type: AsyncAPI`). The
+  catalog below is transcribed verbatim from the provider's own webhook page; nothing here is inferred.
+transport: HTTPS POST to a customer-supplied URL
+delivery: at-completion, fire-and-forget
+retry_policy_published: false
+event_count: 2
+events:
+- name: audit.run.completed
+  published_name: null
+  note: >-
+    ObservePoint does not name its events. There is ONE payload shape, discriminated by the `itemType`
+    field; the two rows here are that discriminator's values, not two published event names.
+  trigger: An audit run finishes, successfully or not
+  discriminator:
+    field: itemType
+    value: audit
+  payload:
+    itemId: The ID of the audit
+    runId: The run ID of the completed audit
+    itemType: '"audit"'
+  example: '{"itemId": 12345, "itemType": "audit", "runId": 98765}'
+- name: web-journey.run.completed
+  published_name: null
+  trigger: A web journey run finishes, successfully or not
+  discriminator:
+    field: itemType
+    value: web-journey
+  payload:
+    itemId: The ID of the journey
+    runId: The run ID of the completed journey
+    itemType: '"web-journey"'
+  example: '{"runId": 873230, "itemType": "web-journey", "itemId": 748316}'
+payload_shape:
+  media_type: application/json
+  fields:
+  - name: itemId
+    type: integer
+    description: The ID of the audit or journey.
+  - name: runId
+    type: integer
+    description: The run ID of the completed audit or journey.
+  - name: itemType
+    type: string
+    enum: [audit, web-journey]
+    description: Indicates whether the run is an "audit" or "web-journey".
+  note: >-
+    The payload is a pointer, not a result. It carries no findings — the consumer is expected to call
+    back into the API with itemId + runId to pull the report.
+subscription:
+  api:
+    field: webHookUrl
+    operations:
+    - method: POST
+      path: /v2/web-audits
+      note: set the webhook URL when creating an audit
+    - method: POST
+      path: /v2/web-journeys
+      note: set the webhook URL when creating a journey
+    - method: PUT
+      path: /v2/web-audits/{auditId}
+      note: assign or change the webhook URL on an existing audit
+    - method: PUT
+      path: /v2/web-journeys/{journeyId}
+      note: assign or change the webhook URL on an existing journey
+    spec_coverage: >-
+      The `webHookUrl` field IS present in the request/response schemas of both the v2 and v3 OpenAPI
+      documents, so the subscription surface is machine-readable even though the event surface is not.
+  ui: app.observepoint.com > Data Sources > Edit an audit or journey > webhook URL > Save
+  scope: per-audit and per-journey (optional; there is no account-wide subscription)
+security:
+  signing: true
+  header: ObservePoint-Signature
+  header_example: t=1693325764,sigv1=3eae1baf0f7f9ed8f9db7e88f27c2f3f3fbb0a73e839b6e10b0d8bb1a71a449d
+  algorithm: HMAC-SHA256
+  canonical_payload: '<timestamp> + "." + <raw webhook body>'
+  key_encoding: the shared secret is base64; decode it before use as the HMAC key
+  signature_encoding: base64
+  verification_steps:
+  - Extract the timestamp (t) and signature (sigv1) from the ObservePoint-Signature header.
+  - Concatenate the timestamp, a period (.), and the raw webhook payload body.
+  - Compute an HMAC SHA-256 signature using your stored sharedSecret.
+  - Compare your computed signature to the value of sigv1 (constant-time).
+  on_failure: Reject the request with 403 (or another error status).
+  replay_protection:
+    timestamp_present: true
+    tolerance_published: false
+    note: >-
+      The timestamp is signed, which makes replay detection POSSIBLE, but ObservePoint publishes no
+      recommended tolerance window and its own sample verifiers do not check the timestamp age. A
+      consumer copying the published Python/JavaScript snippet verbatim gets no replay protection.
+  secret_provisioning:
+    endpoint: POST https://api.observepoint.com/v3/webhooks/rotate-secret
+    permission: Admin
+    response: '{ "sharedSecret": "string", "accountId": number }'
+    shown_once: true
+    account_wide: true
+    spec_coverage: none
+    note: >-
+      Documented in prose only — no /v3/webhooks path exists in any published OpenAPI document, so an
+      agent working from the spec alone cannot discover, provision or rotate the signing secret.
+  reference_implementations:
+  - language: Python
+    source: https://api-docs.observepoint.com/sections/webhook
+  - language: JavaScript (Node.js)
+    source: https://api-docs.observepoint.com/sections/webhook
+documented_use_cases:
+- Check for unapproved cookies or tags and record them in an issue tracker, like Jira
+- Trigger a script to pull the page details report and email the results to recipients listed in the notifications field
+- Ingest results into a BI system such as Tableau by triggering a data import when an audit or journey completes
+- Integrate with Teams or Slack — trigger a message notifying of rule failures
+gaps:
+- No AsyncAPI (or CloudEvents) document, so the event surface is not machine-readable.
+- No published event names; the payload is discriminated by a string field.
+- No documented retry, backoff or dead-letter behaviour on delivery failure.
+- No published timestamp-tolerance guidance, and the sample verifiers do not implement replay checks.
+- The secret-rotation endpoint is absent from all three OpenAPI documents.
+probes:
+- url: https://api-docs.observepoint.com/sections/webhook
+  status: 200
+- url: https://api-docs.observepoint.com/asyncapi.yaml
+  status: 404

@@ -1,0 +1,99 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the ObservePoint V3 API
+  version: 1.0.0
+extends: ../openapi/observepoint-v3-api-openapi.yml
+x-provenance:
+  generated: '2026-08-26'
+  method: generated
+  source: >-
+    Enhancements derived from ObservePoint's own published documentation
+    (https://api-docs.observepoint.com/, /sections/rate-limiting, /sections/webhook) applied over the
+    verbatim spec at https://api-docs.observepoint.com/_bundle/openapi/combined.openapi.yaml.
+    The original openapi/ file is never mutated.
+  note: >-
+    Every action below adds a fact ObservePoint publishes in prose but omits from the contract. Nothing
+    here invents behaviour.
+actions:
+- target: $.info
+  description: Add contact, licence-free terms and documentation pointers the bundle omits.
+  update:
+    contact:
+      name: ObservePoint
+      url: https://www.observepoint.com/contact-us/
+      email: sales@observepoint.com
+    x-documentation-url: https://api-docs.observepoint.com/
+    x-support-url: https://help.observepoint.com/
+    x-changelog-url: https://news.observepoint.com/
+- target: $.info
+  description: >-
+    Record the authentication header form the Getting Started guide documents, which differs from the
+    securityScheme description in the bundle.
+  update:
+    x-authentication:
+      header: Authorization
+      value: 'api_key <YOUR_API_KEY>'
+      key_scope: user
+      issuance: https://app.observepoint.com/my-profile
+      source: https://api-docs.observepoint.com/
+- target: $.info
+  description: Record published rate limits and the 429 contract, absent from every operation in the spec.
+  update:
+    x-rate-limits:
+      scope: per-api-key
+      requests_per_minute_range: 100-1000
+      status_on_exhaustion: 429
+      response_headers: none published
+      retry_guidance: wait and retry, a few seconds up to 5 minutes
+      billing: rate-limited requests are not billed
+      source: https://api-docs.observepoint.com/sections/rate-limiting
+- target: $.info
+  description: Record the webhook event surface, which has no representation in the OpenAPI document.
+  update:
+    x-webhooks:
+      subscription_field: webHookUrl
+      signature_header: ObservePoint-Signature
+      signature_algorithm: HMAC-SHA256 over "<timestamp>.<raw-body>", base64
+      secret_rotation: POST /v3/webhooks/rotate-secret (Admin; not present in this spec)
+      payload: '{ itemId, runId, itemType }'
+      source: https://api-docs.observepoint.com/sections/webhook
+- target: $.info
+  description: Record the pagination contract that applies across the paginated read surface.
+  update:
+    x-pagination:
+      style: page-number
+      params:
+        size: 50-10000 (recommended 100)
+        page: zero-based
+      response_envelope: metadata.pagination
+      fields: [totalCount, totalPageCount, pageSize, currentPageSize, currentPageNumber]
+      source: https://api-docs.observepoint.com/
+- target: $.info
+  description: Record the reversibility posture derived in conventions/observepoint-conventions.yml.
+  update:
+    x-reversibility:
+      grade: documented
+      restorable:
+      - entity: web audit
+        reversal: undeleteWebAudit
+      - entity: web journey
+        reversal: undeleteWebJourney
+      window_published: false
+      partial: configuration is restored; historical run data is not
+      irreversible:
+      - webhook signing-secret rotation
+      - deletion of alerts, exports, action sets, consent categories, users, folders, labels and rules
+- target: $.paths['/v3/web-audits/latest-runs'].get
+  description: Note that this deprecated operation names no replacement and no sunset date.
+  update:
+    x-deprecation:
+      replacement: unknown
+      sunset: null
+      note: Marked deprecated in the published spec with no migration path documented.
+- target: $.paths['/v3/consent-categories/export'].post
+  description: Note that this deprecated operation names no replacement and no sunset date.
+  update:
+    x-deprecation:
+      replacement: unknown
+      sunset: null
+      note: Marked deprecated in the published spec with no migration path documented.

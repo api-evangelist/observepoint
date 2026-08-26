@@ -1,0 +1,65 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the ObservePoint Grid Reporting API
+  version: 1.0.0
+extends: ../openapi/observepoint-grid-reports-api-openapi.yml
+x-provenance:
+  generated: '2026-08-26'
+  method: generated
+  source: >-
+    Enhancements derived from https://api-docs.observepoint.com/sections/grid-api-intro,
+    /sections/grid-api-filters, /sections/grid-api-sorting, /sections/grid-api-grouping,
+    /sections/grid-api-pagination, /sections/grid-api-exports and /sections/rate-limiting, applied over
+    the verbatim spec at https://api-docs.observepoint.com/_bundle/openapi/GRID-API.openapi.yaml.
+actions:
+- target: $.info
+  description: Add contact and documentation pointers.
+  update:
+    contact:
+      name: ObservePoint
+      url: https://www.observepoint.com/contact-us/
+    x-documentation-url: https://api-docs.observepoint.com/sections/grid-api-intro
+    x-examples-url: https://api-docs.observepoint.com/sections/grid-api-examples
+- target: $.info
+  description: >-
+    Record the Grid query language — the operator set, the pagination fields and the grouping/sorting
+    surface — which the docs specify fully but the contract only implies through generic schemas.
+  update:
+    x-grid-query:
+      filter_shape: '{ filteredColumn: { columnId }, operator, arg }'
+      operators:
+      - string_contains
+      - string_regex
+      - string_contains_multi
+      - integer_in
+      - number_between
+      - date_time_between
+      - date_time_relative
+      - is_present
+      - integer_list_contains
+      pagination:
+        location: request body
+        size: 10-10000
+        page: zero-based
+        response_envelope: metadata.pagination
+      sorting: multi-column with explicit order
+      grouping: group mode with aggregate functions
+      column_discovery: GET /v3/reports/grid/{gridEntityType}/schema (getGridSchema)
+      source: https://api-docs.observepoint.com/sections/grid-api-filters
+- target: $.info
+  description: Record the rate-limit contract, absent from every operation.
+  update:
+    x-rate-limits:
+      scope: per-api-key
+      requests_per_minute_range: 100-1000
+      status_on_exhaustion: 429
+      response_headers: none published
+      source: https://api-docs.observepoint.com/sections/rate-limiting
+- target: $.paths['/v3/reports/grid/{gridEntityType}'].post
+  description: >-
+    Flag the discovery dependency — a caller must read the entity schema before it can name a valid
+    columnId in a filter, sort or grouping clause.
+  update:
+    x-depends-on:
+      operationId: getGridSchema
+      reason: columnId values are defined per grid entity type and must be read from the schema endpoint first.

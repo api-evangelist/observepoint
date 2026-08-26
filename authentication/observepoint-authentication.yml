@@ -1,0 +1,54 @@
+generated: '2026-08-26'
+method: searched
+source: https://api-docs.observepoint.com/ (Getting Started > Authentication); corroborated by securitySchemes in openapi/observepoint-v3-api-openapi.yml, openapi/observepoint-grid-reports-api-openapi.yml, openapi/observepoint-v2-api-openapi.yml
+docs: https://api-docs.observepoint.com/
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+  oauth2: false
+  openid_connect: false
+  mutual_tls: false
+  note: >-
+    Single auth model across every ObservePoint API surface (v2, v3 and the Grid Reporting API): a
+    user-level API key sent in the Authorization header. There is no OAuth 2.0, no OpenID Connect and
+    no scope surface, so scopes/ is intentionally absent for this provider.
+schemes:
+- name: API_Key
+  type: apiKey
+  in: header
+  parameter: Authorization
+  description: |-
+    Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+    Example: `Authorization: abc123...def456`
+  sources:
+  - openapi/observepoint-grid-reports-api-openapi.yml
+  - openapi/observepoint-v2-api-openapi.yml
+  - openapi/observepoint-v3-api-openapi.yml
+docs_detail:
+  header: Authorization
+  prefix: api_key
+  documented_form: 'Authorization: api_key YOUR_API_KEY_HERE'
+  note: >-
+    The published Getting Started guide documents the header value with an `api_key ` prefix
+    ("Authorization: api_key YOUR_API_KEY_HERE"), while the OpenAPI securityScheme description shows the
+    bare key ("Authorization: abc123...def456"). The docs example is the authoritative form; the spec
+    description is inconsistent with it. Recorded as published, not reconciled.
+  key_scope: user
+  key_issuance: Self-service from the user profile page in the ObservePoint app (app.observepoint.com/my-profile)
+  rotation: Documented for webhook signing secrets (POST /v3/webhooks/rotate-secret); no documented API-key rotation endpoint
+  source: https://api-docs.observepoint.com/
+observed:
+- url: https://api.observepoint.com/v2/api-docs
+  http_status: 401
+  body: Bearer token is absent
+  note: Unauthenticated request to an api.observepoint.com path returns 401 with a plain-text body.
+  probed: '2026-08-26'
+webhook_authentication:
+  mechanism: HMAC-SHA256 request signature
+  header: ObservePoint-Signature
+  format: t=<unix-timestamp>,sigv1=<base64 HMAC-SHA256 of "<timestamp>.<raw-body>">
+  secret_provisioning: POST https://api.observepoint.com/v3/webhooks/rotate-secret (Admin permission required; secret shown once)
+  source: https://api-docs.observepoint.com/sections/webhook

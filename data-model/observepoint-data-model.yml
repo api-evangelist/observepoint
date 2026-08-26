@@ -1,0 +1,267 @@
+generated: '2026-08-26'
+method: derived
+source: >-
+  openapi/observepoint-v3-api-openapi.yml (path hierarchy + $ref graph + id-reference fields),
+  openapi/observepoint-v2-api-openapi.yml, openapi/observepoint-grid-reports-api-openapi.yml;
+  entity vocabulary cross-checked against https://api-docs.observepoint.com/sections/grid-api-entities
+note: >-
+  Derived from the published contracts and the Grid API entity list. The provider's own data-model
+  documentation page (https://api-docs.observepoint.com/sections/data-model) is a published TODO stub —
+  it lists the entity names and says "Explain all the data model concepts in the ObservePoint API" — so
+  the relationships below come from the URL hierarchy and schema id-fields, not from prose.
+  1,211 component schemas exist across the three documents; only the load-bearing entities are modelled.
+id_conventions:
+  style: opaque integers
+  common_fields:
+  - id
+  - accountId
+  - folderId
+  - subFolderId (domainId in v2)
+  - auditId
+  - runId
+  - pageId
+  - tagId
+  - tagCategoryId
+  - tagVendorId
+  - userId
+  - consentCategoryId
+  - actionId
+  prefixed_ids: false
+  note: >-
+    No type-prefixed identifiers (no "aud_", no "run_"). Every id is a bare integer, so an id carries no
+    information about the entity it belongs to and must always be paired with its parent path.
+entities:
+- name: Account
+  description: The tenant. Owns folders, users, rules, consent categories and the webhook signing secret.
+  path: /account (v2)
+  relationships:
+  - has_many: Folder
+    via: accountId
+  - has_many: User
+    via: accountId
+  - has_many: Rule
+    via: accountId
+  - has_many: ConsentCategory
+    via: accountId
+- name: Folder
+  description: Top-level organisational container.
+  path: /folders (v2)
+  relationships:
+  - belongs_to: Account
+    via: accountId
+  - has_many: SubFolder
+    via: folderId
+- name: SubFolder
+  description: Second-level container, called "domain" in the v2 API and "sub-folder" in the UI and v3.
+  path: /domains (v2)
+  relationships:
+  - belongs_to: Folder
+    via: folderId
+  - has_many: WebAudit
+    via: domainId
+  - has_many: WebJourney
+    via: domainId
+  note: >-
+    The v2/v3 naming split is a real integration hazard — GET /domains (v2) returns what v3 and the UI
+    call sub-folders.
+- name: WebAudit
+  description: A configured crawl of a site — starting URLs, limits, blocking config, actions, rules, schedule.
+  paths:
+  - /web-audits (v2, configuration)
+  - /v3/web-audits (v3, reporting)
+  relationships:
+  - belongs_to: SubFolder
+    via: domainId
+  - has_many: AuditRun
+    via: auditId
+  - has_many: Label
+    via: auditId
+  - has_many: Rule
+    via: webAuditId
+  - has_one: ConsentCategory
+    via: auditId
+    optional: true
+  reversible_delete: true
+  restore_operation: undeleteWebAudit
+- name: AuditRun
+  description: One execution of an audit. The root of every results report.
+  path: /v3/web-audits/{auditId}/runs/{runId}
+  relationships:
+  - belongs_to: WebAudit
+    via: auditId
+  - has_many: Page
+    via: runId
+  - has_many: Cookie
+    via: runId
+  - has_many: Tag
+    via: runId
+  - has_many: NetworkRequest
+    via: runId
+  - has_many: BrowserLog
+    via: runId
+  - has_many: RuleResult
+    via: runId
+  - has_many: Alert
+    via: runId
+  note: >-
+    137 of the 250 v3 paths hang off /v3/web-audits, and almost all of them are
+    /{auditId}/runs/{runId}/reports/... — the audit run is the hub of the entire read model.
+- name: Page
+  description: A web page visited during an audit run.
+  path: /v3/web-audits/{auditId}/runs/{runId}/pages
+  relationships:
+  - belongs_to: AuditRun
+    via: runId
+  - has_many: Cookie
+    via: pageId
+  - has_many: Tag
+    via: pageId
+  - has_many: NetworkRequest
+    via: pageId
+  - has_many: BrowserLog
+    via: pageId
+- name: Cookie
+  description: A cookie observed on a page, with attributes, domain and privacy/consent classification.
+  path: /v3/web-audits/{auditId}/runs/{runId}/cookies
+  relationships:
+  - belongs_to: Page
+    via: pageId
+  - belongs_to: AuditRun
+    via: runId
+  - has_one: ConsentCategory
+    via: consentCategorySnapshotId
+    optional: true
+- name: Tag
+  description: A marketing/analytics tag detected on a page, resolved to a vendor and category.
+  path: /v3/web-audits/{auditId}/runs/{runId}/reports/tag-inventory
+  relationships:
+  - belongs_to: Page
+    via: pageId
+  - belongs_to: TagVendor
+    via: tagVendorId
+  - belongs_to: TagCategory
+    via: tagCategoryId
+  - has_many: Variable
+    via: tagId
+- name: Variable
+  description: A tag variable (e.g. an Adobe eVar or a GA parameter) and its observed value.
+  path: /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory
+  relationships:
+  - belongs_to: Tag
+    via: tagId
+- name: Rule
+  description: A tag-and-variable assertion evaluated against audit and journey results.
+  paths:
+  - /rules (v2)
+  - /v3/rule-library
+  relationships:
+  - belongs_to: Account
+    via: accountId
+  - has_many: RuleResult
+    via: ruleSnapshotId
+  - applied_to: WebAudit
+    via: webAuditId
+  - applied_to: WebJourney
+    via: webJourneyId
+- name: WebJourney
+  description: A scripted multi-step user path, built from action sets and actions.
+  path: /v3/web-journeys
+  relationships:
+  - belongs_to: SubFolder
+    via: domainId
+  - has_many: WebJourneyRun
+    via: webJourneyId
+  - has_many: ActionSet
+    via: webJourneyId
+  - has_many: CustomHeaderGroup
+    via: webJourneyId
+  reversible_delete: true
+  restore_operation: undeleteWebJourney
+- name: WebJourneyRun
+  description: One execution of a journey, with per-action results and errors.
+  path: /v3/web-journeys/{webJourneyId}/runs/{runId}
+  relationships:
+  - belongs_to: WebJourney
+    via: webJourneyId
+  - has_many: JourneyAction
+    via: runId
+- name: ActionSet
+  description: A reusable ordered set of journey actions with their own rules.
+  path: /v3/action-sets
+  relationships:
+  - has_many: Action
+    via: actionSetId
+  - has_many: ActionRule
+    via: actionSetId
+- name: ConsentCategory
+  description: A declared classification of approved/unapproved cookies, tags and requests.
+  path: /v3/consent-categories
+  relationships:
+  - belongs_to: Account
+    via: accountId
+  - applied_to: WebAudit
+    via: auditId
+- name: Alert
+  description: A threshold or condition on a report that fires notifications.
+  path: /v3/alerts
+  relationships:
+  - belongs_to: Account
+    via: accountId
+  - scoped_to: WebAudit
+    via: auditId
+    optional: true
+- name: EmailInbox
+  description: A monitored inbox used for email link validation, with per-message audit runs.
+  path: /v3/email-inboxes
+  relationships:
+  - has_many: EmailInboxMessage
+    via: emailInboxId
+  - has_many: WebAudit
+    via: auditId
+    note: audit configurations attached to the inbox
+- name: SiteCensus
+  description: A broad discovery scan of a site's surface.
+  path: /v3/site-censuses
+  relationships:
+  - belongs_to: Account
+    via: accountId
+- name: Export
+  description: An asynchronous file export of a report; scheduled exports repeat on a cadence.
+  paths:
+  - /v3/exports
+  - /v3/exports/scheduled
+  relationships:
+  - produced_from: AuditRun
+    via: runId
+- name: User
+  description: An account member. API keys are issued per user, so permissions are per user.
+  path: /users (v2)
+  relationships:
+  - belongs_to: Account
+    via: accountId
+- name: Label
+  description: Free-form tagging primitive applied to audits, journeys and runs.
+  path: /labels (v2)
+  relationships:
+  - applied_to: WebAudit
+    via: auditId
+  - applied_to: WebJourney
+  - applied_to: WebJourneyRun
+grid_entities:
+  note: >-
+    The Grid Reporting API exposes the same core entities as flat row/column datasets addressed by
+    {gridEntityType}, with a per-entity schema endpoint (getGridSchema) that returns the available
+    columns and their types. This is the flattened projection of the graph above.
+  source: https://api-docs.observepoint.com/sections/grid-api-entities
+  entities:
+  - Audit Runs
+  - Web Journey Runs
+  - Pages
+  - Cookies
+  - Tags
+  - Network Requests
+  - Console Logs
+gaps:
+- The provider's own data-model page is an unfinished TODO stub, so no authoritative ERD is published.
+- Identifiers are untyped integers with no prefix scheme, so ids are not self-describing.
+- v2 calls a sub-folder a "domain"; the same entity has two names across the two supported versions.

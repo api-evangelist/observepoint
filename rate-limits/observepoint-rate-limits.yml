@@ -1,0 +1,70 @@
+generated: '2026-08-26'
+method: searched
+source: https://api-docs.observepoint.com/sections/rate-limiting
+docs: https://api-docs.observepoint.com/sections/rate-limiting
+limit_count: 3
+scope: per-api-key
+enforcement_status: 429
+note: >-
+  ObservePoint publishes a dedicated rate-limiting page. Limits are enforced per API key and vary by
+  endpoint; the docs give a band rather than a per-endpoint table. Critically, NO rate-limit response
+  headers are documented anywhere (no X-RateLimit-*, no RateLimit-*, no Retry-After), and 429 is not
+  declared on a single operation in any of the three published OpenAPI documents — so an agent has no
+  runtime signal at all and must discover exhaustion by receiving a bare 429.
+rate_limits:
+- scope: per-api-key
+  applies_to: most endpoints (lower band)
+  limit: 100
+  window: 1m
+  unit: requests
+  source: https://api-docs.observepoint.com/sections/rate-limiting
+  quote: >-
+    The rate limit varies between API endpoints, but as a general rule, the API will allow between 100
+    and 600 requests per minute, with some endpoints allowing 1,000 requests per minute.
+- scope: per-api-key
+  applies_to: most endpoints (upper band)
+  limit: 600
+  window: 1m
+  unit: requests
+  source: https://api-docs.observepoint.com/sections/rate-limiting
+- scope: per-api-key
+  applies_to: some endpoints
+  limit: 1000
+  window: 1m
+  unit: requests
+  source: https://api-docs.observepoint.com/sections/rate-limiting
+response_headers:
+  documented: false
+  headers: []
+  retry_after: false
+  note: >-
+    Checked the rate-limiting page, the Getting Started page and all three OpenAPI documents. No
+    rate-limit headers are published and none are declared in any spec response.
+exhaustion:
+  status: 429
+  behaviour: >-
+    Wait and retry. "Usually a few seconds will suffice. Sometimes your code will need to retry for up
+    to 5 minutes. Your code cannot cause harm by continuing to retry when it receives a 429 response."
+  backoff_guidance: retry-with-wait (no published algorithm, no Retry-After header)
+  billing: >-
+    "You will not be billed if your code gets rate limited." Rate-limited requests do not consume paid usage.
+  source: https://api-docs.observepoint.com/sections/rate-limiting
+stability:
+  note: >-
+    "ObservePoint occasionally changes rate limits to ensure the API can operate reliably." The published
+    numbers are explicitly non-contractual.
+other_quotas:
+- name: Grid API page size
+  limit: 10000
+  min: 10
+  unit: records per page
+  source: https://api-docs.observepoint.com/sections/grid-api-pagination
+- name: v3 pagination page size
+  limit: 10000
+  min: 50
+  unit: records per page
+  source: https://api-docs.observepoint.com/
+- name: Journey run usage limit
+  signal: WebJourneyRun_ErrorCode 34 (UsageLimitExceeded)
+  source: openapi/observepoint-v3-api-openapi.yml
+  note: Subscription-level run quota, surfaced as a domain error code rather than a rate limit.

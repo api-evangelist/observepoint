@@ -1,0 +1,49 @@
+generated: '2026-08-26'
+method: generated
+source: >-
+  Authored from ObservePoint's own published contracts (openapi/observepoint-v3-api-openapi.yml,
+  openapi/observepoint-v2-api-openapi.yml, openapi/observepoint-grid-reports-api-openapi.yml) and its
+  documentation at https://api-docs.observepoint.com/. Every operationId referenced in every skill was
+  grepped out of a published spec; none is invented. ObservePoint publishes no skills/ or AGENTS.md of
+  its own — a search of the docs host, the help centre and the GitHub org found nothing.
+provider_published_skills: false
+skill_count: 5
+skills:
+- name: observepoint-run-audit-and-collect-results
+  file: observepoint-run-audit-and-collect-results.md
+  description: Trigger an audit on demand, wait for the run, then pull scores and page results.
+  apis: [ObservePoint V2 API, ObservePoint V3 API]
+  operations: [getAllWebAudits, runAuditNow, getRuns, getRun, getAuditRunInfo, getAuditRunScores, getAuditRunPages, stopAuditRun]
+  consequence: write
+- name: observepoint-query-grid-reports
+  file: observepoint-query-grid-reports.md
+  description: Query any ObservePoint report as rows and columns with filters, sorting, grouping and pagination.
+  apis: [ObservePoint Grid Reporting API]
+  operations: [getGridSchema, getGridData, createSavedReport, getSavedReportsList, deleteSavedReport]
+  consequence: read-with-optional-write
+- name: observepoint-privacy-and-consent-review
+  file: observepoint-privacy-and-consent-review.md
+  description: Pull cookie/tag/request privacy findings for a run and reconcile them against declared consent categories.
+  apis: [ObservePoint V3 API]
+  operations: [getAuditRunCookiePrivacyCompliance, getAuditRunTagPrivacyCompliance, getAuditRunRequestPrivacyCompliance, getCookies, getAuditRunCookieInventoryCookies, getAuditRunConsentCategories, getConsentCategoryLibrary, getConsentCategory, getConsentCategoryCookieEntries]
+  consequence: read
+- name: observepoint-update-audit-configuration
+  file: observepoint-update-audit-configuration.md
+  description: Read-modify-write an audit's configuration safely, including starting URLs and webhook destination.
+  apis: [ObservePoint V2 API]
+  operations: [getAllWebAudits, getWebAudit, updateWebAudit, createWebAudit, getWebAuditAvailableLocations, getWebAuditAvailableFrequencies, getWebAuditAvailableUserAgents, getWebAuditRules, updateWebAuditRules]
+  consequence: write
+- name: observepoint-handle-completion-webhook
+  file: observepoint-handle-completion-webhook.md
+  description: Receive, HMAC-verify and act on an audit or journey completion webhook, and rotate the signing secret.
+  apis: [ObservePoint V2 API, ObservePoint V3 API, ObservePoint Grid Reporting API]
+  operations: [createWebAudit, updateWebAudit, getAuditRunInfo, getAuditRunScores, getGridData]
+  consequence: write
+shared_rules:
+  auth: 'Authorization: api_key <YOUR_API_KEY> on every request; keys are per user'
+  content_type: application/json for POST/PUT; application/json-patch+json for PATCH
+  idempotency: none — no Idempotency-Key header exists on any operation; list-before-retry on creates
+  pagination: size (50-10000, 10-10000 on Grid) + zero-based page; iterate to metadata.pagination.totalCount
+  rate_limits: 100-1000 req/min per key, 429 on exhaustion, NO rate-limit headers, back off up to 5 minutes
+  errors: proprietary JSON envelopes, not RFC 9457; see errors/observepoint-problem-types.yml
+  reversibility: audits and journeys are restorable (undeleteWebAudit / undeleteWebJourney) with no published window; everything else deletes permanently

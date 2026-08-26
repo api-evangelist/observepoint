@@ -1,0 +1,6464 @@
+openapi: 3.0.0
+info:
+  description: ''
+  title: V2 API
+  version: null
+paths:
+  /account:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/account</div>
+      operationId: getAccount
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Returns account for current user
+      tags:
+        - Account
+  /domains:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/domains</div>
+      operationId: getDomains
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Domain'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get list of all sub-folders
+      tags:
+        - Sub-Folders
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/domains</div>
+      operationId: createDomain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewDomain'
+        description: New sub-folder info
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Create new sub-folder
+      tags:
+        - Sub-Folders
+  /domains/{domainId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/domains/<span class="op-path-parameter">{domainId}</span></div>
+      operationId: getDomain
+      parameters:
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get sub-folder by id
+      tags:
+        - Sub-Folders
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/domains/<span class="op-path-parameter">{domainId}</span></div>
+      operationId: updateDomain
+      parameters:
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainUpdate'
+        description: Sub-folder update information
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Update sub-folder with given id
+      tags:
+        - Sub-Folders
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/domains/<span
+        class="op-path-parameter">{domainId}</span></div>
+      operationId: deleteDomain
+      parameters:
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '423':
+          description: >-
+            Following items are still running. Please stop & discard their
+            active runs first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemsAreRunningApiError'
+      security:
+        - API_Key: []
+      summary: Delete sub-folder with given id
+      tags:
+        - Sub-Folders
+  /domains/{domainId}/web-audits:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/domains/<span
+        class="op-path-parameter">{domainId}</span>/web-audits</div>
+      operationId: getAudits
+      parameters:
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: withRuns
+          in: query
+          required: true
+          schema:
+            type: boolean
+        - name: runsLimit
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Audit'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get web audits for sub-folder with given id
+      tags:
+        - Sub-Folders
+  /domains/{domainId}/web-journeys:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/domains/<span
+        class="op-path-parameter">{domainId}</span>/web-journeys</div>
+      operationId: getWebJourneys
+      parameters:
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/WebJourney'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get web journeys for sub-folder with given id
+      tags:
+        - Sub-Folders
+  /folders:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/folders</div>
+      operationId: getFolders
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Folder'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get list of all folders
+      tags:
+        - Folders
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/folders</div>
+      operationId: createFolder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewFolder'
+        description: Folder create information
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Create new folder
+      tags:
+        - Folders
+  /folders/{folderId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/folders/<span class="op-path-parameter">{folderId}</span></div>
+      operationId: findFolder
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+      security:
+        - API_Key: []
+      summary: Get folder by given id
+      tags:
+        - Folders
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/folders/<span class="op-path-parameter">{folderId}</span></div>
+      operationId: updateFolder
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFolder'
+        description: Folder update information
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+      security:
+        - API_Key: []
+      summary: Update folder with given id
+      tags:
+        - Folders
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/folders/<span
+        class="op-path-parameter">{folderId}</span></div>
+      operationId: deleteFolder
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+        '423':
+          description: >-
+            Following items are still running. Please stop & discard their
+            active runs first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemsAreRunningApiError'
+      security:
+        - API_Key: []
+      summary: Delete folder with given id
+      tags:
+        - Folders
+  /folders/{folderId}/users:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/folders/<span
+        class="op-path-parameter">{folderId}</span>/users</div>
+      operationId: GetUsersWithFolderId
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+      security:
+        - API_Key: []
+      summary: Get users of folder with given id
+      tags:
+        - Folders
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/folders/<span
+        class="op-path-parameter">{folderId}</span>/users</div>
+      operationId: addUsers
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: int32
+                type: integer
+              type: array
+        description: List of users ids
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+      security:
+        - API_Key: []
+      summary: Add users to folder with given id
+      tags:
+        - Folders
+  /labels:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/labels</div>
+      operationId: getLabels
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LabelWithSignedItems'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get list of all labels
+      tags:
+        - Labels
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/labels</div>
+      operationId: createNewLabel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewLabel'
+        description: New label info
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelWithSignedItems'
+        '403':
+          description: Duplicate name
+        '422':
+          description: Empty name
+      security:
+        - API_Key: []
+      summary: Create new label
+      tags:
+        - Labels
+  /labels/{labelId}:
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/labels/<span class="op-path-parameter">{labelId}</span></div>
+      operationId: updateLabel
+      parameters:
+        - name: labelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewLabel'
+        description: Updated label info
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelWithSignedItems'
+        '403':
+          description: Duplicate name
+        '404':
+          description: Label with such id doesn't exist in your account
+        '422':
+          description: Empty name
+      security:
+        - API_Key: []
+      summary: Update existing label name
+      tags:
+        - Labels
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/labels/<span
+        class="op-path-parameter">{labelId}</span></div>
+      operationId: deleteALabel
+      parameters:
+        - name: labelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Label deleted
+        '404':
+          description: There is no label with id labelid
+      security:
+        - API_Key: []
+      summary: Delete label with given id
+      tags:
+        - Labels
+  /manual-journeys:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys</div>
+      operationId: allJourneys
+      requestBody:
+        $ref: '#/components/requestBodies/SeqValue'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Journey'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get all manual journeys
+      tags:
+        - Manual Journeys
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/manual-journeys</div>
+      operationId: createJourney
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JourneyRequest'
+        description: New manual journey info
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journey'
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Create new manual journey
+      tags:
+        - Manual Journeys
+  /manual-journeys/certificates/default:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/certificates/default</div>
+      operationId: observepoint$api$manualjourney$ManualJourneyRoute$$getDefaultCertificate
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certificate'
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get default certificate metadata
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span></div>
+      operationId: journey
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journey'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get manual journey
+      tags:
+        - Manual Journeys
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span></div>
+      operationId: initialize
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitializedJourney'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Initialize manual journey run
+      tags:
+        - Manual Journeys
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span></div>
+      operationId: updateJourney
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JourneyRequest'
+        description: Update manual journey info
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journey'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+        '422':
+          description: Supplied entity didn't pass a validation
+      security:
+        - API_Key: []
+      summary: Update manual journey
+      tags:
+        - Manual Journeys
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span></div>
+
+
+        See also POST /v2/manual-journeys/{manualJourneyId}/delete for an
+        equivalent endpoint that supports browser sendBeacon() calls.
+      operationId: deleteJourney
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+        '423':
+          description: This item has active run. Please stop & discard active run first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemIsRunningApiError'
+      security:
+        - API_Key: []
+      summary: Delete manual journey
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/delete:
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/delete</div>
+
+
+        This endpoint provides the same functionality as DELETE
+        /v2/manual-journeys/{manualJourneyId}. It exists to support browser
+        sendBeacon() calls, which can only perform POST requests. This is used
+        when users abruptly leave the live-connect page to ensure proper cleanup
+        of the live-connect session (including stopping any ECS tasks associated
+        with the run and removing the run from the database).
+      operationId: deleteJourneyViaPost
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+        '423':
+          description: This item has active run. Please stop & discard active run first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemIsRunningApiError'
+      security:
+        - API_Key: []
+      summary: Delete manual journey via POST request
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/har-runs:
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/har-runs</div>
+      operationId: createHarRun
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HarJourneyRunCreateRequest'
+        description: New har manual journey request
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                format: int64
+                type: integer
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: >-
+        Create a manual journey run within the manualJourneyId based on uploaded
+        har files.
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/labels:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/labels</div>
+      operationId: journeyLabels
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: number
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get manual journey labels
+      tags:
+        - Manual Journeys
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/labels</div>
+      operationId: updateJourneyLabels
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/LabelArray'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: number
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Update manual journey labels
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/labels/{labelId}:
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/labels/<span
+        class="op-path-parameter">{labelId}</span></div>
+      operationId: deleteJourneyLabel
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: labelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Delete manual journey label
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/rules:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/rules</div>
+      operationId: journeyRules
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  format: int32
+                  type: integer
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get manual journey rules
+      tags:
+        - Manual Journeys
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/rules</div>
+      operationId: updateJourneyRules
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: int32
+                type: integer
+              type: array
+        description: Rules ids
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  format: int32
+                  type: integer
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Update manual journey rules
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs</div>
+      operationId: allRuns
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/SeqValue'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/JourneyRun'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get all available manual journey runs
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span></div>
+      operationId: run
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JourneyRun'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get specified manual journey run
+      tags:
+        - Manual Journeys
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span></div>
+      operationId: deleteJourneyRun
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Delete manual journey run
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/actions:
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/actions</div>
+      operationId: nextJourneyRunAction
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Create new action in specified manual journey run
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/actions/{actionId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/actions/<span
+        class="op-path-parameter">{actionId}</span></div>
+      operationId: journeyRunAction
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: actionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get specified manual journey run action
+      tags:
+        - Manual Journeys
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/actions/<span
+        class="op-path-parameter">{actionId}</span></div>
+      operationId: deleteJourneyRunAction
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: actionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Function1RequestContextFutureRouteResult'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Deletes specified manual journey run action
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/control:
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/control</div>
+      operationId: processRunControlRequest
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Value'
+        description: Control request
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Function1RequestContextFutureRouteResult'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Manual journey run control request
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/labels:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/labels</div>
+      operationId: runLabels
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: number
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get manual journey run labels
+      tags:
+        - Manual Journeys
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/labels</div>
+      operationId: updateRunLabels
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/LabelArray'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: number
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Update manual journey run labels
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/labels/{labelId}:
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/labels/<span
+        class="op-path-parameter">{labelId}</span></div>
+      operationId: deleteRunLabel
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: labelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Delete manual journey run label
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/request-filters:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/request-filters</div>
+      operationId: getRequestFilters
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get request filters of specified manual journey run
+      tags:
+        - Manual Journeys
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/request-filters</div>
+      operationId: setRequestFilters
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqString'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Set request filters for specified manual journey run
+      tags:
+        - Manual Journeys
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/request-filters</div>
+      operationId: removeRequestFilters
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Function1RequestContextFutureRouteResult'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Reset request filters for specified manual journey run
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/request-logs:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/request-logs</div>
+      operationId: getRequestLogs
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/Pagination'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RequestLog'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get request logs of specified manual journey run
+      tags:
+        - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/tags:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/manual-journeys/<span
+        class="op-path-parameter">{manualJourneyId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/tags</div>
+      operationId: getRunTags
+      parameters:
+        - name: manualJourneyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/Pagination'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Tag'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get tags of specified manual journey run
+      tags:
+        - Manual Journeys
+  /rules:
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/rules</div>
+      operationId: createRule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRule'
+        description: Rule create information
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '403':
+          description: >-
+            Current user has read-only permissions or doesn't have access to
+            this rule
+        '409':
+          description: Rule name is not unique
+      security:
+        - API_Key: []
+      summary: Create new rule
+      tags:
+        - Rules
+  /rules/previews:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/rules/previews</div>
+      operationId: getRulePreviews
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RulePreview'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get list of rule preview objects
+      tags:
+        - Rules
+  /rules/snapshots/page-filters/{pageFilterSnapshotId}/original:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/rules/snapshots/page-filters/<span
+        class="op-path-parameter">{pageFilterSnapshotId}</span>/original</div>
+      operationId: getOriginalRulePageFilterIdFromSnapshot
+      parameters:
+        - name: pageFilterSnapshotId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/UserContext'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Rule by given id not found
+      security:
+        - API_Key: []
+      summary: Get original rule page filter id by given rule page filter snapshot id
+      tags:
+        - Rules
+  /rules/snapshots/tags/variables/{tagVariableSnapshotId}/original:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/rules/snapshots/tags/variables/<span
+        class="op-path-parameter">{tagVariableSnapshotId}</span>/original</div>
+      operationId: getOriginalRuleTagVariableIdFromSnapshot
+      parameters:
+        - name: tagVariableSnapshotId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        $ref: '#/components/requestBodies/UserContext'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Rule by given id not found
+      security:
+        - API_Key: []
+      summary: Get original rule tag variable id by given rule tag variable snapshot id
+      tags:
+        - Rules
+  /rules/snapshots/tags/{tagSnapshotId}/original:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/rules/snapshots/tags/<span
+        class="op-path-parameter">{tagSnapshotId}</span>/original</div>
+      operationId: getOriginalRuleTagIdFromSnapshot
+      parameters:
+        - name: tagSnapshotId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/UserContext'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Rule by given id not found
+      security:
+        - API_Key: []
+      summary: Get original rule tag id by given rule tag snapshot id
+      tags:
+        - Rules
+  /rules/snapshots/{ruleSnapshotId}/original:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/rules/snapshots/<span
+        class="op-path-parameter">{ruleSnapshotId}</span>/original</div>
+      operationId: getOriginalRuleIdFromSnapshot
+      parameters:
+        - name: ruleSnapshotId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/UserContext'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Rule by given id not found
+      security:
+        - API_Key: []
+      summary: Get original rule id by given rule snapshot id
+      tags:
+        - Rules
+  /rules/{ruleId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/rules/<span class="op-path-parameter">{ruleId}</span></div>
+      operationId: getRule
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Rule by given id not found
+      security:
+        - API_Key: []
+      summary: Get rule by given id
+      tags:
+        - Rules
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/rules/<span class="op-path-parameter">{ruleId}</span></div>
+      operationId: updateRule
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRule'
+        description: Rule update information
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Rule by given id not found
+        '409':
+          description: Rule name is not unique
+      security:
+        - API_Key: []
+      summary: Update rule with given id
+      tags:
+        - Rules
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/rules/<span
+        class="op-path-parameter">{ruleId}</span></div>
+      operationId: deleteRule
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Rule was successfully deleted
+        '403':
+          description: >-
+            Current user has read-only permissions or doesn't have access to
+            this rule
+        '404':
+          description: Rule by given id not found
+      security:
+        - API_Key: []
+      summary: Delete rule with given id
+      tags:
+        - Rules
+  /rules/{ruleId}/web-journeys:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/rules/<span
+        class="op-path-parameter">{ruleId}</span>/web-journeys</div>
+      operationId: getAllWebJourneysByRule
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/WebJourney'
+                type: array
+        '403':
+          description: >-
+            Current user has read-only permissions or doesn't have access to
+            this rule
+        '404':
+          description: Rule by given id not found
+      security:
+        - API_Key: []
+      summary: Get all web journeys with given rule id
+      tags:
+        - Rules
+  /tags:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/tags</div>
+      operationId: getAllTags
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Tag'
+                type: array
+      security:
+        - API_Key: []
+      summary: Returns all tags
+      tags:
+        - Tags
+  /tags/{tagId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/tags/<span class="op-path-parameter">{tagId}</span></div>
+      operationId: getTag
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '403':
+          description: User doesn't have permissions to get tag by given tagId
+        '404':
+          description: Not found tag by given tagId
+      security:
+        - API_Key: []
+      summary: Return tag by tagId
+      tags:
+        - Tags
+  /users:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/users</div>
+      operationId: getUsers
+      parameters:
+        - name: withDeleted
+          in: query
+          description: Include deleted users
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+        '403':
+          description: Not Admin User
+      security:
+        - API_Key: []
+      summary: Return all users for current user account.
+      tags:
+        - Users
+  /users/{userId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/users/<span class="op-path-parameter">{userId}</span></div>
+      operationId: getUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Not Admin user or id parameter is not equal to current user id
+        '404':
+          description: Not found user by given id
+      security:
+        - API_Key: []
+      summary: >-
+        Return user data by given id. Accessible only for admin users or if
+        {userId} equal to current user id
+      tags:
+        - Users
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/users/<span class="op-path-parameter">{userId}</span></div>
+      operationId: updateUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDocument'
+        description: Updated user data
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Not Admin user or id parameter is not equal to current user id
+        '404':
+          description: Not found user by given id
+      security:
+        - API_Key: []
+      summary: >-
+        Update user data by given userId.Accessible only for admin users or if
+        {userId} equal to current user id
+      tags:
+        - Users
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/users/<span
+        class="op-path-parameter">{userId}</span></div>
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '403':
+          description: Not Admin user or id parameter is not equal to current user id
+        '404':
+          description: Not found user by given id
+      security:
+        - API_Key: []
+      summary: Delete user by given id. Accessible only for admin users
+      tags:
+        - Users
+  /users/{userId}/folders:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/users/<span class="op-path-parameter">{userId}</span>/folders</div>
+      operationId: getUserFolders
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserFolder'
+                type: array
+        '403':
+          description: Not Admin user or id parameter is not equal to current user id
+        '404':
+          description: Not found user by given id
+      security:
+        - API_Key: []
+      summary: >-
+        Return folders list shared with user by given id. Accessible only for
+        admin users or if {userId} equal to current user id
+      tags:
+        - Users
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/users/<span class="op-path-parameter">{userId}</span>/folders</div>
+      operationId: addUserFolders
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/addUserFoldersBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserFolder'
+                type: array
+        '403':
+          description: Not Admin User
+        '404':
+          description: Not found user by given id
+        '422':
+          description: Some of provided folder id's is not found
+      security:
+        - API_Key: []
+      summary: >-
+        Add given folders as shared for user with given userId.Accessible only
+        for admin users
+      tags:
+        - Users
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/users/<span class="op-path-parameter">{userId}</span>/folders</div>
+      operationId: setUserFolders
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/addUserFoldersBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserFolder'
+                type: array
+        '403':
+          description: Not Admin User
+        '404':
+          description: Not found user by given id
+        '422':
+          description: Some of provided folder id's is not found
+      security:
+        - API_Key: []
+      summary: >-
+        Set given folders as shared for user with given userId. Accessible only
+        for admin users
+      tags:
+        - Users
+  /web-audits:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits</div>
+      operationId: getAllWebAudits
+      parameters:
+        - name: withRuns
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: runsLimit
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Audit'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get list of all web audits
+      tags:
+        - Audits
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/web-audits</div>
+      operationId: createWebAudit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewAudit'
+        description: New web audit info
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Audit'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Create new web audit
+      tags:
+        - Audits
+  /web-audits/frequencies:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/frequencies</div>
+      operationId: getWebAuditAvailableFrequencies
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get list of all frequencies
+      tags:
+        - Audits
+  /web-audits/locations:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/locations</div>
+      operationId: getWebAuditAvailableLocations
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Location'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get list of all available locations
+      tags:
+        - Audits
+  /web-audits/user-agents:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/user-agents</div>
+      operationId: getWebAuditAvailableUserAgents
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserAgent'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Get list of all available user agents
+      tags:
+        - Audits
+  /web-audits/{auditId}/labels:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{auditId}</span>/labels</div>
+      operationId: getAuditLabels
+      parameters:
+        - name: auditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/UserContext'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Label'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get audit labels
+      tags:
+        - Audits
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{auditId}</span>/labels</div>
+      operationId: createAuditLabels
+      parameters:
+        - name: auditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqObject'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Label'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Create audit labels
+      tags:
+        - Audits
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/web-audits/<span
+        class="op-path-parameter">{auditId}</span>/labels</div>
+      operationId: deleteWebAuditLabels
+      parameters:
+        - name: auditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/deleteWebAuditLabelsBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Function1RequestContextFutureRouteResult'
+        '204':
+          description: Item was successfully deleted
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Delete web audit labels
+      tags:
+        - Audits
+  /web-audits/{webAuditId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/<span class="op-path-parameter">{webAuditId}</span></div>
+      operationId: getWebAudit
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: withRuns
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: runsLimit
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Audit'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get web audit
+      tags:
+        - Audits
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/web-audits/<span class="op-path-parameter">{webAuditId}</span></div>
+      operationId: updateWebAudit
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditUpdate'
+        description: Update web audit info
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Audit'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+        '422':
+          description: Supplied entity didn't pass a validation
+      security:
+        - API_Key: []
+      summary: Update web audit
+      tags:
+        - Audits
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span></div>
+      operationId: deleteWebAudit
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+        '423':
+          description: This item has active run. Please stop & discard active run first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemIsRunningApiError'
+      security:
+        - API_Key: []
+      summary: Delete web audit
+      tags:
+        - Audits
+  /web-audits/{webAuditId}/filters:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/filters</div>
+      operationId: getWebAuditFilters
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditFilters'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get web audit filters
+      tags:
+        - Audits
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/filters</div>
+      operationId: updateWebAuditFilters
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditFilters'
+        description: New web audit filters
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditFilters'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+        '422':
+          description: Supplied entity didn't pass a validation
+      security:
+        - API_Key: []
+      summary: Update web audit filters
+      tags:
+        - Audits
+  /web-audits/{webAuditId}/rules:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/rules</div>
+      operationId: getWebAuditRules
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RuleDescription'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get web audit rules
+      tags:
+        - Audits
+    put:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-put">PUT</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/rules</div>
+      operationId: updateWebAuditRules
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: int32
+                type: integer
+              type: array
+        description: New web audit rule ids
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RuleDescription'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Update web audit rules
+      tags:
+        - Audits
+  /web-audits/{webAuditId}/runs:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/runs</div>
+      operationId: getRuns
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AuditRunWithRuleFailurePresence'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get all available audit runs
+      tags:
+        - Audits
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/runs</div>
+      operationId: runAuditNow
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRunSwaggerReference'
+        '202':
+          description: >-
+            This audit can't be run at this moment but is queued to run in the
+            future when the concurrency limit is not exceeded
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Request audit run creation
+      tags:
+        - Audits
+  /web-audits/{webAuditId}/runs/current/finish:
+    post:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-post">POST</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/runs/current/finish</div>
+      operationId: finishActiveAuditRun
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Audit run successfully stopped and queued for summarization
+        '401':
+          description: Authentication credentials are missing or invalid
+        '403':
+          description: User does not have permission to stop this audit
+        '404':
+          description: No active run found for this audit
+        '409':
+          description: The audit run is already stopped or completed
+      security:
+        - API_Key: []
+      summary: Stop and finish the currently running audit
+      tags:
+        - Audits
+  /web-audits/{webAuditId}/runs/{runId}:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span></div>
+      operationId: getRun
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRunSwaggerReference'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get specified audit run
+      tags:
+        - Audits
+    delete:
+      description: >-
+        <div class="op-path-box"><span
+        class="op-http-method-delete">DELETE</span> /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span></div>
+      operationId: stopAuditRun
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+        - API_Key: []
+      summary: Stop and discard audit run
+      tags:
+        - Audits
+  /web-audits/{webAuditId}/runs/{runId}/pages/{pageId}/rule-results:
+    get:
+      description: >-
+        <div class="op-path-box"><span class="op-http-method-get">GET</span>
+        /v2/web-audits/<span
+        class="op-path-parameter">{webAuditId}</span>/runs/<span
+        class="op-path-parameter">{runId}</span>/pages/<span
+        class="op-path-parameter">{pageId}</span>/rule-results</div>
+      operationId: getPageRuleResults
+      parameters:
+        - name: webAuditId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: pageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageRuleResults'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+        - API_Key: []
+      summary: Get rule results for page
+      tags:
+        - Audits
+tags:
+  - description: >-
+      Endpoints for managing account settings, configurations, and account-level
+      information
+    name: Account
+  - description: >-
+      Endpoints for managing rules including creation, configuration,
+      assignment, and rule-based validation logic
+    name: Rules
+  - description: >-
+      Endpoints for managing tags and tag-related operations including tag
+      metadata and configuration
+    name: Tags
+  - description: >-
+      Endpoints for managing users including creation, authentication,
+      permissions, and user account management
+    name: Users
+  - description: >-
+      Endpoints for managing manual journeys including real device testing, HAR
+      file ingestion, and journey execution control. These endpoints power Live
+      Connect and HAR Analyzer features in the ObservePoint UI, enabling users
+      to perform manual testing on real devices and analyze HAR files for tag
+      validation and troubleshooting.
+
+
+      For more information, see the [HAR File Processing API
+      Recipe](/sections/api-recipes/har-file-processing).
+    name: Manual Journeys
+  - description: >-
+      Endpoints for managing folders including creation, organization, access
+      control, and folder-based resource management
+    name: Folders
+  - description: >-
+      Endpoints for managing sub-folders including creation, configuration, and
+      sub-folder-based audit and journey management
+    name: Sub-Folders
+  - description: >-
+      Endpoints for managing audits including creation, configuration,
+      execution, and retrieving audit results and runs
+    name: Audits
+  - description: >-
+      Endpoints for managing labels including creation, assignment, and
+      retrieval for organizing audits, journeys, and other resources
+    name: Labels
+servers:
+  - url: https://api.observepoint.com/v2
+components:
+  requestBodies:
+    deleteWebAuditLabelsBody:
+      content:
+        application/json:
+          schema:
+            type: integer
+            format: int32
+    SeqValue:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SeqValue'
+    Pagination:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pagination'
+    bindRulesToActionBody:
+      content:
+        application/json:
+          schema:
+            items:
+              format: int32
+              type: integer
+            type: array
+      required: true
+    addUserFoldersBody:
+      content:
+        application/json:
+          schema:
+            items:
+              format: int32
+              type: integer
+            type: array
+      description: Folders id list
+    LabelArray:
+      content:
+        application/json:
+          schema:
+            items:
+              $ref: '#/components/schemas/Label'
+            type: array
+    UserContext:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserContext'
+  securitySchemes:
+    API_Key:
+      description: >-
+        Use the `Authorization` header in your requests with ObservePoint API
+        key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Account:
+      type: object
+      required:
+        - accountType
+        - appTestsUsed
+        - appsUsed
+        - auditsUsed
+        - customProxySupport
+        - id
+        - maxApps
+        - maxAudits
+        - maxUsers
+        - maxWebJourneys
+        - name
+        - strongPasswordPolicy
+        - urlsUsed
+        - usersUsed
+        - vpnSupport
+        - webJourneysUsed
+      properties:
+        accountType:
+          format: int32
+          type: integer
+        appTestsUsed:
+          format: int32
+          type: integer
+        appsUsed:
+          format: int32
+          type: integer
+        auditPageLimit:
+          type: number
+        auditsUsed:
+          format: int32
+          type: integer
+        customProxySupport:
+          type: boolean
+        id:
+          format: int32
+          type: integer
+        maxApps:
+          format: int32
+          type: integer
+        maxAudits:
+          format: int32
+          type: integer
+        maxUsers:
+          format: int32
+          type: integer
+        maxWebJourneys:
+          format: int32
+          type: integer
+        name:
+          type: string
+        strongPasswordPolicy:
+          type: boolean
+        subDomainIdentifier:
+          type: string
+        urlsUsed:
+          format: int32
+          type: integer
+        usersUsed:
+          format: int32
+          type: integer
+        vpnSupport:
+          type: boolean
+        webJourneyRunLimit:
+          type: number
+        webJourneysUsed:
+          format: int32
+          type: integer
+      description: Account data
+    AccountCapabilities:
+      type: object
+      required:
+        - customProxySupport
+        - strongPasswordPolicy
+        - vpnSupport
+      properties:
+        customProxySupport:
+          type: boolean
+        strongPasswordPolicy:
+          type: boolean
+        vpnSupport:
+          type: boolean
+    Action:
+      type: object
+      required:
+        - actionType
+        - id
+        - name
+        - runId
+        - sequence
+      properties:
+        actionType:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        note:
+          type: string
+        runId:
+          format: int32
+          type: integer
+        sequence:
+          format: int32
+          type: integer
+    ActionSwaggerReference:
+      type: object
+      required:
+        - preventNav
+        - selectors
+      properties:
+        action:
+          enum:
+            - navto
+            - click
+            - input
+            - select
+            - check
+            - uncheck
+            - execute
+            - watch
+            - maskedInput
+            - enterIframe
+            - exitIframe
+          type: string
+        js:
+          type: string
+        label:
+          type: string
+        maskedValue:
+          type: string
+        preventNav:
+          type: boolean
+        seconds:
+          format: int32
+          type: integer
+        selectors:
+          items:
+            $ref: '#/components/schemas/WebActionSelectorSwaggerReference'
+          type: array
+        url:
+          type: string
+        value:
+          type: string
+        waitDuration:
+          format: int32
+          maximum: 1800
+          minimum: 0
+          type: integer
+    ActionTag:
+      type: object
+      required:
+        - duplicates
+        - invalidVariables
+        - multiples
+        - position
+        - responseAt
+        - startedAt
+        - statusCode
+        - stoppedAt
+        - tag
+        - tagInstanceId
+        - valid
+        - variables
+      properties:
+        account:
+          type: string
+        duplicates:
+          format: int32
+          type: integer
+        invalidVariables:
+          items:
+            type: string
+          type: array
+        multiples:
+          format: int32
+          type: integer
+        position:
+          format: double
+          type: number
+        responseAt:
+          format: int64
+          type: integer
+        startedAt:
+          format: int64
+          type: integer
+        statusCode:
+          format: int32
+          type: integer
+        stoppedAt:
+          format: int64
+          type: integer
+        tag:
+          $ref: '#/components/schemas/Tag'
+        tagInstanceId:
+          type: string
+        valid:
+          type: boolean
+        variables:
+          items:
+            $ref: '#/components/schemas/TagVariable'
+          type: array
+        version:
+          type: string
+    ApiRuleResult:
+      type: object
+      required:
+        - checkTimes
+        - name
+        - pageFilterResults
+        - ruleId
+        - tagResults
+      properties:
+        checkTimes:
+          $ref: '#/components/schemas/CheckTimesResult'
+        name:
+          type: string
+        pageFilterResults:
+          items:
+            $ref: '#/components/schemas/PageFilterResult'
+          type: array
+        resultType:
+          enum:
+            - Passed
+            - Failed
+            - NotApplied
+            - Broken
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        tagResults:
+          items:
+            $ref: '#/components/schemas/TagResult'
+          type: array
+    AttributesSelector:
+      allOf:
+        - $ref: '#/components/schemas/WebActionSelectorSwaggerReference'
+        - type: object
+          required:
+            - selectorType
+            - value
+          properties:
+            selectorType:
+              format: int32
+              type: integer
+            value:
+              $ref: '#/components/schemas/WebActionElementDescriptionSwaggerReference'
+    Audit:
+      type: object
+      required:
+        - created
+        - domainId
+        - folderId
+        - id
+        - labels
+        - lastUpdated
+        - limit
+        - name
+        - ownerId
+        - queued
+        - recipients
+        - runs
+        - startingUrls
+      properties:
+        created:
+          format: date-time
+          type: string
+        domainId:
+          format: int32
+          type: integer
+        filters:
+          $ref: '#/components/schemas/AuditFilters'
+        folderId:
+          format: int32
+          type: integer
+        frequency:
+          type: string
+        id:
+          format: int32
+          type: integer
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        lastRun:
+          format: date-time
+          type: string
+        lastUpdated:
+          format: date-time
+          type: string
+        limit:
+          format: int32
+          type: integer
+        name:
+          type: string
+        nextRun:
+          format: date-time
+          type: string
+        options:
+          $ref: '#/components/schemas/AuditOptions'
+        ownerId:
+          format: int32
+          type: integer
+        queued:
+          type: boolean
+        recipients:
+          items:
+            type: string
+          type: array
+        rules:
+          items:
+            $ref: '#/components/schemas/RuleDescription'
+          type: array
+        runs:
+          items:
+            $ref: '#/components/schemas/AuditRunSwaggerReference'
+          type: array
+        schedule:
+          type: boolean
+        screenshot:
+          type: string
+        startingUrls:
+          items:
+            type: string
+          type: array
+        taggingPlans:
+          items:
+            type: number
+          type: array
+        webAuditRunning:
+          type: number
+      description: Web audit model
+    AuditAction:
+      type: object
+      required:
+        - action
+        - filter
+      properties:
+        action:
+          $ref: '#/components/schemas/SequencedActionSwaggerReference'
+        filter:
+          type: string
+    AuditActionArray:
+      type: object
+      required:
+        - actions
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/AuditActionSwaggerReference'
+          type: array
+    AuditActionSwaggerReference:
+      type: object
+      required:
+        - filter
+        - preventNav
+        - selectors
+        - sequence
+      properties:
+        action:
+          enum:
+            - navto
+            - click
+            - input
+            - select
+            - check
+            - uncheck
+            - execute
+            - watch
+            - maskedInput
+            - enterIframe
+            - exitIframe
+          type: string
+        actionId:
+          type: number
+        filter:
+          type: string
+        js:
+          type: string
+        label:
+          type: string
+        maskedValue:
+          type: string
+        preventNav:
+          type: boolean
+        rules:
+          items:
+            type: number
+          type: array
+        seconds:
+          format: int32
+          type: integer
+        selectors:
+          items:
+            $ref: '#/components/schemas/WebActionSelectorSwaggerReference'
+          type: array
+        sequence:
+          format: int32
+          type: integer
+        url:
+          type: string
+        value:
+          type: string
+        waitDuration:
+          format: int32
+          maximum: 1800
+          minimum: 0
+          type: integer
+    AuditFilters:
+      type: object
+      required:
+        - exclude
+        - include
+      properties:
+        exclude:
+          items:
+            type: string
+          type: array
+        include:
+          items:
+            $ref: '#/components/schemas/IncludeFilter'
+          type: array
+    AuditLogin:
+      type: object
+      required:
+        - actions
+        - url
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/SequencedActionSwaggerReference'
+          type: array
+        url:
+          type: string
+    AuditOptions:
+      type: object
+      required:
+        - fireTags
+        - loadFlash
+        - location
+        - requestRate
+        - stripQueryString
+        - userAgent
+      properties:
+        adobeAuditor:
+          type: boolean
+        blockThirdPartyCookies:
+          type: boolean
+        browserHeight:
+          format: int32
+          type: integer
+        browserWidth:
+          format: int32
+          type: integer
+        customHttpHeaders:
+          items:
+            $ref: '#/components/schemas/CustomHttpHeaderAssignment'
+          type: array
+        customProxy:
+          type: string
+        discoverSitemap:
+          type: boolean
+        fireTags:
+          type: boolean
+        gpcEnabled:
+          type: boolean
+        loadFlash:
+          type: boolean
+        location:
+          type: string
+        remoteFileMapConfig:
+          items:
+            $ref: '#/components/schemas/RemoteFileMapping'
+          type: array
+        requestRate:
+          format: int32
+          type: integer
+        sameUrlRunId:
+          type: number
+        stripQueryString:
+          type: boolean
+        userAgent:
+          type: string
+        vpnEnabled:
+          type: boolean
+        webHookUrl:
+          type: string
+    AuditRun:
+      type: object
+      required:
+        - adobeAuditor
+        - id
+        - limit
+        - silentMode
+        - started
+        - supportedFeatures
+        - taggedUrl
+        - totalUrl
+        - userId
+        - webAuditId
+      properties:
+        adobeAuditor:
+          type: boolean
+        completed:
+          format: date-time
+          type: string
+        completedAt:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        limit:
+          format: int32
+          type: integer
+        score:
+          description: >-
+            Deprecated. Use `/v3/web-audits/{auditId}/runs/{runId}/scores`
+            instead
+          format: int32
+          type: integer
+        silentMode:
+          type: boolean
+        started:
+          format: date-time
+          type: string
+        stoppedEarlyByUserId:
+          type: number
+        supportedFeatures:
+          items:
+            $ref: '#/components/schemas/FeatureWhichCanBeSupportedByAuditRun'
+          type: array
+        taggedUrl:
+          format: int32
+          type: integer
+        totalUrl:
+          format: int32
+          type: integer
+        userId:
+          format: int32
+          type: integer
+        webAuditId:
+          format: int32
+          type: integer
+    AuditRunSwaggerReference:
+      type: object
+      required:
+        - adobeAuditor
+        - id
+        - limit
+        - silentMode
+        - taggedUrl
+        - totalUrl
+        - userId
+        - webAuditId
+      properties:
+        adobeAuditor:
+          type: boolean
+        completed:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        limit:
+          format: int32
+          type: integer
+        score:
+          description: >-
+            Deprecated. Use `/v3/web-audits/{auditId}/runs/{runId}/scores`
+            instead
+          format: int32
+          type: integer
+        silentMode:
+          type: boolean
+        started:
+          format: date-time
+          type: string
+        supportedFeatures:
+          example: '[TagLoadtimeReport, ConsoleLogsReport]'
+          items:
+            type: string
+          type: array
+        taggedUrl:
+          format: int32
+          type: integer
+        totalUrl:
+          format: int32
+          type: integer
+        userId:
+          format: int32
+          type: integer
+        webAuditId:
+          format: int32
+          type: integer
+    AuditRunWithRuleFailurePresence:
+      type: object
+      required:
+        - adobeAuditor
+        - id
+        - isRuleFailurePresent
+        - limit
+        - score
+        - silentMode
+        - started
+        - supportedFeatures
+        - taggedUrl
+        - totalUrl
+        - userId
+        - webAuditId
+      properties:
+        adobeAuditor:
+          type: boolean
+        completed:
+          format: date-time
+          type: string
+        completedAt:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        isRuleFailurePresent:
+          type: boolean
+        limit:
+          format: int32
+          type: integer
+        score:
+          format: int32
+          type: integer
+        silentMode:
+          type: boolean
+        started:
+          format: date-time
+          type: string
+        supportedFeatures:
+          items:
+            $ref: '#/components/schemas/FeatureWhichCanBeSupportedByAuditRun'
+          type: array
+        taggedUrl:
+          format: int32
+          type: integer
+        totalUrl:
+          format: int32
+          type: integer
+        userId:
+          format: int32
+          type: integer
+        webAuditId:
+          format: int32
+          type: integer
+    AuditUpdate:
+      type: object
+      required:
+        - domainId
+        - id
+        - limit
+        - name
+        - recipients
+        - startingUrls
+      properties:
+        domainId:
+          format: int32
+          type: integer
+        filters:
+          $ref: '#/components/schemas/AuditFilters'
+        frequency:
+          type: string
+        id:
+          format: int32
+          type: integer
+        limit:
+          format: int32
+          type: integer
+        name:
+          type: string
+        nextRun:
+          format: date-time
+          type: string
+        options:
+          $ref: '#/components/schemas/AuditOptions'
+        ownerId:
+          format: int32
+          type: integer
+        recipients:
+          items:
+            type: string
+          type: array
+        schedule:
+          $ref: '#/components/schemas/WritableItemSchedule'
+        startingUrls:
+          items:
+            type: string
+          type: array
+    AuthToken:
+      type: object
+      required:
+        - created
+        - decryptedToken
+        - token
+        - tokenType
+        - userId
+      properties:
+        created:
+          type: string
+        decryptedToken:
+          type: string
+        token:
+          type: string
+        tokenType:
+          $ref: '#/components/schemas/TokenType'
+        userId:
+          type: string
+    Authorization:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    CardScheduleData:
+      type: object
+      required:
+        - description
+        - isPaused
+        - presetType
+      properties:
+        description:
+          type: string
+        isPaused:
+          type: boolean
+        presetType:
+          $ref: '#/components/schemas/SchedulePreset'
+    Certificate:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    CheckTimesResult:
+      type: object
+      required:
+        - actual
+        - expected
+      properties:
+        actual:
+          format: int32
+          type: integer
+        expected:
+          format: int32
+          type: integer
+    Chronology:
+      type: object
+      required:
+        - zone
+      properties:
+        zone:
+          $ref: '#/components/schemas/DateTimeZone'
+    CustomHttpHeaderAssignment:
+      type: object
+      required:
+        - groupId
+        - isApplyToAll
+      properties:
+        groupId:
+          format: int64
+          type: integer
+        isApplyToAll:
+          type: boolean
+    DateTimeField:
+      type: object
+      required:
+        - durationField
+        - leapDurationField
+        - lenient
+        - maximumValue
+        - minimumValue
+        - name
+        - rangeDurationField
+        - supported
+        - type
+      properties:
+        durationField:
+          $ref: '#/components/schemas/DurationField'
+        leapDurationField:
+          $ref: '#/components/schemas/DurationField'
+        lenient:
+          type: boolean
+        maximumValue:
+          format: int32
+          type: integer
+        minimumValue:
+          format: int32
+          type: integer
+        name:
+          type: string
+        rangeDurationField:
+          $ref: '#/components/schemas/DurationField'
+        supported:
+          type: boolean
+        type:
+          $ref: '#/components/schemas/DateTimeFieldType'
+    DateTimeFieldType:
+      type: object
+      required:
+        - durationType
+        - name
+        - rangeDurationType
+      properties:
+        durationType:
+          $ref: '#/components/schemas/DurationFieldType'
+        name:
+          type: string
+        rangeDurationType:
+          $ref: '#/components/schemas/DurationFieldType'
+    DateTimeZone:
+      type: object
+      required:
+        - fixed
+        - id
+      properties:
+        fixed:
+          type: boolean
+        id:
+          type: string
+    Domain:
+      type: object
+      required:
+        - accountId
+        - createdAt
+        - domain
+        - folderId
+        - id
+        - name
+        - userId
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        createdAt:
+          format: date-time
+          type: string
+        domain:
+          type: string
+        folderId:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        totals:
+          $ref: '#/components/schemas/DomainTotals'
+        userId:
+          format: int32
+          type: integer
+      description: Domain model
+    DomainTotals:
+      type: object
+      required:
+        - auditsRunning
+        - automatedJourneys
+        - averageScore
+        - errors
+        - guidedJourneys
+        - pages
+        - simulationsRunning
+      properties:
+        auditsRunning:
+          format: int32
+          type: integer
+        automatedJourneys:
+          format: int32
+          type: integer
+        averageScore:
+          format: int32
+          type: integer
+        errors:
+          format: int32
+          type: integer
+        guidedJourneys:
+          format: int32
+          type: integer
+        pages:
+          format: int32
+          type: integer
+        simulationsRunning:
+          format: int32
+          type: integer
+    DomainUpdate:
+      type: object
+      required:
+        - domain
+        - folderId
+        - name
+      properties:
+        dataLayer:
+          type: string
+        domain:
+          type: string
+        folderId:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: Domain update information
+    DurationField:
+      type: object
+      required:
+        - name
+        - precise
+        - supported
+        - type
+        - unitMillis
+      properties:
+        name:
+          type: string
+        precise:
+          type: boolean
+        supported:
+          type: boolean
+        type:
+          $ref: '#/components/schemas/DurationFieldType'
+        unitMillis:
+          format: int64
+          type: integer
+    DurationFieldType:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    EntityCount:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          format: int32
+          type: integer
+      description: Entity count
+    FeatureWhichCanBeSupportedByAuditRun:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string
+    FileMappingResult:
+      type: object
+      required:
+        - config
+        - fileUrl
+        - mappedRequests
+      properties:
+        config:
+          $ref: '#/components/schemas/RemoteFileMapping'
+        fileUrl:
+          type: string
+        mappedRequests:
+          items:
+            type: string
+          type: array
+    FileSizeResult:
+      type: object
+      required:
+        - size
+      properties:
+        size:
+          format: int64
+          type: integer
+    FileUploadResult:
+      type: object
+      required:
+        - fileId
+      properties:
+        fileId:
+          type: string
+    Folder:
+      type: object
+      required:
+        - accountId
+        - appFailures
+        - appRuleFailures
+        - appsCount
+        - appsInQueue
+        - appsRunning
+        - auditsCount
+        - auditsRunning
+        - createdAt
+        - createdByUserId
+        - createdByUserName
+        - domainsCount
+        - id
+        - journeysCount
+        - name
+        - simulationErrors
+        - simulationsRunning
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        appFailures:
+          format: int32
+          type: integer
+        appRuleFailures:
+          format: int32
+          type: integer
+        appsCount:
+          format: int32
+          type: integer
+        appsInQueue:
+          format: int32
+          type: integer
+        appsRunning:
+          format: int32
+          type: integer
+        auditsCount:
+          format: int32
+          type: integer
+        auditsRunning:
+          format: int32
+          type: integer
+        createdAt:
+          format: date-time
+          type: string
+        createdByUserId:
+          format: int32
+          type: integer
+        createdByUserName:
+          type: string
+        domainsCount:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        journeysCount:
+          format: int32
+          type: integer
+        name:
+          type: string
+        simulationErrors:
+          format: int32
+          type: integer
+        simulationsRunning:
+          format: int32
+          type: integer
+      description: Folder model
+    Function1:
+      type: object
+    Function1RequestContextFutureRouteResult:
+      type: object
+    GeneratedAction:
+      type: object
+      required:
+        - action
+        - timestamp
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionSwaggerReference'
+        timestamp:
+          format: int64
+          type: integer
+    HarJourneyRunCreateRequest:
+      type: object
+      required:
+        - harFiles
+      properties:
+        harFiles:
+          items:
+            $ref: '#/components/schemas/UploadedHarFile'
+          type: array
+        journeyRunName:
+          type: string
+        webhookUrl:
+          type: string
+      description: Model for creation of live connect run based on har files
+    IncludeFilter:
+      type: object
+      required:
+        - includeLimit
+        - value
+      properties:
+        includeLimit:
+          format: int32
+          type: integer
+        value:
+          type: string
+    InitializedJourney:
+      type: object
+      required:
+        - journeyId
+        - name
+        - proxyInfo
+        - runId
+      properties:
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        journeyId:
+          format: int32
+          type: integer
+        name:
+          type: string
+        proxyInfo:
+          $ref: '#/components/schemas/ProxyInfo'
+        runId:
+          format: int32
+          type: integer
+    ItemIsRunningApiError:
+      type: object
+      required:
+        - errorCode
+        - message
+        - runId
+      properties:
+        errorCode:
+          format: int32
+          type: integer
+        message:
+          type: string
+        runId:
+          format: int64
+          type: integer
+    ItemWithActiveRun:
+      type: object
+      required:
+        - itemId
+        - itemName
+        - itemType
+        - runId
+      properties:
+        itemId:
+          format: int64
+          type: integer
+        itemName:
+          type: string
+        itemType:
+          type: string
+        runId:
+          format: int64
+          type: integer
+    ItemsAreRunningApiError:
+      type: object
+      required:
+        - errorCode
+        - items
+        - message
+      properties:
+        errorCode:
+          format: int32
+          type: integer
+        items:
+          items:
+            $ref: '#/components/schemas/ItemWithActiveRun'
+          type: array
+        message:
+          type: string
+    Journey:
+      type: object
+      required:
+        - createdAt
+        - emails
+        - folderId
+        - id
+        - name
+        - osOfDevice
+        - updatedAt
+        - userId
+        - versionOfOs
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        journeyType:
+          format: int32
+          type: integer
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        name:
+          type: string
+        osOfDevice:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: int32
+          type: integer
+        versionOfOs:
+          type: string
+    JourneyRequest:
+      type: object
+      required:
+        - emails
+        - folderId
+        - name
+        - osOfDevice
+        - versionOfOs
+      properties:
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int32
+          type: integer
+        journeyType:
+          format: int32
+          type: integer
+        name:
+          type: string
+        osOfDevice:
+          type: string
+        versionOfOs:
+          type: string
+    JourneyRun:
+      type: object
+      required:
+        - id
+        - journeyId
+        - manageSSL
+        - name
+        - osOfDevice
+        - requestedAt
+        - status
+        - versionOfOs
+      properties:
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        completedAt:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        journeyId:
+          format: int32
+          type: integer
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        manageSSL:
+          type: boolean
+        name:
+          type: string
+        osOfDevice:
+          type: string
+        proxyInfo:
+          type: string
+        requestedAt:
+          format: date-time
+          type: string
+        rulesDetails:
+          $ref: '#/components/schemas/RunRuleDetails'
+        startedAt:
+          format: date-time
+          type: string
+        status:
+          $ref: '#/components/schemas/Value'
+        versionOfOs:
+          type: string
+    Label:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    LabelId:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          format: int32
+          type: integer
+    LabelWithSignedItems:
+      type: object
+      required:
+        - alerts
+        - audits
+        - consentCategories
+        - emailInboxes
+        - id
+        - mobileJourney
+        - name
+        - rules
+        - savedReports
+        - webJourney
+      properties:
+        alerts:
+          items:
+            type: number
+          type: array
+        audits:
+          items:
+            type: number
+          type: array
+        consentCategories:
+          items:
+            type: number
+          type: array
+        emailInboxes:
+          items:
+            type: number
+          type: array
+        id:
+          format: int32
+          type: integer
+        mobileJourney:
+          items:
+            type: number
+          type: array
+        name:
+          type: string
+        rules:
+          items:
+            type: number
+          type: array
+        savedReports:
+          items:
+            type: number
+          type: array
+        webJourney:
+          items:
+            type: number
+          type: array
+      description: Label with all items to which it was assigned
+    LocalDateTime:
+      type: object
+      required:
+        - centuryOfEra
+        - chronology
+        - dayOfMonth
+        - dayOfWeek
+        - dayOfYear
+        - era
+        - fieldTypes
+        - fields
+        - hourOfDay
+        - millisOfDay
+        - millisOfSecond
+        - minuteOfHour
+        - monthOfYear
+        - secondOfMinute
+        - values
+        - weekOfWeekyear
+        - weekyear
+        - year
+        - yearOfCentury
+        - yearOfEra
+      properties:
+        centuryOfEra:
+          format: int32
+          type: integer
+        chronology:
+          $ref: '#/components/schemas/Chronology'
+        dayOfMonth:
+          format: int32
+          type: integer
+        dayOfWeek:
+          format: int32
+          type: integer
+        dayOfYear:
+          format: int32
+          type: integer
+        era:
+          format: int32
+          type: integer
+        fieldTypes:
+          items:
+            $ref: '#/components/schemas/DateTimeFieldType'
+          type: array
+        fields:
+          items:
+            $ref: '#/components/schemas/DateTimeField'
+          type: array
+        hourOfDay:
+          format: int32
+          type: integer
+        millisOfDay:
+          format: int32
+          type: integer
+        millisOfSecond:
+          format: int32
+          type: integer
+        minuteOfHour:
+          format: int32
+          type: integer
+        monthOfYear:
+          format: int32
+          type: integer
+        secondOfMinute:
+          format: int32
+          type: integer
+        values:
+          items:
+            format: int32
+            type: integer
+          type: array
+        weekOfWeekyear:
+          format: int32
+          type: integer
+        weekyear:
+          format: int32
+          type: integer
+        year:
+          format: int32
+          type: integer
+        yearOfCentury:
+          format: int32
+          type: integer
+        yearOfEra:
+          format: int32
+          type: integer
+    Location:
+      type: object
+      required:
+        - countryCode
+        - id
+        - label
+        - name
+      properties:
+        countryCode:
+          type: string
+        id:
+          format: int32
+          type: integer
+        label:
+          type: string
+        name:
+          type: string
+    NewAudit:
+      type: object
+      required:
+        - domainId
+        - limit
+        - name
+        - recipients
+        - startingUrls
+      properties:
+        domainId:
+          format: int32
+          type: integer
+        filters:
+          $ref: '#/components/schemas/AuditFilters'
+        frequency:
+          type: string
+        limit:
+          format: int32
+          type: integer
+        name:
+          type: string
+        nextRun:
+          format: date-time
+          type: string
+        options:
+          $ref: '#/components/schemas/AuditOptions'
+        recipients:
+          items:
+            type: string
+          type: array
+        schedule:
+          $ref: '#/components/schemas/WritableItemSchedule'
+        startingUrls:
+          items:
+            type: string
+          type: array
+    NewDomain:
+      type: object
+      required:
+        - domain
+        - folderId
+        - name
+      properties:
+        dataLayer:
+          type: string
+        domain:
+          type: string
+        folderId:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: Domain creation information
+    NewFolder:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+      description: Folder create information
+    NewLabel:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+      description: Label creation information
+    NewPageFilter:
+      type: object
+      properties:
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        type:
+          description: 1 - url, 2 - status code, 3 - final url, 4 - final status code
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+          format: int32
+          type: integer
+        value:
+          type: string
+    NewRule:
+      type: object
+      required:
+        - checkTimes
+        - matchAllFilters
+        - name
+      properties:
+        checkTimes:
+          format: int32
+          type: integer
+        isDefaultRule:
+          type: number
+        labels:
+          items:
+            $ref: '#/components/schemas/LabelId'
+          type: array
+        matchAllFilters:
+          type: boolean
+        name:
+          type: string
+        notes:
+          type: string
+        pageFilters:
+          items:
+            $ref: '#/components/schemas/NewPageFilter'
+          type: array
+        recipients:
+          items:
+            type: string
+          type: array
+        tags:
+          items:
+            $ref: '#/components/schemas/NewRuleTag'
+          type: array
+      description: Rule create information
+    NewRuleTag:
+      type: object
+      required:
+        - tagId
+      properties:
+        account:
+          type: string
+        clause:
+          enum:
+            - If
+            - Then
+            - Else
+          type: string
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        statusCode:
+          $ref: '#/components/schemas/RuleTagStatusCode'
+        tagId:
+          format: int32
+          type: integer
+        validationDescription:
+          type: string
+        variables:
+          items:
+            $ref: '#/components/schemas/NewRuleTagVariable'
+          type: array
+    NewRuleTagVariable:
+      type: object
+      required:
+        - variable
+      properties:
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        ruleTagId:
+          format: int32
+          type: integer
+        selectorType:
+          enum:
+            - String
+            - UrlParameter
+            - DataLayer
+            - Tag
+            - FinalUrlParameter
+          type: string
+        validationDescription:
+          type: string
+        value:
+          type: string
+        valueTagId:
+          format: int32
+          type: integer
+        variable:
+          type: string
+    Option:
+      type: object
+      required:
+        - defined
+        - empty
+      properties:
+        defined:
+          type: boolean
+        empty:
+          type: boolean
+    OptionPagination:
+      type: object
+      required:
+        - defined
+        - empty
+      properties:
+        defined:
+          type: boolean
+        empty:
+          type: boolean
+    PageFilter:
+      type: object
+      required:
+        - id
+        - ruleId
+      properties:
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        type:
+          description: 1 - url, 2 - status code, 3 - final url, 4 - final status code
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+          format: int32
+          type: integer
+        value:
+          type: string
+    PageFilterResult:
+      type: object
+      required:
+        - actual
+        - expected
+      properties:
+        actual:
+          type: string
+        expected:
+          type: string
+        filterType:
+          enum:
+            - Url
+            - StatusCode
+            - FinalUrl
+            - FinalStatusCode
+          type: string
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+    PageInfo:
+      type: object
+      required:
+        - loadtime
+        - size
+        - statusCode
+        - url
+      properties:
+        loadtime:
+          format: int32
+          type: integer
+        size:
+          format: int32
+          type: integer
+        statusCode:
+          format: int32
+          type: integer
+        url:
+          type: string
+    PageRuleResult:
+      type: object
+      required:
+        - name
+        - noOfChecks
+        - pageFilterResults
+        - ruleId
+        - tagResults
+      properties:
+        name:
+          type: string
+        noOfChecks:
+          $ref: '#/components/schemas/CheckTimesResult'
+        pageFilterResults:
+          items:
+            $ref: '#/components/schemas/PageFilterResult'
+          type: array
+        resultType:
+          enum:
+            - Passed
+            - Failed
+            - NotApplied
+            - Broken
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        tagResults:
+          items:
+            $ref: '#/components/schemas/PageTagResult'
+          type: array
+    PageRuleResultTag:
+      type: object
+      required:
+        - id
+        - name
+        - variables
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        tagAccount:
+          type: string
+        tagAccountMatchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        variables:
+          items:
+            $ref: '#/components/schemas/TagVariableResult'
+          type: array
+    PageRuleResults:
+      type: object
+      required:
+        - results
+        - summary
+      properties:
+        results:
+          items:
+            $ref: '#/components/schemas/PageRuleResult'
+          type: array
+        summary:
+          $ref: '#/components/schemas/PageRuleResultsSummary'
+    PageRuleResultsSummary:
+      type: object
+      required:
+        - totalNoOfRulesApplied
+        - totalNoOfRulesFailed
+        - totalNoOfRulesNotApplied
+        - totalNoOfRulesPassed
+      properties:
+        totalNoOfRulesApplied:
+          format: int32
+          type: integer
+        totalNoOfRulesFailed:
+          format: int32
+          type: integer
+        totalNoOfRulesNotApplied:
+          format: int32
+          type: integer
+        totalNoOfRulesPassed:
+          format: int32
+          type: integer
+    PageTagResult:
+      type: object
+      required:
+        - conditionId
+        - tag
+      properties:
+        conditionId:
+          format: int32
+          type: integer
+        resultType:
+          enum:
+            - Passed
+            - TagMissing
+            - IncorrectVariables
+          type: string
+        tag:
+          $ref: '#/components/schemas/PageRuleResultTag'
+    Pagination:
+      type: object
+      required:
+        - limit
+        - offset
+      properties:
+        limit:
+          format: int32
+          type: integer
+        offset:
+          format: int32
+          type: integer
+    Permissions:
+      type: object
+      required:
+        - intValue
+        - stringValue
+      properties:
+        intValue:
+          format: int32
+          type: integer
+        stringValue:
+          type: string
+    ProxyInfo:
+      type: object
+      required:
+        - interface
+        - port
+      properties:
+        authorization:
+          $ref: '#/components/schemas/Authorization'
+        interface:
+          type: string
+        port:
+          format: int32
+          type: integer
+    RemoteFileMapping:
+      type: object
+      required:
+        - matchType
+        - matchValue
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        createdBy:
+          format: int32
+          type: integer
+        fileId:
+          format: int32
+          type: integer
+        fileUrl:
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+            - '[equals'
+            - regex]
+          type: string
+        matchValue:
+          type: string
+        name:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        updatedBy:
+          format: int32
+          type: integer
+    RequestLog:
+      type: object
+      required:
+        - enabledSsl
+        - id
+        - journeyTagIds
+        - requestInfo
+        - requestLog
+        - responseInfo
+        - stepId
+        - timestamp
+      properties:
+        enabledSsl:
+          type: boolean
+        id:
+          type: string
+        journeyTagIds:
+          items:
+            type: string
+          type: array
+        requestInfo:
+          items:
+            $ref: '#/components/schemas/RequestLogProperty'
+          type: array
+        requestLog:
+          type: string
+        responseInfo:
+          items:
+            $ref: '#/components/schemas/RequestLogProperty'
+          type: array
+        stepId:
+          format: int32
+          type: integer
+        timestamp:
+          format: int64
+          type: integer
+    RequestLogProperty:
+      type: object
+      required:
+        - propName
+        - propValue
+      properties:
+        propName:
+          type: string
+        propValue:
+          type: string
+    Rule:
+      type: object
+      required:
+        - accountId
+        - checkTimes
+        - createdAt
+        - createdBy
+        - fromTemplate
+        - id
+        - isDefaultRule
+        - matchAllFilters
+        - name
+        - updatedAt
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        checkTimes:
+          format: int32
+          type: integer
+        createdAt:
+          format: date-time
+          type: string
+        createdBy:
+          format: int32
+          type: integer
+        fromTemplate:
+          type: boolean
+        id:
+          format: int32
+          type: integer
+        isDefaultRule:
+          type: boolean
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        matchAllFilters:
+          type: boolean
+        name:
+          type: string
+        notes:
+          type: string
+        pageFilters:
+          items:
+            $ref: '#/components/schemas/PageFilter'
+          type: array
+        recipients:
+          items:
+            type: string
+          type: array
+        tags:
+          items:
+            $ref: '#/components/schemas/RuleTag'
+          type: array
+        updatedAt:
+          format: date-time
+          type: string
+      description: Rule model
+    RuleDescription:
+      type: object
+      required:
+        - accountId
+        - checkTimes
+        - createdAt
+        - id
+        - matchAllFilters
+        - name
+        - updatedAt
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        checkTimes:
+          format: int32
+          type: integer
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchAllFilters:
+          type: boolean
+        name:
+          type: string
+        recipients:
+          items:
+            type: string
+          type: array
+        updatedAt:
+          format: date-time
+          type: string
+    RulePreview:
+      type: object
+      required:
+        - id
+        - isDefaultRule
+        - labels
+        - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        isDefaultRule:
+          type: boolean
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        name:
+          type: string
+      description: Rule preview model
+    RuleResultOverview:
+      type: object
+      required:
+        - broken
+        - failed
+        - notApplied
+        - passed
+      properties:
+        broken:
+          format: int32
+          type: integer
+        failed:
+          format: int32
+          type: integer
+        notApplied:
+          format: int32
+          type: integer
+        passed:
+          format: int32
+          type: integer
+    RuleResultTag:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    RuleTag:
+      type: object
+      required:
+        - id
+        - ruleId
+        - tagId
+      properties:
+        account:
+          type: string
+        clause:
+          enum:
+            - If
+            - Then
+            - Else
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        statusCode:
+          $ref: '#/components/schemas/RuleTagStatusCode'
+        tagId:
+          format: int32
+          type: integer
+        validationDescription:
+          type: string
+        variables:
+          items:
+            $ref: '#/components/schemas/RuleTagVariable'
+          type: array
+    RuleTagStatusCode:
+      type: object
+      properties:
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        value:
+          format: int32
+          type: integer
+        valueType:
+          enum:
+            - Specific
+            - SuccessAndRedirect
+            - Broken
+          type: string
+    RuleTagVariable:
+      type: object
+      required:
+        - id
+        - ruleTagId
+        - variable
+      properties:
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        ruleTagId:
+          format: int32
+          type: integer
+        selectorType:
+          enum:
+            - String
+            - UrlParameter
+            - DataLayer
+            - Tag
+            - FinalUrlParameter
+          type: string
+        validationDescription:
+          type: string
+        value:
+          type: string
+        valueTagId:
+          format: int32
+          type: integer
+        variable:
+          type: string
+    RunRuleDetails:
+      type: object
+      required:
+        - actionRuleOverview
+        - globalRuleOverview
+      properties:
+        actionRuleOverview:
+          $ref: '#/components/schemas/RuleResultOverview'
+        globalRuleOverview:
+          $ref: '#/components/schemas/RuleResultOverview'
+    SchedulePreset:
+      type: object
+    ScriptServicesCounts:
+      type: object
+      required:
+        - journeyFixes
+        - maxMonitoredJourneys
+        - usedMonitoredJourneys
+      properties:
+        journeyFixes:
+          format: int32
+          type: integer
+        maxMonitoredJourneys:
+          format: int32
+          type: integer
+        usedMonitoredJourneys:
+          format: int32
+          type: integer
+    SearchAppDomain:
+      type: object
+      required:
+        - folderId
+        - folderName
+        - id
+        - name
+      properties:
+        folderId:
+          format: int64
+          type: integer
+        folderName:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      description: Found domains
+    SearchFolder:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      description: Found folders
+    SearchJourney:
+      type: object
+      required:
+        - domainId
+        - domainName
+        - folderId
+        - folderName
+        - id
+        - name
+        - runId
+      properties:
+        domainId:
+          format: int64
+          type: integer
+        domainName:
+          type: string
+        folderId:
+          format: int64
+          type: integer
+        folderName:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        runId:
+          format: int64
+          type: integer
+      description: Found web journeys
+    SearchResult:
+      type: object
+      required:
+        - audits
+        - domains
+        - folders
+        - webJourneys
+      properties:
+        audits:
+          items:
+            $ref: '#/components/schemas/SearchJourney'
+          type: array
+        domains:
+          items:
+            $ref: '#/components/schemas/SearchAppDomain'
+          type: array
+        folders:
+          items:
+            $ref: '#/components/schemas/SearchFolder'
+          type: array
+        webJourneys:
+          items:
+            $ref: '#/components/schemas/SearchJourney'
+          type: array
+      description: Global search results
+    SeqObject:
+      type: object
+      required:
+        - empty
+        - traversableAgain
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    SeqSequencedAction:
+      type: object
+      required:
+        - empty
+        - traversableAgain
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    SeqString:
+      type: object
+      required:
+        - empty
+        - traversableAgain
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    SeqValue:
+      type: object
+      required:
+        - empty
+        - traversableAgain
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    SequencedAction:
+      type: object
+      required:
+        - action
+        - sequence
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionSwaggerReference'
+        actionId:
+          type: number
+        rules:
+          items:
+            type: number
+          type: array
+        sequence:
+          format: int32
+          type: integer
+    SequencedActionSwaggerReference:
+      type: object
+      required:
+        - preventNav
+        - selectors
+        - sequence
+      properties:
+        action:
+          enum:
+            - navto
+            - click
+            - input
+            - select
+            - check
+            - uncheck
+            - execute
+            - watch
+            - maskedInput
+            - enterIframe
+            - exitIframe
+          type: string
+        actionId:
+          type: number
+        js:
+          type: string
+        label:
+          type: string
+        maskedValue:
+          type: string
+        preventNav:
+          type: boolean
+        rules:
+          items:
+            type: number
+          type: array
+        seconds:
+          format: int32
+          type: integer
+        selectors:
+          items:
+            $ref: '#/components/schemas/WebActionSelectorSwaggerReference'
+          type: array
+        sequence:
+          format: int32
+          type: integer
+        url:
+          type: string
+        value:
+          type: string
+        waitDuration:
+          format: int32
+          maximum: 1800
+          minimum: 0
+          type: integer
+    SimpleSelector:
+      allOf:
+        - $ref: '#/components/schemas/WebActionSelectorSwaggerReference'
+        - type: object
+          required:
+            - selectorType
+            - value
+          properties:
+            selectorType:
+              format: int32
+              type: integer
+            value:
+              type: string
+    SnowflakeUsage:
+      type: object
+      required:
+        - useForAdobeAuditor
+        - useForAppJourneyRuleResults
+        - useForAppJourneys
+        - useForAudits
+        - useForLiveConnect
+        - useForLiveConnectRuleResults
+        - useForWebJourneyRuleResults
+        - useForWebJourneys
+        - used
+      properties:
+        useForAdobeAuditor:
+          type: boolean
+        useForAppJourneyRuleResults:
+          type: boolean
+        useForAppJourneys:
+          type: boolean
+        useForAudits:
+          type: boolean
+        useForLiveConnect:
+          type: boolean
+        useForLiveConnectRuleResults:
+          type: boolean
+        useForWebJourneyRuleResults:
+          type: boolean
+        useForWebJourneys:
+          type: boolean
+        used:
+          type: boolean
+    Tag:
+      type: object
+      required:
+        - category
+        - duplicateScoring
+        - icon
+        - id
+        - name
+      properties:
+        category:
+          $ref: '#/components/schemas/TagCategory'
+        duplicateScoring:
+          type: boolean
+        icon:
+          description: Tag icon URI
+          type: string
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        numSignatures:
+          type: number
+        numVariables:
+          type: number
+        type:
+          $ref: '#/components/schemas/TagType'
+        vendor:
+          $ref: '#/components/schemas/TagVendor'
+      description: Tag data
+    TagCategory:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: Tag category data
+    TagResult:
+      type: object
+      required:
+        - conditionId
+        - tag
+        - variables
+      properties:
+        conditionId:
+          format: int32
+          type: integer
+        resultType:
+          enum:
+            - Passed
+            - TagMissing
+            - IncorrectVariables
+          type: string
+        tag:
+          $ref: '#/components/schemas/RuleResultTag'
+        tagAccount:
+          type: string
+        tagAccountMatchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        variables:
+          items:
+            $ref: '#/components/schemas/TagVariableResult'
+          type: array
+    TagType:
+      type: object
+    TagVariable:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        value:
+          type: string
+    TagVariableResult:
+      type: object
+      required:
+        - expectedValues
+        - snapshotId
+      properties:
+        actualValue:
+          type: string
+        expectedParamName:
+          type: string
+        expectedValues:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        name:
+          type: string
+        resultType:
+          enum:
+            - Passed
+            - MissingVariable
+            - BadValue
+          type: string
+        selectorType:
+          enum:
+            - String
+            - UrlParameter
+            - DataLayer
+            - Tag
+            - FinalUrlParameter
+          type: string
+        snapshotId:
+          format: int64
+          type: integer
+        variableTag:
+          $ref: '#/components/schemas/RuleResultTag'
+    TagVendor:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    TokenType:
+      type: object
+    UpdateFolder:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+      description: Folder update information
+    UpdatePageFilter:
+      type: object
+      properties:
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        type:
+          description: 1 - url, 2 - status code, 3 - final url, 4 - final status code
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+          format: int32
+          type: integer
+        value:
+          type: string
+    UpdateRule:
+      type: object
+      required:
+        - checkTimes
+        - matchAllFilters
+        - name
+      properties:
+        checkTimes:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        isDefaultRule:
+          type: number
+        labels:
+          items:
+            $ref: '#/components/schemas/LabelId'
+          type: array
+        matchAllFilters:
+          type: boolean
+        name:
+          type: string
+        notes:
+          type: string
+        pageFilters:
+          items:
+            $ref: '#/components/schemas/UpdatePageFilter'
+          type: array
+        recipients:
+          items:
+            type: string
+          type: array
+        tags:
+          items:
+            $ref: '#/components/schemas/UpdateRuleTag'
+          type: array
+      description: Rule update information
+    UpdateRuleTag:
+      type: object
+      required:
+        - tagId
+      properties:
+        account:
+          type: string
+        clause:
+          enum:
+            - If
+            - Then
+            - Else
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        statusCode:
+          $ref: '#/components/schemas/RuleTagStatusCode'
+        tagId:
+          format: int32
+          type: integer
+        validationDescription:
+          type: string
+        variables:
+          items:
+            $ref: '#/components/schemas/UpdateRuleTagVariable'
+          type: array
+    UpdateRuleTagVariable:
+      type: object
+      required:
+        - variable
+      properties:
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+            - Equals
+            - DoesNotEqual
+            - Contains
+            - DoesNotContain
+            - Regex
+            - IsSet
+            - IsNotSet
+            - GreaterThanOrEqualTo
+            - LessThanOrEqualTo
+          type: string
+        ruleTagId:
+          format: int32
+          type: integer
+        selectorType:
+          enum:
+            - String
+            - UrlParameter
+            - DataLayer
+            - Tag
+            - FinalUrlParameter
+          type: string
+        validationDescription:
+          type: string
+        value:
+          type: string
+        valueTagId:
+          format: int32
+          type: integer
+        variable:
+          type: string
+    UploadedHarFile:
+      type: object
+      required:
+        - s3Key
+      properties:
+        name:
+          type: string
+        s3Key:
+          type: string
+    User:
+      type: object
+      required:
+        - accountId
+        - created
+        - email
+        - firstName
+        - fullUsageDashboardAccess
+        - id
+        - lastName
+        - maxPagesPerAudit
+        - timezone
+        - updated
+        - username
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        created:
+          format: date-time
+          type: string
+        deleted:
+          description: >-
+            ISO 8601 date time string with offset when user was deleted, null if
+            not deleted
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: boolean
+        id:
+          format: int32
+          type: integer
+        lastLogin:
+          format: date-time
+          type: string
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          format: int32
+          type: integer
+        permissions:
+          enum:
+            - guest
+            - user
+            - admin
+          type: string
+        timezone:
+          type: string
+        updated:
+          format: date-time
+          type: string
+        username:
+          type: string
+      description: User model
+    UserAction:
+      type: object
+    UserAgent:
+      type: object
+      required:
+        - label
+        - name
+      properties:
+        label:
+          type: string
+        name:
+          type: string
+    UserContext:
+      type: object
+      required:
+        - accountId
+        - accountStatus
+        - accountType
+        - capabilities
+        - credsExpired
+        - email
+        - features
+        - id
+        - isAccountActive
+        - isAccountAdmin
+        - isLongTermToken
+        - isOpAdmin
+        - isOpSysAdmin
+        - isReadOnly
+        - isUser
+        - isUserToken
+        - isVisitor
+        - permissions
+        - rawToken
+        - snowflakeUsage
+        - timezone
+        - tokenType
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        accountStatus:
+          enum:
+            - ACTIVE
+            - ACTIVE_BILLING_PROBLEM
+            - INACTIVE_BILLING_FAILED
+            - INACTIVE_USER_CANCELLED
+            - INACTIVE
+            - DEMO
+          type: string
+        accountType:
+          enum:
+            - ADOBE_AUDITOR
+            - FREE
+            - CONTRACT
+            - CPM_PARTNER
+            - SAMPLE
+            - INTERNAL
+            - CONTRACT_SELF_SERVICE
+          type: string
+        authToken:
+          $ref: '#/components/schemas/AuthToken'
+        capabilities:
+          $ref: '#/components/schemas/AccountCapabilities'
+        credsExpired:
+          type: boolean
+        email:
+          type: string
+        features:
+          items:
+            $ref: '#/components/schemas/Value'
+          type: array
+        id:
+          format: int32
+          type: integer
+        isAccountActive:
+          type: boolean
+        isAccountAdmin:
+          type: boolean
+        isLongTermToken:
+          type: boolean
+        isOpAdmin:
+          type: boolean
+        isOpSysAdmin:
+          type: boolean
+        isReadOnly:
+          type: boolean
+        isUser:
+          type: boolean
+        isUserToken:
+          type: boolean
+        isVisitor:
+          type: boolean
+        loginAsRequestedByUserId:
+          type: number
+        permissions:
+          $ref: '#/components/schemas/Permissions'
+        rawToken:
+          type: string
+        snowflakeUsage:
+          $ref: '#/components/schemas/SnowflakeUsage'
+        timezone:
+          $ref: '#/components/schemas/DateTimeZone'
+        tokenType:
+          $ref: '#/components/schemas/TokenType'
+    UserDocument:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - timezone
+        - username
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: number
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          type: number
+        permissions:
+          enum:
+            - guest
+            - user
+            - admin
+          type: string
+        timezone:
+          type: string
+        username:
+          type: string
+      description: User create/update model
+    UserFolder:
+      type: object
+      required:
+        - accountId
+        - id
+        - name
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: User folder model
+    Value:
+      type: object
+    WebActionElementAttributeSwaggerReference:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+    WebActionElementDescriptionSwaggerReference:
+      type: object
+      required:
+        - attributes
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/WebActionElementAttributeSwaggerReference'
+          type: array
+        innerHTML:
+          type: string
+        tagName:
+          type: string
+    WebActionSelectorSwaggerReference:
+      type: object
+      discriminator:
+        propertyName: selectorType
+      properties:
+        selectorType:
+          format: int32
+          type: integer
+      description: 'Children: AttributesSelector, SimpleSelector'
+    WebJourney:
+      type: object
+      required:
+        - actions
+        - domainId
+        - emails
+        - folderId
+        - id
+        - name
+        - options
+        - queued
+        - userId
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/SequencedActionSwaggerReference'
+          type: array
+        createdAt:
+          format: date-time
+          type: string
+        domainId:
+          format: int64
+          type: integer
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        lastCheck:
+          format: date-time
+          type: string
+        name:
+          type: string
+        nextCheck:
+          format: date-time
+          type: string
+        options:
+          $ref: '#/components/schemas/WebJourneyOptions'
+        queued:
+          type: boolean
+        screenshot:
+          type: string
+        status:
+          enum:
+            - Ok
+            - Failed
+            - NotChecked
+            - RulesFailed
+            - ActionFailed
+            - PageFailed
+            - DataCollectionFailure
+          type: string
+        userId:
+          format: int64
+          type: integer
+        webJourneyRunning:
+          type: boolean
+      description: Web journey model
+    WebJourneyCardData:
+      type: object
+      required:
+        - domain
+        - domainId
+        - emails
+        - folderId
+        - id
+        - labels
+        - name
+        - options
+        - queued
+        - schedule
+        - startingUrl
+        - userId
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        domain:
+          type: string
+        domainId:
+          format: int64
+          type: integer
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        lastCheck:
+          format: date-time
+          type: string
+        lastRun:
+          $ref: '#/components/schemas/WebJourneyRun'
+        name:
+          type: string
+        nextCheck:
+          format: date-time
+          type: string
+        options:
+          $ref: '#/components/schemas/WebJourneyOptions'
+        queued:
+          type: boolean
+        schedule:
+          $ref: '#/components/schemas/CardScheduleData'
+        screenshot:
+          type: string
+        startingUrl:
+          type: string
+        status:
+          enum:
+            - Ok
+            - Failed
+            - NotChecked
+            - RulesFailed
+            - ActionFailed
+            - PageFailed
+            - DataCollectionFailure
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: int64
+          type: integer
+        webJourneyRunning:
+          type: boolean
+      description: Web Journey with Last Run Info
+    WebJourneyData:
+      type: object
+      required:
+        - actions
+        - domainId
+        - emails
+        - name
+        - options
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/SequencedActionSwaggerReference'
+          type: array
+        domainId:
+          format: int64
+          type: integer
+        emails:
+          items:
+            type: string
+          type: array
+        name:
+          type: string
+        options:
+          $ref: '#/components/schemas/WebJourneyOptions'
+    WebJourneyOptions:
+      type: object
+      required:
+        - alerts
+        - browserWidth
+        - loadFlash
+        - location
+        - userAgent
+      properties:
+        alerts:
+          type: boolean
+        browserWidth:
+          format: int32
+          type: integer
+        customProxy:
+          type: string
+        flashLiveVideoEnabled:
+          type: boolean
+        frequency:
+          type: string
+        loadFlash:
+          type: boolean
+        location:
+          type: string
+        monitoredByScriptServices:
+          type: number
+        nextRun:
+          format: date-time
+          type: string
+        remoteFileMapConfig:
+          items:
+            $ref: '#/components/schemas/RemoteFileMapping'
+          type: array
+        userAgent:
+          type: string
+        userAgentDescription:
+          type: string
+        vpnEnabled:
+          type: boolean
+        webHookUrl:
+          type: string
+    WebJourneyRun:
+      type: object
+      required:
+        - id
+        - webJourneyId
+      properties:
+        completedAt:
+          format: date-time
+          type: string
+        id:
+          format: int64
+          type: integer
+        startedAt:
+          format: date-time
+          type: string
+        status:
+          enum:
+            - Ok
+            - Failed
+            - NotChecked
+            - RulesFailed
+            - ActionFailed
+            - PageFailed
+            - DataCollectionFailure
+          type: string
+        webJourneyId:
+          format: int64
+          type: integer
+    WebJourneyRunActionResult:
+      type: object
+      required:
+        - action
+        - actionId
+        - fileMappingResults
+        - generatedActions
+        - ruleResults
+        - screenshot
+        - simplifiedRuleSetupAllowed
+        - success
+        - tags
+        - thumbnail
+        - timelineId
+        - timestamp
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionSwaggerReference'
+        actionId:
+          format: int64
+          type: integer
+        actionSetId:
+          type: number
+        failureMessage:
+          type: string
+        failureType:
+          type: string
+        fileMappingResults:
+          items:
+            $ref: '#/components/schemas/FileMappingResult'
+          type: array
+        finishPageUrl:
+          type: string
+        generatedActions:
+          items:
+            $ref: '#/components/schemas/GeneratedAction'
+          type: array
+        pageInfo:
+          $ref: '#/components/schemas/PageInfo'
+        result:
+          type: string
+        ruleResults:
+          items:
+            $ref: '#/components/schemas/ApiRuleResult'
+          type: array
+        screenshot:
+          type: string
+        simplifiedRuleSetupAllowed:
+          type: boolean
+        startPageUrl:
+          type: string
+        success:
+          type: boolean
+        tags:
+          items:
+            $ref: '#/components/schemas/ActionTag'
+          type: array
+        thumbnail:
+          type: string
+        timelineId:
+          format: int32
+          type: integer
+        timestamp:
+          format: int64
+          type: integer
+    WebJourneyRunResult:
+      type: object
+      required:
+        - actions
+        - globalRuleResults
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/WebJourneyRunActionResult'
+          type: array
+        globalRuleResults:
+          items:
+            $ref: '#/components/schemas/ApiRuleResult'
+          type: array
+    WebJourneyWithInfo:
+      type: object
+      required:
+        - domain
+        - domainId
+        - emails
+        - folderId
+        - id
+        - labels
+        - name
+        - options
+        - queued
+        - runs
+        - startingUrl
+        - userId
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        domain:
+          type: string
+        domainId:
+          format: int64
+          type: integer
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        lastCheck:
+          format: date-time
+          type: string
+        name:
+          type: string
+        nextCheck:
+          format: date-time
+          type: string
+        options:
+          $ref: '#/components/schemas/WebJourneyOptions'
+        queued:
+          type: boolean
+        runs:
+          items:
+            $ref: '#/components/schemas/WebJourneyRun'
+          type: array
+        screenshot:
+          type: string
+        startingUrl:
+          type: string
+        status:
+          enum:
+            - Ok
+            - Failed
+            - NotChecked
+            - RulesFailed
+            - ActionFailed
+            - PageFailed
+            - DataCollectionFailure
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: int64
+          type: integer
+        webJourneyRunning:
+          type: boolean
+      description: Web journey with run info model
+    WritableItemSchedule:
+      type: object
+      required:
+        - dtStart
+        - isPaused
+        - recurrenceRule
+        - tzId
+      properties:
+        dtStart:
+          $ref: '#/components/schemas/LocalDateTime'
+        id:
+          type: number
+        isPaused:
+          type: boolean
+        recurrenceRule:
+          type: string
+        tzId:
+          type: string

@@ -1,0 +1,160 @@
+generated: '2026-08-26'
+method: derived
+source: >-
+  openapi/observepoint-v3-api-openapi.yml, openapi/observepoint-grid-reports-api-openapi.yml,
+  openapi/observepoint-v2-api-openapi.yml (4xx/5xx responses); enriched from
+  https://api-docs.observepoint.com/ (API Responses) and a live 404/401 probe of api.observepoint.com
+format: proprietary-json
+rfc9457: false
+note: >-
+  ObservePoint does NOT use RFC 9457 application/problem+json. Errors are ordinary application/json
+  objects. Two envelopes are in play: the v3/Grid `ErrorModel` (timestamp, message, details,
+  validationReport) and a numeric-code envelope used by v2 and by a few v3 run endpoints
+  (errorCode, message, plus endpoint-specific fields such as runId or items). A live unauthenticated
+  probe of api.observepoint.com returned the second shape verbatim.
+envelopes:
+- name: ErrorModel
+  used_by:
+  - openapi/observepoint-v3-api-openapi.yml
+  - openapi/observepoint-grid-reports-api-openapi.yml
+  media_type: application/json
+  fields:
+  - name: timestamp
+    type: string
+    format: date-time
+  - name: message
+    type: string
+  - name: details
+    type: string
+  - name: validationReport
+    type: object
+- name: ApiError (numeric code)
+  used_by:
+  - openapi/observepoint-v2-api-openapi.yml
+  - openapi/observepoint-v3-api-openapi.yml
+  media_type: application/json
+  fields:
+  - name: errorCode
+    type: integer
+  - name: message
+    type: string
+  - name: runId
+    type: integer
+    optional: true
+    note: present on ItemIsRunningApiError
+  - name: items
+    type: array
+    optional: true
+    note: present on ItemsAreRunningApiError
+  observed:
+    url: https://api.observepoint.com/openapi.json
+    http_status: 404
+    body: '{"message":"Requested resource not found","errorCode":0}'
+    probed: '2026-08-26'
+status_class_policy:
+  source: https://api-docs.observepoint.com/
+  '2xx': The request was successful
+  '4xx': There was a mistake in your request. The response payload will tell you what was wrong.
+  '5xx': >-
+    There is an error with the ObservePoint servers. You can retry certain 5xx errors (like 502).
+    If retrying doesn't resolve the problem, contact ObservePoint support.
+problem_types:
+- status: 400
+  title: Bad request
+  occurrences: 198
+  specs: [v3, grid]
+  media: application/json
+  remediation: Correct the request payload or query parameters; the response body names the failing field.
+- status: 401
+  title: Authentication credentials are missing or invalid
+  occurrences: 349
+  specs: [v3, grid, v2]
+  remediation: >-
+    Send the Authorization header in the documented form `Authorization: api_key <YOUR_API_KEY>`.
+    A missing header on api.observepoint.com returns the plain-text body "Bearer token is absent".
+- status: 403
+  title: Insufficient permissions for the requested folder, rule, user or resource
+  occurrences: 176
+  specs: [v3, grid, v2]
+  media: application/json
+  examples:
+  - Don't have permissions to access this folder
+  - Not Admin user or id parameter is not equal to current user id
+  - Current user has read-only permissions or doesn't have access to this rule
+  remediation: >-
+    Use a key belonging to a user with write access to the folder/sub-folder, or with Admin rights for
+    account-level operations such as user management and webhook secret rotation.
+- status: 404
+  title: Requested item not found
+  occurrences: 309
+  specs: [v3, grid, v2]
+  media: application/json
+  examples:
+  - Requested item not found
+  - Rule by given id not found
+  - Not found user by given id
+  remediation: Verify the id; deleted (archived) audits and journeys stop resolving until undeleted.
+- status: 409
+  title: Conflict — name collision or run already in progress
+  occurrences: 4
+  specs: [v3, v2]
+  media: application/json
+  examples:
+  - Rule name is not unique
+  - Journey is already running
+  - The audit run is already stopped or completed
+  remediation: Choose a unique name, or wait for / stop the in-flight run before retrying.
+- status: 422
+  title: Supplied entity didn't pass validation
+  occurrences: 7
+  specs: [v2]
+  examples:
+  - Supplied entity didn't pass a validation
+  - Empty name
+  - Some of provided folder id's is not found
+  remediation: Populate required fields and reference existing folder ids.
+- status: 423
+  title: Locked — the item has an active run
+  occurrences: 5
+  specs: [v2]
+  media: application/json
+  examples:
+  - This item has active run. Please stop & discard active run first
+  - Following items are still running. Please stop & discard their active runs first
+  remediation: >-
+    Stop and discard the active run (DELETE /web-audits/{webAuditId}/runs/{runId} on v2) before mutating
+    or deleting the item.
+- status: 424
+  title: Failed dependency
+  occurrences: 1
+  specs: [v3]
+  remediation: An upstream ObservePoint resource the operation depends on was unavailable; retry.
+- status: 429
+  title: Too Many Requests — API rate limit exceeded
+  occurrences: 0
+  specs: []
+  documented_only: true
+  source: https://api-docs.observepoint.com/sections/rate-limiting
+  note: >-
+    429 is documented in the rate-limiting guide but is declared on ZERO operations in any of the three
+    published OpenAPI documents. An agent reading only the spec would never learn the API can rate-limit it.
+  remediation: >-
+    Wait and retry; usually a few seconds is enough, occasionally up to 5 minutes. ObservePoint states
+    retrying cannot cause harm and that rate-limited requests are not billed.
+domain_error_codes:
+- name: WebJourneyRun_ErrorCode
+  source: openapi/observepoint-v3-api-openapi.yml#/components/schemas/WebJourneyRun_ErrorCode
+  codes:
+  - code: 10
+    meaning: ValidationError
+  - code: 11
+    meaning: MalformedRequest
+  - code: 33
+    meaning: AlreadyRunning
+  - code: 34
+    meaning: UsageLimitExceeded
+gaps:
+- No RFC 9457 / application/problem+json representation on any operation.
+- No 5xx response is declared on any operation in any of the three specs, despite the docs describing 5xx behaviour.
+- No 429 response is declared on any operation, despite a dedicated rate-limiting doc page.
+- 401 responses declare no response body schema, so the plain-text 401 an agent actually receives is undocumented.

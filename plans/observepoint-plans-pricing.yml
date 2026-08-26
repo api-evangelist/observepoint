@@ -1,0 +1,57 @@
+generated: '2026-08-26'
+method: searched
+source: https://www.observepoint.com/pricing/
+docs: https://www.observepoint.com/pricing/
+plan_count: 0
+pricing_model: sales-quoted
+currency: USD
+note: >-
+  ObservePoint publishes NO priced plans. https://www.observepoint.com/pricing/ (HTTP 200) renders a
+  JavaScript "Pricing Calculator" widget with no tier names, no prices and no quotas in the served HTML;
+  the page's only calls to action are "Get Demo" (request-a-demo form) and "Try for Free"
+  (app.observepoint.com/sign-up). The footer routes buyers to sales@observepoint.com / +1 (801) 717-9361.
+  plan_count is 0 because there is nothing published to record, not because the page is missing.
+api_pricing:
+  included_in_subscription: true
+  additional_cost: false
+  quote: >-
+    "API access is included with all ObservePoint subscriptions. There is no additional cost to use the API."
+  source: https://api-docs.observepoint.com/
+metered_dimensions:
+- name: Data retention
+  default: 13 months of results data, included with the subscription
+  paid_upgrades:
+  - 3 years + 1 month (additional charge)
+  - 5 years + 1 month (additional charge)
+  - 7 years + 1 month (additional charge)
+  note: >-
+    Configuration data (settings, rules, alerts) is retained indefinitely while the subscription is
+    active; only results data ages out. After cancellation an access-only read-only subscription can be
+    purchased to keep reading retained results.
+  source: https://help.observepoint.com/en/articles/13161465-observepoint-data-retention
+- name: Journey/audit run usage
+  signal: WebJourneyRun_ErrorCode 34 (UsageLimitExceeded)
+  note: A subscription-level run allowance exists and is enforced in the API, but its size is not published.
+  source: openapi/observepoint-v3-api-openapi.yml
+support_tiers:
+  note: >-
+    Not priced plans — ObservePoint publishes three named SUPPORT levels attached to a subscription, with
+    no response-time SLA, no coverage hours and no prices stated.
+  tiers:
+  - name: Self Support
+    includes: Technical Support via email and in-app chat, Help Center, Academy, TipJar and Data Chat LIVE, Slack Community
+  - name: Live Support
+    includes: Self Support plus a team of Success Managers for strategic planning, working sessions and business reviews
+  - name: Named Support
+    includes: Live Support plus a dedicated Success Manager familiar with the customer's implementation
+  source: https://help.observepoint.com/en/articles/9251132-customer-success-support-levels
+free_tier:
+  available: true
+  form: Self-service "Try for Free" signup at https://app.observepoint.com/sign-up
+  limits_published: false
+probes:
+- url: https://www.observepoint.com/pricing/
+  status: 200
+  note: Served HTML contains navigation, address and "Pricing Calculator" heading only — no prices.
+- url: https://app.observepoint.com/sign-up
+  status: 200

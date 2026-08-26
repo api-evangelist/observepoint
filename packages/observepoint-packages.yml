@@ -1,0 +1,61 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  npm registry search (registry.npmjs.org/-/v1/search?text=observepoint), pypi.org/pypi/{observepoint,
+  observepoint-api,observepoint-sdk}/json, rubygems.org/api/v1/gems/observepoint.json, crates.io search,
+  packagist.org search, and the GitHub org api.github.com/orgs/observepoint/repos
+summary:
+  official_sdk_count: 0
+  official_package_count: 1
+  note: >-
+    ObservePoint publishes NO first-party client SDK on any package registry. npm, PyPI, RubyGems,
+    crates.io and Packagist all return zero ObservePoint-owned packages (npm's only near-match,
+    "tracklint", belongs to an unrelated GitHub user). The published docs teach the API with raw curl
+    and a plain `requests` example rather than a client library. The one first-party distributable is a
+    GitHub Action for triggering audits from CI/CD, distributed from the GitHub repo (and Marketplace),
+    not from a language registry — so it is recorded here as a package but NOT as an SDK, and no
+    `type: SDKs` pointer is emitted in apis.yml.
+packages:
+- name: observepoint/github-actions-integration
+  kind: github-action
+  official: true
+  registry: github
+  url: https://github.com/observepoint/github-actions-integration
+  description: >-
+    A GitHub Action that automatically triggers ObservePoint audits in CI/CD pipelines with secure
+    callback handling. Ships action.yaml plus workflow-examples/.
+  license: MIT
+  version: v1.1.0
+  published: '2026-01-27'
+  first_published: '2025-07-17'
+  last_commit: '2026-05-14'
+  release_count: 2
+  source: https://api.github.com/repos/observepoint/github-actions-integration/releases
+  note: >-
+    Version and date read from the GitHub Releases API (tag v1.1.0, published_at 2026-01-27T14:14:26Z).
+    GitHub Actions have no language-registry metadata endpoint; the release tag is the currency signal.
+registries_checked:
+- registry: npm
+  query: https://registry.npmjs.org/-/v1/search?text=observepoint
+  first_party_hits: 0
+- registry: pypi
+  query: https://pypi.org/pypi/observepoint/json (also observepoint-api, observepoint-sdk)
+  status: 404
+  first_party_hits: 0
+- registry: rubygems
+  query: https://rubygems.org/api/v1/gems/observepoint.json
+  status: 404
+  first_party_hits: 0
+- registry: crates.io
+  query: https://crates.io/api/v1/crates?q=observepoint
+  first_party_hits: 0
+- registry: packagist
+  query: https://packagist.org/search.json?q=observepoint
+  first_party_hits: 0
+- registry: github
+  query: https://api.github.com/orgs/observepoint/repos
+  first_party_hits: 1
+  note: >-
+    8 public repos in the org; 6 are archived forks of third-party tooling (LittleProxy, browsermob-proxy,
+    chrome-har-capturer, collection-cacheable-for-spring, ex_aws, jooq-codegen-sbt), 1 is a 2026 hackathon
+    Chrome-extension skeleton, and 1 is the GitHub Action recorded above.

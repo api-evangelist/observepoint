@@ -1,0 +1,1205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Verbatim components.schemas extracted from ObservePoint's published Data Dictionary API OpenAPI document (https://api-docs.observepoint.com/_bundle/openapi/DATA-DICTIONARY-API.openapi.yaml). That document declares 70 schemas and ZERO paths - it is a schema-only definition published alongside the operational specs. Extracted 2026-08-26 by the API Evangelist enrichment pipeline; schema bodies are unmodified.",
+  "title": "Data Dictionary API by Observepoint",
+  "$defs": {
+    "DateAndTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with\nthe following additional restrictions:\n1. An uppercase T must separate the date and time portions.\n2. An uppercase Z must denote that a numeric time zone offset isn't present.\n\nIn general, these timestamp requirements are the same in\n[AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)\n",
+      "example": "2016-08-18T17:33:00Z"
+    },
+    "AuditId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 107239
+    },
+    "RunId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 33010
+    },
+    "WebJourneyId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 107239
+    },
+    "ActionSequenceId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 3
+    },
+    "PageId": {
+      "type": "string",
+      "example": "381d04a05a4aa6aea44f078e1f8e9fe6"
+    },
+    "DataDictionary_EntityTypeEnum": {
+      "type": "string",
+      "description": "Data dictionary entity type",
+      "enum": [
+        "cookies",
+        "tags"
+      ]
+    },
+    "DataDictionary_SourceEnum": {
+      "type": "string",
+      "description": "Whether the field or definition is managed by ObservePoint or created by the customer",
+      "enum": [
+        "op",
+        "custom"
+      ]
+    },
+    "DataDictionary_FieldsDTO": {
+      "type": "object",
+      "description": "All fields available in a dictionary, both ObservePoint and custom.\n\nFields returned in the `visibleFields` array are the only fields visible in the specified dictionary,\nordered according to configuration, and enriched with account-specific configuration properties\n(e.g. `showInDataPreview`).\n\nThe response is narrowed for visitors and for accounts with limited Data Dictionary access.\nThose callers get only the subset of visible fields that are flagged `showInDataPreview`, and an\nempty `hiddenFields` \u2014 a populated hidden list would itself disclose that further fields exist.\nBoth arrays are always present.\n",
+      "required": [
+        "visibleFields",
+        "hiddenFields"
+      ],
+      "properties": {
+        "visibleFields": {
+          "type": "array",
+          "description": "Fields visible in this dictionary, in display order. Restricted callers (see the schema description) receive only the fields flagged `showInDataPreview`.\n",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_Field"
+          }
+        },
+        "hiddenFields": {
+          "type": "array",
+          "description": "Fields hidden in this dictionary. Always empty for restricted callers (see the schema description), which is not the same as there being no hidden fields.\n",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_Field"
+          }
+        }
+      }
+    },
+    "DataDictionary_Field": {
+      "required": [
+        "id",
+        "source",
+        "name",
+        "formatSchema",
+        "dictionarySettings",
+        "canEdit",
+        "canDelete"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldTrait"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "canEdit": {
+              "type": "array",
+              "description": "Properties of this field that the current user is allowed to update",
+              "items": {
+                "$ref": "#/components/schemas/DataDictionary_FieldEditablePropertyEnum"
+              }
+            },
+            "canDelete": {
+              "type": "boolean",
+              "description": "Whether the current user is allowed to delete this field"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_FieldTrait": {
+      "type": "object",
+      "description": "Common field properties shared across field representations",
+      "properties": {
+        "id": {
+          "$ref": "#/components/schemas/DataDictionary_FieldId"
+        },
+        "source": {
+          "$ref": "#/components/schemas/DataDictionary_SourceEnum"
+        },
+        "name": {
+          "type": "string",
+          "description": "Field name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Field description"
+        },
+        "formatSchema": {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        },
+        "displayMetadata": {
+          "$ref": "#/components/schemas/DataDictionary_DisplayMetadata"
+        },
+        "dictionarySettings": {
+          "$ref": "#/components/schemas/DataDictionary_DictionarySettings"
+        }
+      }
+    },
+    "DataDictionary_FieldId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Field ID",
+      "example": 123
+    },
+    "DataDictionary_FieldFormatEnum": {
+      "type": "string",
+      "description": "Data format of the field's value:\n* `text` - plain text string\n* `integer_number` - whole number\n* `decimal_number` - decimal number\n* `markdown` - markdown-formatted text\n* `email` - string, a valid email address, at most 320 characters\n* `url` - string, a valid http/https URL, at most 2000 characters\n* `duration_seconds` - non-negative whole number of seconds\n* `date` - strict ISO `yyyy-MM-dd` string\n* `datetime` - ISO-8601 string with a UTC or numeric offset\n* `enum` - item id from the field's item catalog (see `DataDictionary_EnumFieldFormatSchema`)\n* `entity_reference` - id of a referenced entity (see `DataDictionary_EntityReferenceFieldFormatSchema`)\n",
+      "enum": [
+        "text",
+        "integer_number",
+        "decimal_number",
+        "markdown",
+        "email",
+        "url",
+        "duration_seconds",
+        "date",
+        "datetime",
+        "enum",
+        "entity_reference"
+      ]
+    },
+    "DataDictionary_FieldFormatSchema": {
+      "type": "object",
+      "description": "Describes the data format of a field's value",
+      "required": [
+        "type",
+        "isList"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatEnum"
+        },
+        "isList": {
+          "type": "boolean",
+          "description": "Whether the field holds a list of values"
+        }
+      },
+      "discriminator": {
+        "propertyName": "type",
+        "mapping": {
+          "text": "#/components/schemas/DataDictionary_TextFieldFormatSchema",
+          "integer_number": "#/components/schemas/DataDictionary_IntegerNumberFieldFormatSchema",
+          "decimal_number": "#/components/schemas/DataDictionary_DecimalNumberFieldFormatSchema",
+          "markdown": "#/components/schemas/DataDictionary_MarkdownFieldFormatSchema",
+          "email": "#/components/schemas/DataDictionary_EmailFieldFormatSchema",
+          "url": "#/components/schemas/DataDictionary_UrlFieldFormatSchema",
+          "duration_seconds": "#/components/schemas/DataDictionary_DurationSecondsFieldFormatSchema",
+          "date": "#/components/schemas/DataDictionary_DateFieldFormatSchema",
+          "datetime": "#/components/schemas/DataDictionary_DatetimeFieldFormatSchema",
+          "enum": "#/components/schemas/DataDictionary_EnumFieldFormatSchema",
+          "entity_reference": "#/components/schemas/DataDictionary_EntityReferenceFieldFormatSchema"
+        }
+      }
+    },
+    "DataDictionary_TextFieldFormatSchema": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        }
+      ]
+    },
+    "DataDictionary_MarkdownFieldFormatSchema": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        }
+      ]
+    },
+    "DataDictionary_IntegerNumberFieldFormatSchema": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        }
+      ]
+    },
+    "DataDictionary_DecimalNumberFieldFormatSchema": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        }
+      ]
+    },
+    "DataDictionary_EmailFieldFormatSchema": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        }
+      ]
+    },
+    "DataDictionary_UrlFieldFormatSchema": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        }
+      ]
+    },
+    "DataDictionary_DurationSecondsFieldFormatSchema": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        }
+      ]
+    },
+    "DataDictionary_DateFieldFormatSchema": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        }
+      ]
+    },
+    "DataDictionary_DatetimeFieldFormatSchema": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        }
+      ]
+    },
+    "DataDictionary_EnumItem": {
+      "type": "object",
+      "description": "One selectable item of an `enum` field. Item ids are client-assigned and stable:\nrenaming an item keeps its id, so stored definition values are never affected.\n",
+      "required": [
+        "id",
+        "value"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "description": "Client-assigned item id: a non-negative integer (zero allowed),\nunique within the field. An id that matches an existing item of the field\nrenames that item; a new id adds a new item.\n"
+        },
+        "value": {
+          "type": "string",
+          "description": "Display value (label) of the item. Unique within the field, case-insensitive."
+        }
+      }
+    },
+    "DataDictionary_EnumFieldFormatSchema": {
+      "description": "Field format schema for `enum` values. The definition value is an item id\n(or an array of item ids when `isList` is `true`).\n\nFor custom fields, items can be renamed and new items added; items cannot be removed.\nWhen updating, submit the field's FULL item catalog (like other editable properties,\n`enumItems` is replaced as a whole): every existing item id must be present, or the\nrequest is rejected as an attempted removal.\n",
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        },
+        {
+          "type": "object",
+          "required": [
+            "enumItems"
+          ],
+          "properties": {
+            "enumItems": {
+              "type": "array",
+              "description": "The selectable items of this field",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/components/schemas/DataDictionary_EnumItem"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_ReferencedEntityTypeEnum": {
+      "type": "string",
+      "description": "Which kind of entity an `entity_reference` field's value ids point to",
+      "enum": [
+        "user",
+        "tag"
+      ]
+    },
+    "DataDictionary_EntityReferenceFieldFormatSchema": {
+      "description": "Field format schema for `entity_reference` values. The definition value is a positive\ninteger id of the referenced entity (or an array of ids when `isList` is `true`).\nReferenced ids are not existence-checked.\n\n`isList: true` is only supported for `tag` referencedEntityType.\n",
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldFormatSchema"
+        },
+        {
+          "type": "object",
+          "required": [
+            "referencedEntityType"
+          ],
+          "properties": {
+            "referencedEntityType": {
+              "$ref": "#/components/schemas/DataDictionary_ReferencedEntityTypeEnum"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_DisplayMetadata": {
+      "type": "object",
+      "description": "Free-form display metadata for the field (used by the UI)"
+    },
+    "DataDictionary_DictionarySettings": {
+      "type": "object",
+      "description": "Account-specific configuration for a field within a dictionary",
+      "required": [
+        "showInDataPreview"
+      ],
+      "properties": {
+        "showInDataPreview": {
+          "type": "boolean",
+          "description": "Whether the field is shown in the definition details preview"
+        }
+      }
+    },
+    "DataDictionary_FieldEditablePropertyEnum": {
+      "type": "string",
+      "description": "A field property that can be updated.\nProperty names are in camel case, e.g. `display_metadata` enum value corresponds to the `displayMetadata` property.\n\n`format_schema` is advertised for all custom fields, but only `enum` fields have mutable\ncontent: their `enumItems` can be renamed and new items added (never removed).\nThe `type` and `isList` properties are always immutable, and format schema changes on any\nother format are rejected.\n",
+      "enum": [
+        "name",
+        "description",
+        "display_metadata",
+        "dictionary_settings",
+        "format_schema"
+      ]
+    },
+    "DataDictionary_GlobalStatusEnum": {
+      "type": "string",
+      "description": "Global visibility status of an ObservePoint field.\nWhen `hidden`, users won't be able to see the field at all.\n",
+      "enum": [
+        "visible",
+        "hidden"
+      ]
+    },
+    "DataDictionary_FieldsUpdateRequestDTO": {
+      "type": "object",
+      "description": "Full update of all fields, both ObservePoint and custom.\n- To create a new field, do not specify an `id`.\n- To update a field, specify its `id` and all of its editable properties.\n- To reorder fields, change their position in the array.\n- To hide a field, move it to the `hiddenFields` array.\n- To delete a field, omit it from the request body.\n\nThe `canEdit` property (provided by \"get fields\" endpoint) defines which properties can be updated.\nSimilarly, `canDelete` defines which fields can be deleted.\n\nNote that fields are shared between dictionaries. Changing a field's name in one dictionary\nwill also change it in other dictionaries.\n",
+      "required": [
+        "visibleFields",
+        "hiddenFields"
+      ],
+      "properties": {
+        "visibleFields": {
+          "type": "array",
+          "description": "Fields to be visible in this dictionary, in the desired display order",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_FieldUpdate"
+          }
+        },
+        "hiddenFields": {
+          "type": "array",
+          "description": "Fields to be hidden in this dictionary",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_FieldUpdate"
+          }
+        }
+      }
+    },
+    "DataDictionary_FieldUpdate": {
+      "description": "A field in an update request. Omit `id` to create a new field.\nAllowed properties depend on the field source (ObservePoint or custom),\n`canEdit` property, and whether this is a create or update operation.\nMore details in the `DataDictionary_FieldsUpdateRequestDTO` description.\n",
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldTrait"
+        }
+      ]
+    },
+    "DataDictionary_FieldsUpdateResponseDTO": {
+      "type": "object",
+      "required": [
+        "createdIds",
+        "updatedIds",
+        "deletedIds"
+      ],
+      "properties": {
+        "createdIds": {
+          "type": "array",
+          "description": "IDs of the fields created",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_FieldId"
+          }
+        },
+        "updatedIds": {
+          "type": "array",
+          "description": "IDs of the fields that actually changed as a result of this request \u2014 either their\naccount settings (visibility, data-preview flag, or position) or an editable property\n(name, description, display metadata, enum items).\n",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_FieldId"
+          }
+        },
+        "deletedIds": {
+          "type": "array",
+          "description": "IDs of the fields deleted",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_FieldId"
+          }
+        }
+      }
+    },
+    "DataDictionary_OpFieldsDTO": {
+      "type": "object",
+      "description": "ObservePoint fields with their global default settings. Similar to the regular fields response,\nbut returns only the ObservePoint default settings, which are not tied to any account.\n\nNote that putting an ObservePoint field in `hiddenFields` will NOT hide it globally,\nit will still be visible under \"Hidden fields\" in the layout editor.\nTo hide an ObservePoint field globally, update its `globalStatus`.\n",
+      "required": [
+        "visibleFields",
+        "hiddenFields"
+      ],
+      "properties": {
+        "visibleFields": {
+          "type": "array",
+          "description": "Fields visible in this dictionary by default, in display order",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_OpField"
+          }
+        },
+        "hiddenFields": {
+          "type": "array",
+          "description": "Fields hidden in this dictionary by default",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_OpField"
+          }
+        }
+      }
+    },
+    "DataDictionary_OpField": {
+      "required": [
+        "id",
+        "source",
+        "name",
+        "spreadsheetKey",
+        "formatSchema",
+        "dictionarySettings",
+        "canEdit",
+        "canDelete",
+        "globalStatus"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_Field"
+        },
+        {
+          "type": "object",
+          "required": [
+            "globalStatus",
+            "spreadsheetKey"
+          ],
+          "properties": {
+            "globalStatus": {
+              "$ref": "#/components/schemas/DataDictionary_GlobalStatusEnum"
+            },
+            "spreadsheetKey": {
+              "type": "string",
+              "description": "Identifier of the field in the cookie dictionary spreadsheet. Always present for\nObservePoint fields and unique across them; supplied when the field is created and\nimmutable thereafter.\n"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_OpFieldsUpdateRequestDTO": {
+      "type": "object",
+      "description": "Update of ObservePoint fields and their global default settings (not tied to any account).\nBehaves similarly to the regular fields update, but only allows updating ObservePoint fields.\n\nThis is a full-state update of the ObservePoint field catalog, which is shared across all\nentity types. An ObservePoint field omitted from the request is deleted globally \u2014 not just\nfor the `{entityType}` in the path \u2014 so every request must carry the complete set of\nObservePoint fields.\n\nTo prevent accidental data loss, an ObservePoint field cannot be deleted if it has values in customer definitions.\nIn that case, hide the field instead by setting `globalStatus` to `hidden`.\n",
+      "required": [
+        "visibleFields",
+        "hiddenFields"
+      ],
+      "properties": {
+        "visibleFields": {
+          "type": "array",
+          "description": "ObservePoint fields to set as visible, in the desired display order",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_OpFieldUpdate"
+          }
+        },
+        "hiddenFields": {
+          "type": "array",
+          "description": "ObservePoint fields to set as hidden",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_OpFieldUpdate"
+          }
+        }
+      }
+    },
+    "DataDictionary_OpFieldUpdate": {
+      "description": "Similar to the regular `DataDictionary_FieldUpdate`,\nbut also includes a `globalStatus` property which controls the global visibility of the ObservePoint field.\n\nUnlike the regular field update, `id` is always required (even when creating a field):\nObservePoint fields use explicit low-numbered ids rather than auto-increment, so the server\ndetermines create vs. update by whether the given `id` already exists.\n\n`spreadsheetKey` is required when creating a new ObservePoint field and must be unique across\nall ObservePoint fields. It is ignored when updating an existing field (the key is immutable).\n",
+      "required": [
+        "id"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldUpdate"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "globalStatus": {
+              "$ref": "#/components/schemas/DataDictionary_GlobalStatusEnum"
+            },
+            "spreadsheetKey": {
+              "type": "string",
+              "description": "Identifier of the field in the cookie dictionary spreadsheet. Required when creating\na new ObservePoint field; ignored on update.\n"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_DefinitionId": {
+      "type": "string",
+      "description": "Definition ID",
+      "example": "a64d610e-a42f-42ea-8d1a-4db5d9828a3f"
+    },
+    "DataDictionary_User": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "User ID",
+          "example": 1
+        },
+        "firstName": {
+          "type": "string",
+          "description": "User's first name",
+          "example": "Dev"
+        },
+        "lastName": {
+          "type": "string",
+          "description": "User's last name",
+          "example": "Team"
+        }
+      }
+    },
+    "DataDictionary_DefinitionDTO": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "entityType",
+        "source",
+        "createdAt",
+        "updatedAt",
+        "canEdit",
+        "canDelete",
+        "fields"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/components/schemas/DataDictionary_DefinitionId"
+        },
+        "name": {
+          "type": "string",
+          "description": "Definition name"
+        },
+        "entityType": {
+          "$ref": "#/components/schemas/DataDictionary_EntityTypeEnum"
+        },
+        "source": {
+          "$ref": "#/components/schemas/DataDictionary_SourceEnum"
+        },
+        "createdAt": {
+          "$ref": "#/components/schemas/DateAndTime"
+        },
+        "updatedAt": {
+          "$ref": "#/components/schemas/DateAndTime"
+        },
+        "createdBy": {
+          "$ref": "#/components/schemas/DataDictionary_User"
+        },
+        "updatedBy": {
+          "$ref": "#/components/schemas/DataDictionary_User"
+        },
+        "matchCriteria": {
+          "type": "array",
+          "description": "Rules used to match this definition to the entities. Absent when the current user is not allowed to see match criteria: visitors, and accounts with limited Data Dictionary access.\n",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_MatchCriterion"
+          }
+        },
+        "canEdit": {
+          "type": "array",
+          "description": "Properties of this definition that the current user is allowed to update",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_DefinitionEditablePropertyEnum"
+          }
+        },
+        "canDelete": {
+          "type": "boolean",
+          "description": "Whether the current user is allowed to delete this definition"
+        },
+        "fields": {
+          "type": "array",
+          "description": "Field values for this definition",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_DefinitionFieldValue"
+          }
+        }
+      }
+    },
+    "DataDictionary_MatchCriterion": {
+      "type": "object",
+      "required": [
+        "property",
+        "operator",
+        "operand"
+      ],
+      "properties": {
+        "property": {
+          "$ref": "#/components/schemas/DataDictionary_MatchCriterionPropertyEnum"
+        },
+        "operator": {
+          "$ref": "#/components/schemas/DataDictionary_MatchCriterionOperatorEnum"
+        },
+        "operand": {
+          "type": "object",
+          "description": "Value to match against. The concrete type depends on the property:\na number for `tag_id`, a string for every other property.\nString operands are limited to 200 characters.\n"
+        },
+        "negated": {
+          "type": "boolean",
+          "description": "If true, the match criterion is negated",
+          "default": false
+        }
+      }
+    },
+    "DataDictionary_MatchCriterionPropertyEnum": {
+      "type": "string",
+      "description": "Entity property to match against. Available properties depend on the entity type.",
+      "enum": [
+        "cookie_name",
+        "cookie_domain",
+        "tag_id",
+        "tag_account",
+        "page_domain"
+      ]
+    },
+    "DataDictionary_MatchCriterionOperatorEnum": {
+      "type": "string",
+      "description": "Match operator used to compare the property value against the operand",
+      "enum": [
+        "equals",
+        "starts_with",
+        "ends_with",
+        "contains",
+        "regex",
+        "is_subdomain_of"
+      ]
+    },
+    "DataDictionary_DefinitionFieldValue": {
+      "description": "Field's configuration and its value for a definition.",
+      "required": [
+        "id",
+        "source",
+        "name",
+        "formatSchema",
+        "dictionarySettings"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_FieldTrait"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "object",
+              "description": "Value of the field. The concrete type depends on the field's format:\nstring for `text`/`markdown`/`email`/`url`/`date`/`datetime`,\nnumber for `integer_number`/`decimal_number`/`duration_seconds`,\nan enum item id (number) for `enum`,\na positive integer id of the referenced entity for `entity_reference`.\nWhen the field's `isList` is `true`, the value is an array of the format's scalar type.\nMay be absent when the field has no value for this definition.\n"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_DefinitionEditablePropertyEnum": {
+      "type": "string",
+      "description": "A definition property that can be updated.\nProperty names are in camel case, e.g. `match_criteria` enum value corresponds to the `matchCriteria` property.\n",
+      "enum": [
+        "name",
+        "match_criteria",
+        "op_field_values",
+        "custom_field_values"
+      ]
+    },
+    "DataDictionary_DefinitionFieldValueInput": {
+      "type": "object",
+      "description": "A field value to set on a definition",
+      "required": [
+        "id",
+        "value"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/components/schemas/DataDictionary_FieldId"
+        },
+        "value": {
+          "type": "object",
+          "description": "Value for the field. The concrete type depends on the field's format:\nstring for `text`/`markdown`/`email`/`url`/`date`/`datetime`,\nnumber for `integer_number`/`decimal_number`/`duration_seconds`,\nan enum item id (number) for `enum`,\na positive integer id of the referenced entity for `entity_reference`.\nWhen the field's `isList` is `true`, the value is an array of the format's scalar type.\n"
+        }
+      }
+    },
+    "DataDictionary_CreateDefinitionRequestDTO": {
+      "type": "object",
+      "description": "Payload to create a custom definition.\n`opFieldValues` and `customFieldValues` set field values and are optional.\n",
+      "required": [
+        "name",
+        "matchCriteria"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Definition name"
+        },
+        "matchCriteria": {
+          "type": "array",
+          "description": "Rules used to match this definition to the entities",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_MatchCriterion"
+          }
+        },
+        "opFieldValues": {
+          "type": "array",
+          "description": "Values for ObservePoint fields",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_DefinitionFieldValueInput"
+          }
+        },
+        "customFieldValues": {
+          "type": "array",
+          "description": "Values for custom fields",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_DefinitionFieldValueInput"
+          }
+        }
+      }
+    },
+    "DataDictionary_CreateDefinitionResponseDTO": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/components/schemas/DataDictionary_DefinitionId"
+        }
+      }
+    },
+    "DataDictionary_UpdateDefinitionRequestDTO": {
+      "type": "object",
+      "description": "Payload to update a Data Dictionary definition. The concrete shape is selected by the\n`source` discriminator, which must match the definition's actual source; a mismatch is rejected.\n- `custom`: see `DataDictionary_UpdateCustomDefinitionRequestDTO`\n- `op`: see `DataDictionary_UpdateOpDefinitionRequestDTO`\n",
+      "required": [
+        "source"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/components/schemas/DataDictionary_SourceEnum"
+        },
+        "customFieldValues": {
+          "type": "array",
+          "description": "Values for custom fields",
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_DefinitionFieldValueInput"
+          }
+        }
+      },
+      "discriminator": {
+        "propertyName": "source",
+        "mapping": {
+          "op": "#/components/schemas/DataDictionary_UpdateOpDefinitionRequestDTO",
+          "custom": "#/components/schemas/DataDictionary_UpdateCustomDefinitionRequestDTO"
+        }
+      }
+    },
+    "DataDictionary_UpdateOpDefinitionRequestDTO": {
+      "description": "Update payload for an ObservePoint-managed definition. Only custom field values may be set;\nname, match criteria and ObservePoint field values are not editable for ObservePoint definitions.\n",
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_UpdateDefinitionRequestDTO"
+        }
+      ]
+    },
+    "DataDictionary_UpdateCustomDefinitionRequestDTO": {
+      "description": "Update payload for a custom definition. `name` and `matchCriteria` are required and are fully\nreplaced on every update. `opFieldValues` and `customFieldValues` overwrite the respective\nfield values.\n",
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_UpdateDefinitionRequestDTO"
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "matchCriteria"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Definition name"
+            },
+            "matchCriteria": {
+              "type": "array",
+              "description": "Rules used to match this definition to the entities",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/components/schemas/DataDictionary_MatchCriterion"
+              }
+            },
+            "opFieldValues": {
+              "type": "array",
+              "description": "Values for ObservePoint fields",
+              "items": {
+                "$ref": "#/components/schemas/DataDictionary_DefinitionFieldValueInput"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_DefinitionFeedbackTrait": {
+      "type": "object",
+      "description": "Feedback properties shared by the submit request and the returned records",
+      "properties": {
+        "score": {
+          "type": "number",
+          "format": "double",
+          "description": "Definition score, from 0 to 100",
+          "minimum": 0,
+          "maximum": 100,
+          "example": 80.5
+        },
+        "reviewText": {
+          "type": "string",
+          "description": "Optional free-text review",
+          "maxLength": 5000
+        }
+      }
+    },
+    "DataDictionary_DefinitionFeedbackRequestDTO": {
+      "description": "Feedback submitted for a Data Dictionary definition.",
+      "required": [
+        "score"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_DefinitionFeedbackTrait"
+        }
+      ]
+    },
+    "DataDictionary_DefinitionFeedbackListDTO": {
+      "type": "object",
+      "description": "The current user's feedback records for a Data Dictionary definition.",
+      "required": [
+        "feedback"
+      ],
+      "properties": {
+        "feedback": {
+          "type": "array",
+          "description": "Currently at most one element, the current user's most recent feedback",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_DefinitionFeedbackDTO"
+          }
+        }
+      }
+    },
+    "DataDictionary_DefinitionFeedbackDTO": {
+      "description": "The current user's feedback record; reviewText is absent when no review was given.",
+      "required": [
+        "score",
+        "createdAt"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_DefinitionFeedbackTrait"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "createdAt": {
+              "$ref": "#/components/schemas/DateAndTime"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_EffectiveDefinitionsDTO": {
+      "deprecated": true,
+      "type": "object",
+      "description": "Effective Data Dictionary definitions for the matched entity.\nMatching considers contextual properties including page domain, so multiple effective definitions can be returned.\n",
+      "required": [
+        "definitions"
+      ],
+      "properties": {
+        "definitions": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_DefinitionDTO"
+          }
+        }
+      }
+    },
+    "DataDictionary_InContextMatch_EntityProperties": {
+      "deprecated": true,
+      "type": "object",
+      "description": "Entity properties to match against definition match criteria.\nProperties depend on the entity type.\n",
+      "required": [
+        "entityType"
+      ],
+      "properties": {
+        "entityType": {
+          "$ref": "#/components/schemas/DataDictionary_EntityTypeEnum"
+        }
+      },
+      "discriminator": {
+        "propertyName": "entityType",
+        "mapping": {
+          "cookies": "#/components/schemas/DataDictionary_InContextMatch_CookieEntityProperties",
+          "tags": "#/components/schemas/DataDictionary_InContextMatch_TagEntityProperties"
+        }
+      }
+    },
+    "DataDictionary_InContextMatch_CookieEntityProperties": {
+      "deprecated": true,
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_InContextMatch_EntityProperties"
+        },
+        {
+          "type": "object",
+          "required": [
+            "cookieName",
+            "cookieDomain"
+          ],
+          "properties": {
+            "cookieName": {
+              "type": "string",
+              "description": "Cookie name to match"
+            },
+            "cookieDomain": {
+              "type": "string",
+              "description": "Cookie domain to match"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_InContextMatch_TagEntityProperties": {
+      "deprecated": true,
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_InContextMatch_EntityProperties"
+        },
+        {
+          "type": "object",
+          "required": [
+            "tagId",
+            "tagAccount"
+          ],
+          "properties": {
+            "tagId": {
+              "type": "integer",
+              "format": "int64",
+              "description": "Tag id to match"
+            },
+            "tagAccount": {
+              "type": "string",
+              "description": "Tag account to match"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_MatchesRequestDTO": {
+      "type": "object",
+      "description": "`entityProperties` are the property values to match against definitions (e.g. cookie name, cookie domain, tag ID).\n\n`context` (optional) property is the Audit / Web Journey run ID context for matching.\nWhen provided, it is used to fetch additional details about the entity\n(e.g. page domains where a cookie or a tag was observed, tag accounts associated with a tag).\nAn entity with given `entityProperties` can appear more than once within the context,\nso multiple effective definitions can be returned, one for each unique observed variation of an entity in the context.\nFor example, cookie `_ga (example.com)` may appear on page domains `a.com` and `b.com` in context of a run,\nand have separate effective definitions - `_ga (example.com) on a.com` and `_ga (example.com) on b.com`.\n\n`entityProperties` takes precedence over `context`: a property present in `entityProperties`\nwon't be supplied from the context. But any omitted property (page domain or tag account)\nwill be supplied from the context if it's provided.\n\nWhen `context` is not provided, only properties from `entityProperties` are considered for matching.\nIf some properties are omitted, their respective match criteria won't match.\nFor example, if `pageDomain` is not provided in `entityProperties`,\ndefinitions that have page domain criteria won't match and won't be returned as effective.\n\nSame as in other places, definition is considered effective if:\n1. every match criterion has matched (it's a candidate definition);\n2. it is selected among other candidate definitions using tie-breaking algorithm.\n\nWhen `context` is not provided and some properties are omitted in `entityProperties`,\nwe may match some definitions partially. Definition is considered a partial match if:\n1. it's a custom definition;\n2. some of its match criteria has matched, but some has not;\n3. every unmatched criterion is unmatched because property value for it was not provided in `entityProperties`.\n\nFor example, if there are definitions `tag ID: 1` and `tag ID: 1, tag account: test`,\nrequest has `entityProperties` with `tagId` set to `1`, then the first definition will be effective,\nand the second definition will be partially matched.\n",
+      "required": [
+        "entityProperties"
+      ],
+      "properties": {
+        "entityProperties": {
+          "$ref": "#/components/schemas/DataDictionary_MatchEntityProperties"
+        },
+        "context": {
+          "$ref": "#/components/schemas/DataDictionary_MatchContext"
+        }
+      }
+    },
+    "DataDictionary_MatchesResponseDTO": {
+      "type": "object",
+      "description": "Effective and partially matched Data Dictionary definitions for the provided entity values.\nSee more details in `DataDictionary_MatchesRequestDTO` description.\n",
+      "required": [
+        "effectiveDefinitions",
+        "partiallyMatchedDefinitions"
+      ],
+      "properties": {
+        "effectiveDefinitions": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_DefinitionDTO"
+          }
+        },
+        "partiallyMatchedDefinitions": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/components/schemas/DataDictionary_DefinitionDTO"
+          }
+        }
+      }
+    },
+    "DataDictionary_MatchEntityProperties": {
+      "type": "object",
+      "description": "Entity properties to match against a definition's match criteria. The properties depend on the entity type.\nSee more details in `DataDictionary_MatchesRequestDTO` description.\n",
+      "required": [
+        "entityType"
+      ],
+      "properties": {
+        "entityType": {
+          "$ref": "#/components/schemas/DataDictionary_EntityTypeEnum"
+        }
+      },
+      "discriminator": {
+        "propertyName": "entityType",
+        "mapping": {
+          "cookies": "#/components/schemas/DataDictionary_CookieEntityProperties",
+          "tags": "#/components/schemas/DataDictionary_TagEntityProperties"
+        }
+      }
+    },
+    "DataDictionary_CookieEntityProperties": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_MatchEntityProperties"
+        },
+        {
+          "type": "object",
+          "required": [
+            "cookieName",
+            "cookieDomain"
+          ],
+          "properties": {
+            "cookieName": {
+              "type": "string"
+            },
+            "cookieDomain": {
+              "type": "string"
+            },
+            "pageDomain": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_TagEntityProperties": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_MatchEntityProperties"
+        },
+        {
+          "type": "object",
+          "required": [
+            "tagId"
+          ],
+          "properties": {
+            "tagId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "tagAccount": {
+              "type": "string"
+            },
+            "pageDomain": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_MatchContextTypeEnum": {
+      "type": "string",
+      "description": "Type of the matching context.",
+      "enum": [
+        "audit_run",
+        "web_journey_run"
+      ]
+    },
+    "DataDictionary_MatchContext": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/components/schemas/DataDictionary_MatchContextTypeEnum"
+        }
+      },
+      "discriminator": {
+        "propertyName": "type",
+        "mapping": {
+          "audit_run": "#/components/schemas/DataDictionary_AuditRunMatchContext",
+          "web_journey_run": "#/components/schemas/DataDictionary_WebJourneyRunMatchContext"
+        }
+      }
+    },
+    "DataDictionary_AuditRunMatchContext": {
+      "description": "Context of an Audit run. `pageId` narrows the context to a single page.",
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_MatchContext"
+        },
+        {
+          "type": "object",
+          "required": [
+            "auditId",
+            "runId"
+          ],
+          "properties": {
+            "auditId": {
+              "$ref": "#/components/schemas/AuditId"
+            },
+            "runId": {
+              "$ref": "#/components/schemas/RunId"
+            },
+            "pageId": {
+              "$ref": "#/components/schemas/PageId"
+            }
+          }
+        }
+      ]
+    },
+    "DataDictionary_WebJourneyRunMatchContext": {
+      "description": "Context of a single action in a Web Journey run.",
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/DataDictionary_MatchContext"
+        },
+        {
+          "type": "object",
+          "required": [
+            "webJourneyId",
+            "runId",
+            "actionSequenceId"
+          ],
+          "properties": {
+            "webJourneyId": {
+              "$ref": "#/components/schemas/WebJourneyId"
+            },
+            "runId": {
+              "$ref": "#/components/schemas/RunId"
+            },
+            "actionSequenceId": {
+              "$ref": "#/components/schemas/ActionSequenceId"
+            }
+          }
+        }
+      ]
+    },
+    "ErrorModel": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "string"
+        },
+        "validationReport": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

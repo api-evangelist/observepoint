@@ -1,0 +1,74 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the ObservePoint V2 API
+  version: 1.0.0
+extends: ../openapi/observepoint-v2-api-openapi.yml
+x-provenance:
+  generated: '2026-08-26'
+  method: generated
+  source: >-
+    Enhancements derived from https://api-docs.observepoint.com/ (Versioning, Authentication),
+    /sections/choosing-api-endpoints, /sections/webhook and /sections/rate-limiting, applied over the
+    verbatim spec at https://api-docs.observepoint.com/_bundle/openapi/SCALA-API.openapi.yaml.
+actions:
+- target: $.info
+  description: The bundle ships an empty description and no contact. Add both, plus the version's support posture.
+  update:
+    description: >-
+      The ObservePoint v2 REST API, served from https://api.observepoint.com/v2. Covers account, users,
+      folders and sub-folders (called "domains" here), labels, tag and variable rules, tag definitions,
+      web audits and audit runs, and manual journeys. ObservePoint states that v2 and v3 are both fully
+      supported with no plans for deprecation; audit and journey CONFIGURATION is still documented
+      against v2 paths, so this is not a retired surface.
+    contact:
+      name: ObservePoint
+      url: https://www.observepoint.com/contact-us/
+    x-documentation-url: https://api-docs.observepoint.com/sections/v2-index
+- target: $.info
+  description: Record the version-support statement so a consumer can tell v2 is current, not sunset.
+  update:
+    x-version-support:
+      status: fully supported
+      deprecation_planned: false
+      preferred_for_new_work: v3
+      quote: >-
+        "Both versions of the API are fully supported and have no plans for deprecation. ... The v3
+        endpoints are generally preferred because they give you better control over pagination and filtering."
+      source: https://api-docs.observepoint.com/
+- target: $.info
+  description: Record the naming collision between v2 "domains" and v3/UI "sub-folders".
+  update:
+    x-terminology:
+      domain: >-
+        In v2, /domains addresses what the ObservePoint UI and the v3 API call a SUB-FOLDER. It is not a
+        DNS domain. This is the most common v2/v3 integration mistake.
+- target: $.info
+  description: Record the webhook subscription surface that lives on v2 write paths.
+  update:
+    x-webhooks:
+      subscription_field: webHookUrl
+      set_on:
+      - POST /v2/web-audits
+      - POST /v2/web-journeys
+      - PUT /v2/web-audits/{auditId}
+      - PUT /v2/web-journeys/{journeyId}
+      signature_header: ObservePoint-Signature
+      source: https://api-docs.observepoint.com/sections/webhook
+- target: $.info
+  description: Record the rate-limit contract, absent from every operation.
+  update:
+    x-rate-limits:
+      scope: per-api-key
+      requests_per_minute_range: 100-1000
+      status_on_exhaustion: 429
+      response_headers: none published
+      source: https://api-docs.observepoint.com/sections/rate-limiting
+- target: $.paths['/web-audits/{webAuditId}'].delete
+  description: Record that this delete is reversible through the v3 restore operation.
+  update:
+    x-reversibility:
+      reversal_operationId: undeleteWebAudit
+      reversal_path: PATCH /v3/web-audits/undelete
+      window_published: false
+      partial: configuration is restored; historical run data is not
+      source: openapi/observepoint-v3-api-openapi.yml

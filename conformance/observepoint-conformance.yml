@@ -1,0 +1,153 @@
+generated: '2026-08-26'
+method: derived
+source: >-
+  openapi/observepoint-v3-api-openapi.yml, openapi/observepoint-grid-reports-api-openapi.yml,
+  openapi/observepoint-v2-api-openapi.yml; docs at https://api-docs.observepoint.com/ and
+  https://www.observepoint.com/privacy-policy/
+note: >-
+  Each entry is asserted against the published contract or a published page, with the exact evidence
+  location. Absence is recorded as conforms:false rather than omitted, so a reader can see what was
+  checked. No conformance is asserted from marketing copy.
+standards:
+- id: openapi-3.0
+  conforms: true
+  evidence: >-
+    All three published documents declare `openapi: 3.0.0` (the Data Collection component document declares
+    3.0.1). Bundled and downloadable in YAML and JSON from the Redocly docs site at
+    https://api-docs.observepoint.com/_bundle/openapi/*.openapi.{yaml,json}.
+- id: rest
+  conforms: true
+  evidence: >-
+    Resource-oriented JSON over HTTPS on api.observepoint.com; GET/PUT/POST/PATCH/DELETE with conventional
+    status-code semantics documented at https://api-docs.observepoint.com/.
+- id: rfc6902-json-patch
+  conforms: true
+  evidence: >-
+    "For PATCH requests, you must specify the Content-Type header as application/json-patch+json, unless
+    specified otherwise for the particular endpoint." — https://api-docs.observepoint.com/
+- id: rfc2104-hmac
+  conforms: true
+  evidence: >-
+    Webhook requests are signed with HMAC-SHA256 over "<timestamp>.<raw-body>" and delivered in the
+    ObservePoint-Signature header. https://api-docs.observepoint.com/sections/webhook
+- id: pagination
+  conforms: true
+  evidence: >-
+    Page-number pagination with size/page and a metadata.pagination response envelope
+    (totalCount, totalPageCount, pageSize, currentPageSize, currentPageNumber), documented on both the
+    v2/v3 surface and the Grid API. https://api-docs.observepoint.com/ and /sections/grid-api-pagination
+- id: api-key-auth
+  conforms: true
+  evidence: >-
+    apiKey securityScheme named API_Key, in: header, name: Authorization, declared in all three specs and
+    documented at https://api-docs.observepoint.com/.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: >-
+    No operation returns application/problem+json. Errors use proprietary JSON envelopes (ErrorModel and a
+    numeric errorCode shape). See errors/observepoint-problem-types.yml.
+- id: rfc6749-oauth2
+  conforms: false
+  evidence: No oauth2 securityScheme in any spec; no OAuth flow documented. API keys only.
+- id: openid-connect
+  conforms: false
+  evidence: >-
+    No openIdConnect securityScheme; /.well-known/openid-configuration returns 404 on every ObservePoint host.
+    See well-known/observepoint-well-known.yml.
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: >-
+    No Sunset or Deprecation response header is declared on any operation, and no deprecation policy is
+    published. Two v3 operations carry `deprecated: true` with no sunset date. See lifecycle/observepoint-lifecycle.yml.
+- id: idempotency-key
+  conforms: false
+  evidence: >-
+    Zero header parameters are declared across all three specs; no Idempotency-Key mechanism exists.
+    See conventions/observepoint-conventions.yml.
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: /.well-known/security.txt returns 404 on api, www and api-docs hosts, and 403 on app. See well-known/.
+- id: rfc8615-well-known-api-catalog
+  conforms: false
+  evidence: /.well-known/api-catalog returns 404 on every probed host.
+- id: rfc9309-rate-limit-headers
+  conforms: false
+  evidence: >-
+    Rate limiting is enforced and returns 429, but no RateLimit-*/X-RateLimit-*/Retry-After header is
+    documented or declared. See rate-limits/observepoint-rate-limits.yml.
+- id: asyncapi
+  conforms: false
+  evidence: >-
+    No AsyncAPI document published (/asyncapi.yaml and /asyncapi.json 404 on the docs host, nothing in the
+    GitHub org). A signed webhook surface exists and is captured in asyncapi/observepoint-webhooks.yml.
+- id: json-schema
+  conforms: true
+  evidence: >-
+    1,211 component schemas across the three documents (938 v3, 137 Grid, 136 v2), plus a schema-only
+    Data Dictionary definition captured in json-schema/.
+- id: graphql
+  conforms: false
+  evidence: No /graphql surface found on api.observepoint.com or the docs host.
+- id: grpc
+  conforms: false
+  evidence: No .proto published in the GitHub org, on buf.build, or referenced in the docs.
+- id: soap-wsdl
+  conforms: false
+  evidence: '?wsdl and /services?wsdl on api.observepoint.com return 301 and 404 respectively; no SOAP surface documented.'
+- id: mcp
+  conforms: false
+  evidence: >-
+    No ObservePoint MCP server exists — nothing in the docs, the GitHub org, the llms.txt tool list, or
+    a web search. See mcp/observepoint-mcp.yml (derived candidate, deployment mode none).
+- id: a2a-agent-card
+  conforms: false
+  evidence: >-
+    /.well-known/agent-card.json and /.well-known/agent.json 404 (or 403) on every ObservePoint host.
+    No a2a/ artifact is written.
+- id: llms-txt
+  conforms: true
+  evidence: >-
+    Two published llms.txt files, both HTTP 200 and saved verbatim: https://api-docs.observepoint.com/llms.txt
+    (a table of contents over the API docs, with .md twins for every page) and
+    https://www.observepoint.com/llms.txt (a marketing-site LLM behaviour guide). llms-full.txt 404s.
+domain_standards:
+  market: web governance / digital analytics and privacy assurance
+  note: >-
+    ObservePoint's market has no interoperability standard of the kind `domain_standard_conformance`
+    rewards — there is no SCIM/OData/OpenRTB/HL7/ISO-20022 equivalent for tag auditing, and ObservePoint
+    declares none in any of its three contracts. What it DOES do is measure other people's compliance
+    regimes: the v3 contract carries first-class privacy and accessibility report surfaces whose subject
+    matter is regulatory. Those are recorded below as subject-matter coverage, NOT as conformance claims
+    by ObservePoint, and no `domain_standard_conformance` credit should be read from them.
+  declared_in_contract: false
+  subject_matter_regimes:
+  - regime: WCAG (Web Content Accessibility Guidelines)
+    surface: Accessibility issue reporting on audit runs
+    evidence: >-
+      openapi/observepoint-v3-api-openapi.yml — GET /v3/web-audits/{auditId}/runs/{runId}/live-results/
+      accessibility-issues and .../accessibility-issues/{requestId}; the product solution page
+      https://www.observepoint.com/solutions/accessibility/
+    note: ObservePoint scans customer sites for WCAG issues; it does not claim WCAG conformance of its own API.
+  - regime: GDPR / CCPA-style consent and privacy assurance
+    surface: cookie-privacy, tag-privacy and request-privacy report operations; consent-categories management
+    evidence: >-
+      openapi/observepoint-v3-api-openapi.yml — /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-privacy,
+      /reports/tag-privacy, /reports/request-privacy, and /v3/consent-categories
+    note: Subject-matter coverage of privacy regimes, not a certification.
+compliance_certifications:
+  published: false
+  trust_center:
+    url: https://trust.observepoint.com/
+    status: 200
+    readable: false
+    note: >-
+      ObservePoint runs a trust centre on its own subdomain and it responds 200 with the title
+      "Trust center", but the page is a client-rendered React SPA: the served HTML is a 604-byte shell,
+      every /api/* path returns the same shell (SPA catch-all), and the JS bundle contains no reachable
+      API base. No certification could be read. Because NO certification name could be verified from any
+      public source, NO `Compliance` pointer is emitted in apis.yml — only `TrustCenter`, which asserts
+      the surface exists, which it demonstrably does.
+  searched:
+  - Web search for ObservePoint SOC 2 / ISO 27001 — no ObservePoint-specific result.
+  - https://www.observepoint.com/security/ — HTTP 403, no page.
+  - https://www.observepoint.com/trust/ — HTTP 404.

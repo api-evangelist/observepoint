@@ -1,0 +1,240 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://api-docs.observepoint.com/ (Getting Started: hostname, auth, versioning, pagination, requests,
+  responses), https://api-docs.observepoint.com/sections/grid-api-pagination,
+  https://api-docs.observepoint.com/sections/grid-api-filters,
+  https://api-docs.observepoint.com/sections/grid-api-sorting,
+  https://api-docs.observepoint.com/sections/grid-api-grouping,
+  https://api-docs.observepoint.com/sections/rate-limiting,
+  https://api-docs.observepoint.com/sections/webhook; corroborated by the three specs in openapi/
+docs: https://api-docs.observepoint.com/
+api_style: REST/JSON
+base_url: https://api.observepoint.com
+auth:
+  style: api-key-header
+  header: Authorization
+  value_form: 'api_key <YOUR_API_KEY>'
+  key_scope: user
+  see: authentication/observepoint-authentication.yml
+content_types:
+  request:
+    POST: application/json
+    PUT: application/json
+    PATCH: application/json-patch+json
+    GET: none required
+    DELETE: none required
+  response: application/json
+  note: >-
+    PATCH defaults to RFC 6902 JSON Patch (application/json-patch+json) "unless specified otherwise for
+    the particular endpoint" — an unusual and easily-missed convention that an agent must honour.
+  source: https://api-docs.observepoint.com/
+idempotency:
+  supported: false
+  header: null
+  scope: null
+  retention: null
+  note: >-
+    ObservePoint publishes NO idempotency mechanism. There is no Idempotency-Key (or any other) header
+    parameter declared on a single operation across all three OpenAPI documents — a full sweep of
+    `parameters[].in == header` returns an empty set — and the docs never mention idempotent retries.
+    Retry safety rests entirely on HTTP method semantics: GET/PUT/DELETE are naturally idempotent, POST
+    creates (audits, journeys, action sets, saved reports) and POST run-triggers are NOT. The closest
+    thing to a guard is a 409 "Journey is already running" / "The audit run is already stopped or
+    completed" on run endpoints, and a 423 lock on v2 mutations of running items. Because no idempotency
+    support exists, NO `Idempotency` pointer is emitted in apis.yml.
+  evidence:
+  - openapi/observepoint-v3-api-openapi.yml (0 header parameters declared)
+  - openapi/observepoint-grid-reports-api-openapi.yml (0 header parameters declared)
+  - openapi/observepoint-v2-api-openapi.yml (0 header parameters declared)
+pagination:
+  styles:
+  - name: page-number query parameters (v2 / v3)
+    params:
+      size: records per page, allowed range 50 - 10,000, recommended 100
+      page: zero-based page number, 0 - unbounded
+    location: query string
+    response_fields:
+      envelope: metadata.pagination
+      totalCount: total records across all pages
+      totalPageCount: total number of pages
+      pageSize: requested records per page
+      currentPageSize: records in this page
+      currentPageNumber: zero-based index of this page
+    termination: compare records downloaded against metadata.pagination.totalCount
+    source: https://api-docs.observepoint.com/
+  - name: page-number body fields (Grid Reporting API)
+    params:
+      size: records per page, min 10, max 10,000
+      page: zero-based page number
+    location: JSON request body (POST)
+    response_fields:
+      envelope: metadata.pagination
+      totalCount: total records in the dataset
+      totalPageCount: total pages in the dataset
+    note: >-
+      Same concept, different transport — Grid pagination is sent in the POST payload, not the query
+      string, and the minimum page size differs (10 vs 50). Datasets can reach billions of records.
+    source: https://api-docs.observepoint.com/sections/grid-api-pagination
+  cursor: false
+  link_header: false
+filtering:
+  surface: Grid Reporting API `filters.conditions[]`
+  shape: '{ filteredColumn: { columnId }, operator, arg }'
+  operators:
+  - string_contains
+  - string_regex
+  - string_contains_multi
+  - integer_in
+  - number_between
+  - date_time_between
+  - date_time_relative
+  - is_present
+  - integer_list_contains
+  note: >-
+    Deliberately minimal operator set — `string_contains` covers exact / starts-with / ends-with /
+    contains. Column ids come from the per-entity schema endpoint (GET /v3/reports/grid/{gridEntityType}/schema).
+  source: https://api-docs.observepoint.com/sections/grid-api-filters
+sorting:
+  surface: Grid Reporting API sort fields (multi-column, explicit order)
+  source: https://api-docs.observepoint.com/sections/grid-api-sorting
+grouping:
+  surface: Grid Reporting API group mode with aggregate functions
+  source: https://api-docs.observepoint.com/sections/grid-api-grouping
+field_expansion:
+  supported: false
+  note: No sparse-fieldset or expand/include parameter is documented or declared in any spec.
+metadata_fields:
+  supported: false
+  note: No customer-defined metadata bag on resources; Labels are the closest first-class tagging primitive (v2 /labels).
+request_tracing:
+  request_id_header: false
+  note: >-
+    No request-id / correlation-id header is documented or declared on any operation. Support escalation
+    therefore cannot reference a server-side request identifier.
+versioning:
+  style: major version in the URL path (/v2, /v3)
+  see: lifecycle/observepoint-lifecycle.yml
+error_envelope:
+  media_type: application/json
+  shapes:
+  - ErrorModel: '{ timestamp, message, details, validationReport }'
+  - ApiError: '{ errorCode, message, ... }'
+  rfc9457: false
+  see: errors/observepoint-problem-types.yml
+rate_limit_signaling:
+  headers: none
+  status: 429
+  retry_after: false
+  see: rate-limits/observepoint-rate-limits.yml
+  note: >-
+    Limits are published in prose only. No runtime header tells an agent how much budget is left, so the
+    only safe strategy is to catch 429 and back off for up to five minutes.
+webhooks:
+  supported: true
+  transport: HTTPS POST to a customer-supplied URL
+  configuration_field: webHookUrl on the audit/journey resource
+  signature_header: ObservePoint-Signature
+  signature_scheme: HMAC-SHA256 over "<timestamp>.<raw-body>", base64
+  see: asyncapi/observepoint-webhooks.yml
+  source: https://api-docs.observepoint.com/sections/webhook
+dry_run_mode:
+  supported: false
+  note: >-
+    No preview/validate/dry-run parameter is declared on any write operation. An agent cannot rehearse a
+    configuration change before applying it. Not `na` — ObservePoint has a large write surface, it just
+    does not offer a rehearsal mode.
+reversibility:
+  grade: documented
+  applicable: true
+  summary: >-
+    ObservePoint has real, first-class reversal operations for its two most consequential deletes — audits
+    and web journeys are archived rather than destroyed, and there is a public API to restore them. What is
+    NOT published anywhere is a WINDOW: no doc, no operation description and no schema states how long an
+    archived audit or journey remains restorable, so the grade stops at `documented`. The only bounding fact
+    ObservePoint publishes is the results-data retention policy (13 months by default), and restoring is
+    explicitly documented as NOT bringing historical run data back.
+  write_surfaces:
+  - operation: Delete web audit
+    operationIds:
+    - deleteWebAudit
+    spec: openapi/observepoint-v2-api-openapi.yml
+    reversal:
+      operationId: undeleteWebAudit
+      method: PATCH
+      path: /v3/web-audits/undelete
+      spec: openapi/observepoint-v3-api-openapi.yml
+      semantics: >-
+        "Restore a single archived audit into a chosen destination Folder and Sub-folder. The original
+        parents are not reinstated. Historical run data is not restored. Per-item outcomes (including
+        destination_gone and already_restored) are returned in the 200 response body."
+      window: null
+      window_source: null
+      partial: true
+      partial_note: Configuration is restored; historical run results are NOT.
+  - operation: Delete web journey (single, or bulk by domain/folder)
+    operationIds:
+    - deleteWebJourney
+    - deleteWebJourneys
+    spec: openapi/observepoint-v3-api-openapi.yml
+    reversal:
+      operationId: undeleteWebJourney
+      method: PATCH
+      path: /v3/web-journeys/undelete
+      spec: openapi/observepoint-v3-api-openapi.yml
+      semantics: >-
+        Same shape as the audit restore — destination folder chosen by the caller, original parents not
+        reinstated, historical run data not restored, per-item outcomes in the 200 body.
+      window: null
+      window_source: null
+      partial: true
+  - operation: Run an audit or journey
+    operationIds:
+    - runAuditNow
+    - runWebJourney
+    reversal:
+      operationIds:
+      - stopAuditRun
+      - deleteCurrentWebJourneyRun
+      - deleteWebJourneyRun
+      - cancelEmailInboxMessageRuns
+      - stopSiteCensusDataCollection
+      semantics: >-
+        In-flight runs can be stopped and discarded (v2 DELETE /web-audits/{webAuditId}/runs/{runId} is
+        literally summarised "Stop and discard audit run"). Once a run has completed, 409 "The audit run is
+        already stopped or completed" is returned — completion is the point of no return.
+      window: until the run completes
+      window_source: openapi/observepoint-v2-api-openapi.yml (409 response description)
+  - operation: Delete alert / scheduled export / action set / consent category / custom header group / remote file mapping / saved report / user / folder / sub-folder / label / rule / email inbox / site census
+    reversal: null
+    irreversible: true
+    note: >-
+      Everything outside audits and journeys deletes with no published restore path. An agent must treat
+      these DELETEs as terminal.
+  irreversible_surfaces:
+  - name: Webhook signing-secret rotation
+    path: POST /v3/webhooks/rotate-secret
+    operationId: null
+    spec_coverage: none
+    note: >-
+      Rotation is immediate and account-wide, the previous secret stops being used at once, and the new
+      secret is displayed only once. There is no undo and no grace period for dual-signing — every
+      verifier must be updated before rotating. This endpoint is documented in prose ONLY — no
+      /v3/webhooks path appears in any of the three published OpenAPI documents.
+    source: https://api-docs.observepoint.com/sections/webhook
+  - name: Results-data expiry
+    note: >-
+      Results data older than the account retention window (13 months by default) is deleted
+      automatically and cannot be recovered.
+    source: https://help.observepoint.com/en/articles/13161465-observepoint-data-retention
+  gaps:
+  - No restore window is stated for archived audits or journeys anywhere in the docs or the specs.
+  - Restore is partial by design (configuration only), which is documented but easy for an agent to miss.
+  - No bulk-undo, no transaction/batch rollback, and no dry-run to rehearse a destructive call.
+cross_links:
+  errors: errors/observepoint-problem-types.yml
+  lifecycle: lifecycle/observepoint-lifecycle.yml
+  authentication: authentication/observepoint-authentication.yml
+  rate_limits: rate-limits/observepoint-rate-limits.yml
+  webhooks: asyncapi/observepoint-webhooks.yml
+  data_model: data-model/observepoint-data-model.yml

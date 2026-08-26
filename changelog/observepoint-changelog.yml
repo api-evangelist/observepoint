@@ -1,0 +1,103 @@
+generated: '2026-08-26'
+method: searched
+source: https://news.observepoint.com/
+docs: https://news.observepoint.com/
+scheme: dated product-release posts (no version numbers)
+current_version: null
+api_versions_in_flight:
+- v2
+- v3
+cadence: irregular — roughly monthly, 5 pages of history at the time of capture
+feed: null
+note: >-
+  ObservePoint's dated change surface is the News Center at news.observepoint.com — a product-release
+  feed with per-post dates and New / New feature / Product update labels. The Help Center article titled
+  "Release Notes" (help.observepoint.com/en/articles/10490980-release-notes) is an INDEX that points at
+  the News Center plus two in-app surfaces (Product Updates/Feedback under the Support menu, and an
+  Announcements panel); it carries no dated entries itself. There is NO API-specific changelog: none of
+  the entries below is written for API consumers, none names an endpoint or a schema change, and the API
+  docs site has no changelog page at all. An integrator cannot learn from any published surface when a
+  v2 or v3 contract changed.
+entries:
+- title: Archiving Audits & Journeys
+  date: '2026-08-05'
+  label: New feature
+  breaking: false
+  additions: true
+  highlights: >-
+    Deleted Audits and Journeys are archived instead of permanently removed, and Account Admins can
+    restore them. This is the product-side counterpart of the undeleteWebAudit / undeleteWebJourney
+    operations recorded in conventions/observepoint-conventions.yml (reversibility).
+- title: Undo/Redo is Live for Reports
+  date: '2026-06-15'
+  label: Product update
+  breaking: false
+  additions: true
+  highlights: Grid report configuration changes can be undone or redone via keyboard shortcuts or UI controls.
+- title: Enhanced Visibility for Cookies and Links
+  date: '2026-06-11'
+  label: New feature
+  breaking: false
+  additions: true
+  highlights: Two new report columns, "All Page Cookies" and "All Page Links", for filtering on missing elements.
+- title: Refreshed Reports & Gallery Screens
+  date: '2026-06-09'
+  label: New feature
+  breaking: false
+  additions: true
+  highlights: Smart search, a template gallery, bulk actions and AI-powered auto-labeling in the Reports interface.
+- title: Smarter, Faster Consent Category Management
+  date: '2026-05-06'
+  label: Product update
+  breaking: false
+  additions: true
+  highlights: Vendor-based item addition, bulk operations and Excel imports for consent categories.
+- title: Charting is Live in Reports!
+  date: '2026-04-13'
+  label: New feature
+  breaking: false
+  additions: true
+  highlights: Bar, line, area, pie and donut charts inside reports, synced to the report's filters.
+- title: Page Details Initiators
+  date: '2026-03-16'
+  label: Product update
+  breaking: false
+  additions: true
+  highlights: Tag Initiators expanded to cover tags, cookies and network requests.
+- title: New Audit & Journey Locations
+  date: '2026-03-05'
+  label: New feature
+  breaking: false
+  additions: true
+  highlights: >-
+    Twelve new global scanning locations across APAC, EMEA and the Americas. Relevant to API callers —
+    GET /web-audits/locations (v2, getWebAuditAvailableLocations) returns this list.
+- title: Universal Breakouts in Reporting
+  date: '2026-03-03'
+  label: Product update
+  breaking: false
+  additions: true
+  highlights: Reports can be broken out by multiple dimensions without exporting.
+- title: Powerful Date Formatting in Reports!
+  date: '2026-02-19'
+  label: Product update
+  breaking: false
+  additions: true
+  highlights: Timestamp fields group into Hour, Day, Week, Month, Quarter or Year buckets.
+other_surfaces:
+- name: Help Center — Release Notes (index)
+  url: https://help.observepoint.com/en/articles/10490980-release-notes
+  status: 200
+  note: Index page, no dated entries of its own.
+- name: In-app Product Updates / Feedback
+  url: https://app.observepoint.com
+  gated: true
+  note: Behind the application login; not readable without an account.
+- name: Blog product round-ups
+  url: https://www.observepoint.com/blog/
+  status: 200
+  note: Occasional "product drop" round-up posts; marketing-shaped, not a changelog.
+gaps:
+- No API changelog and no changelog page on api-docs.observepoint.com.
+- No RSS/Atom feed discovered on the News Center.
+- Entries carry no version identifiers, so they cannot be pinned to a contract revision.

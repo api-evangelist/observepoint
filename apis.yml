@@ -1,23 +1,209 @@
 aid: observepoint
 name: ObservePoint
-description: 'ObservePoint is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  ObservePoint is a web governance and digital data-quality platform that automatically scans websites, mobile web
+  properties and email links to validate analytics tags, marketing pixels, cookies, consent banners, link integrity and
+  WCAG accessibility. Customers configure Audits (large-scale crawls of a site) and Web Journeys (scripted multi-step
+  user paths), run them on a schedule or on demand, and get back structured reports on tags, variables, cookies,
+  network requests, browser logs, privacy exposure and accessibility issues. Everything in the product is available
+  through a public REST API at api.observepoint.com across two supported versions (v2 and v3) plus a Grid Reporting
+  API that returns any report as rows and columns with filtering, sorting, grouping, pagination and export. API access
+  is included with every ObservePoint subscription at no additional cost, and audits and journeys can push completion
+  webhooks (HMAC-SHA256 signed) into CI/CD pipelines, BI tools and ticketing systems.
+image: https://www.observepoint.com/wp-content/themes/observepoint/assets/images/op-fallback-img.png
 url: https://raw.githubusercontent.com/api-evangelist/observepoint/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-26'
 modified: '2026-08-26'
 tags:
 - Company
-apis: []
+- Web Governance
+- Tag Management
+- Analytics Validation
+- Privacy Compliance
+- Consent Management
+- Web Accessibility
+- Data Quality
+- Marketing Technology
+- Website Auditing
+- Digital Analytics
+- Webhooks
+tags_raw:
+- company
+- web-governance
+- tag-management
+- analytics-validation
+- privacy-compliance
+- consent-management
+- web-accessibility
+- data-quality
+- marketing-technology
+- website-auditing
+- digital-analytics
+- webhooks
+apis:
+- name: ObservePoint V3 API
+  description: >-
+    The current, preferred ObservePoint REST API. 283 operations covering web audits and their runs, page/tag/cookie/
+    variable/browser-log/privacy reports, exports and scheduled exports, alerts, consent categories, action sets,
+    web journeys and journey runs, email inboxes and email link validation, site censuses, custom header groups,
+    remote file mappings, data sources, geo-locations, user events and webhook secret rotation. Authenticated with a
+    user-level API key passed as `Authorization: api_key <key>`.
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Web Governance
+  - Website Auditing
+  - Analytics Validation
+  - Privacy Compliance
+  - Web Accessibility
+  - Consent Management
+  - Webhooks
+  tags_raw:
+  - web-governance
+  - website-auditing
+  - analytics-validation
+  - privacy-compliance
+  - web-accessibility
+  - consent-management
+  - webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-v3-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Overlay
+    url: overlays/observepoint-v3-api-overlay.yaml
+- name: ObservePoint Grid Reporting API
+  description: >-
+    The fastest and most flexible way to read ObservePoint results data. A single POST endpoint per grid entity type
+    returns report data in row/column form with filters, operators, multi-column sorting, group mode with aggregate
+    functions, and pagination up to 10,000 records per page across datasets of billions of rows. Includes a schema
+    endpoint that lists available columns and types, saved report configurations, and asynchronous Excel/file exports.
+  humanURL: https://api-docs.observepoint.com/sections/grid-api-intro
+  baseURL: https://api.observepoint.com
+  tags:
+  - Web Governance
+  - Reporting
+  - Data Quality
+  - Digital Analytics
+  tags_raw:
+  - web-governance
+  - reporting
+  - data-quality
+  - digital-analytics
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-grid-reports-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Overlay
+    url: overlays/observepoint-grid-reports-api-overlay.yaml
+- name: ObservePoint V2 API
+  description: >-
+    The legacy but fully supported v2 REST API, served from https://api.observepoint.com/v2. 88 operations covering
+    account, users, folders and sub-folders (domains), labels, tag and variable rules, tag definitions, web audits and
+    audit runs, and manual journeys with their runs and actions. ObservePoint states that both v2 and v3 are fully
+    supported with no plans for deprecation; v3 is preferred for new work because of better pagination and filtering.
+  humanURL: https://api-docs.observepoint.com/sections/v2-index
+  baseURL: https://api.observepoint.com/v2
+  tags:
+  - Web Governance
+  - Website Auditing
+  - Tag Management
+  - Account Management
+  tags_raw:
+  - web-governance
+  - website-auditing
+  - tag-management
+  - account-management
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-v2-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+  - type: Overlay
+    url: overlays/observepoint-v2-api-overlay.yaml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: DomainSecurity
+  url: security/observepoint-domain-security.yml
+- type: Authentication
+  url: authentication/observepoint-authentication.yml
 - type: Website
-  url: https://www.nasdaqprivatemarket.com/
+  url: https://www.observepoint.com/
+- type: DeveloperPortal
+  url: https://api-docs.observepoint.com/
+- type: Documentation
+  url: https://api-docs.observepoint.com/
+- type: APIReference
+  url: https://api-docs.observepoint.com/sections/v3-index
+- type: GettingStarted
+  url: https://help.observepoint.com/en/articles/9106323-getting-started-with-the-observepoint-api
+- type: Support
+  url: https://help.observepoint.com/
+- type: Blog
+  url: https://www.observepoint.com/blog/
+- type: GitHubOrganization
+  url: https://github.com/observepoint
+- type: Pricing
+  url: https://www.observepoint.com/pricing/
+- type: SignUp
+  url: https://app.observepoint.com/sign-up
+- type: Login
+  url: https://app.observepoint.com/login
+- type: TermsOfService
+  url: https://www.observepoint.com/service-agreement/
+- type: PrivacyPolicy
+  url: https://www.observepoint.com/privacy-policy/
+- type: ChangeLog
+  url: https://news.observepoint.com/
+- type: TrustCenter
+  url: https://trust.observepoint.com/
+- type: LLMsTxt
+  url: llms/observepoint-llms.txt
+- type: LLMsTxt
+  url: llms/observepoint-site-llms.txt
+- type: Conventions
+  url: conventions/observepoint-conventions.yml
+- type: ErrorCatalog
+  url: errors/observepoint-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/observepoint-lifecycle.yml
+- type: Conformance
+  url: conformance/observepoint-conformance.yml
+- type: DataModel
+  url: data-model/observepoint-data-model.yml
+- type: Packages
+  url: packages/observepoint-packages.yml
+- type: RateLimits
+  url: rate-limits/observepoint-rate-limits.yml
+- type: Plans
+  url: plans/observepoint-plans-pricing.yml
+- type: ChangeLog
+  url: changelog/observepoint-changelog.yml
+- type: Webhooks
+  url: asyncapi/observepoint-webhooks.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: JSONSchema
+  url: json-schema/observepoint-data-dictionary-schemas.json
+x-enrichment:
+  date: '2026-08-26'
+  status: enriched
+  artifacts_added: 29
+  pass: local-v1
