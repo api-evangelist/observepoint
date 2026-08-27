@@ -44,102 +44,1601 @@ tags_raw:
 - digital-analytics
 - webhooks
 apis:
-- name: ObservePoint V3 API
-  description: >-
-    The current, preferred ObservePoint REST API. 283 operations covering web audits and their runs, page/tag/cookie/
-    variable/browser-log/privacy reports, exports and scheduled exports, alerts, consent categories, action sets,
-    web journeys and journey runs, email inboxes and email link validation, site censuses, custom header groups,
-    remote file mappings, data sources, geo-locations, user events and webhook secret rotation. Authenticated with a
-    user-level API key passed as `Authorization: api_key <key>`.
+- aid: observepoint:observepoint-account-api
+  name: ObservePoint Account API
+  description: Endpoints for managing account settings, configurations, and account-level information
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
-  - Web Governance
-  - Website Auditing
-  - Analytics Validation
-  - Privacy Compliance
-  - Web Accessibility
-  - Consent Management
-  - Webhooks
-  tags_raw:
-  - web-governance
-  - website-auditing
-  - analytics-validation
-  - privacy-compliance
-  - web-accessibility
-  - consent-management
-  - webhooks
+  - Account
   properties:
   - type: OpenAPI
-    url: openapi/observepoint-v3-api-openapi.yml
+    url: openapi/observepoint-account-api-openapi.yml
   - type: Documentation
     url: https://api-docs.observepoint.com/sections/v3-index
   - type: APIReference
     url: https://api-docs.observepoint.com/openapi/combined.openapi
-  - type: Overlay
-    url: overlays/observepoint-v3-api-overlay.yaml
-- name: ObservePoint Grid Reporting API
-  description: >-
-    The fastest and most flexible way to read ObservePoint results data. A single POST endpoint per grid entity type
-    returns report data in row/column form with filters, operators, multi-column sorting, group mode with aggregate
-    functions, and pagination up to 10,000 records per page across datasets of billions of rows. Includes a schema
-    endpoint that lists available columns and types, saved report configurations, and asynchronous Excel/file exports.
-  humanURL: https://api-docs.observepoint.com/sections/grid-api-intro
-  baseURL: https://api.observepoint.com
-  tags:
-  - Web Governance
-  - Reporting
-  - Data Quality
-  - Digital Analytics
-  tags_raw:
-  - web-governance
-  - reporting
-  - data-quality
-  - digital-analytics
-  properties:
-  - type: OpenAPI
-    url: openapi/observepoint-grid-reports-api-openapi.yml
   - type: Documentation
     url: https://api-docs.observepoint.com/sections/grid-api-intro
   - type: APIReference
     url: https://api-docs.observepoint.com/openapi/grid-api.openapi
   - type: Examples
     url: https://api-docs.observepoint.com/sections/grid-api-examples
-  - type: Overlay
-    url: overlays/observepoint-grid-reports-api-overlay.yaml
-- name: ObservePoint V2 API
-  description: >-
-    The legacy but fully supported v2 REST API, served from https://api.observepoint.com/v2. 88 operations covering
-    account, users, folders and sub-folders (domains), labels, tag and variable rules, tag definitions, web audits and
-    audit runs, and manual journeys with their runs and actions. ObservePoint states that both v2 and v3 are fully
-    supported with no plans for deprecation; v3 is preferred for new work because of better pagination and filtering.
-  humanURL: https://api-docs.observepoint.com/sections/v2-index
-  baseURL: https://api.observepoint.com/v2
-  tags:
-  - Web Governance
-  - Website Auditing
-  - Tag Management
-  - Account Management
-  tags_raw:
-  - web-governance
-  - website-auditing
-  - tag-management
-  - account-management
-  properties:
-  - type: OpenAPI
-    url: openapi/observepoint-v2-api-openapi.yml
   - type: Documentation
     url: https://api-docs.observepoint.com/sections/v2-index
   - type: APIReference
     url: https://api-docs.observepoint.com/openapi/scala-api.openapi
-  - type: Overlay
-    url: overlays/observepoint-v2-api-overlay.yaml
+- aid: observepoint:observepoint-account-triggered-alerts-api
+  name: ObservePoint Account Triggered Alerts API
+  description: Account-level triggered alerts
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - account-triggered-alerts
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-account-triggered-alerts-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-account-usage-alerts-api
+  name: ObservePoint Account Usage Alerts API
+  description: Alerts related to account usage
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - account-usage-alerts
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-account-usage-alerts-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-account-usage-export-api
+  name: ObservePoint Account Usage Export API
+  description: Export account usage data
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - account-usage-export
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-account-usage-export-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-account-usage-v2-api
+  name: ObservePoint Account Usage V2 API
+  description: Account usage data
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - account-usage-v2
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-account-usage-v2-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-action-set-action-rules-api
+  name: ObservePoint Action Set Action Rules API
+  description: APIs for managing Action Set Action Rules
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - action-set-action-rules
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-action-set-action-rules-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-action-set-actions-api
+  name: ObservePoint Action Set Actions API
+  description: APIs for managing Action Set Actions
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - action-set-actions
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-action-set-actions-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-action-sets-api
+  name: ObservePoint Action Sets API
+  description: APIs for managing Action Sets
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - action-sets
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-action-sets-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-alert-export-api
+  name: ObservePoint Alert Export API
+  description: Export alert data
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - alert-export
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-alert-export-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-alert-summary-report-api
+  name: ObservePoint Alert Summary Report API
+  description: Alert Summary report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - alert-summary-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-alert-summary-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-alerts-api
+  name: ObservePoint Alerts API
+  description: Alert management and configuration
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - alerts
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-alerts-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-audit-actions-api
+  name: ObservePoint Audit Actions API
+  description: APIs for managing audit actions
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - audit-actions
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-audit-actions-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-audit-blocking-config-api
+  name: ObservePoint Audit Blocking Config API
+  description: APIs for managing audit request blocking configuration
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - audit-blocking-config
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-audit-blocking-config-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-audit-login-actions-api
+  name: ObservePoint Audit Login Actions API
+  description: APIs for managing audit login actions
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - audit-login-actions
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-audit-login-actions-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-audit-run-export-api
+  name: ObservePoint Audit Run Export API
+  description: Export audit run data
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - audit-run-export
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-audit-run-export-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-audit-summary-report-api
+  name: ObservePoint Audit Summary Report API
+  description: Audit Summary report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - audit-summary-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-audit-summary-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-audits-api
+  name: ObservePoint Audits API
+  description: >-
+    Endpoints for managing audits including creation, configuration, execution, and retrieving audit results
+    and runs
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Audits
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-audits-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-audits-consent-category-api
+  name: ObservePoint Audits Consent Category API
+  description: APIs for managing audit consent categories
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - audits-consent-category
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-audits-consent-category-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-audits-management-api
+  name: ObservePoint Audits Management API
+  description: APIs for managing audits
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - audits-management
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-audits-management-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-browser-logs-report-api
+  name: ObservePoint Browser Logs Report API
+  description: Browser Logs report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - browser-logs-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-browser-logs-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-consent-categories-api
+  name: ObservePoint Consent Categories API
+  description: APIs for managing Consent Categories
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - consent-categories
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-consent-categories-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-consent-category-export-api
+  name: ObservePoint Consent Category Export API
+  description: Export consent category data
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - consent-category-export
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-consent-category-export-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-cookie-inventory-report-api
+  name: ObservePoint Cookie Inventory Report API
+  description: Cookie Inventory report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - cookie-inventory-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-cookie-inventory-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-cookie-privacy-report-api
+  name: ObservePoint Cookie Privacy Report API
+  description: Cookie privacy report
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - cookie-privacy-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-cookie-privacy-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-custom-headers-api
+  name: ObservePoint Custom Headers API
+  description: APIs for managing custom HTTP header groups
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - custom-headers
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-custom-headers-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-data-sources-api
+  name: ObservePoint Data Sources API
+  description: APIs for managing Data Sources
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - data-sources
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-data-sources-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-email-finder-api
+  name: ObservePoint Email Finder API
+  description: OpAdmin-only APIs for finding email inboxes and messages by search string
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - email-finder
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-email-finder-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-email-inbox-configuration-api
+  name: ObservePoint Email Inbox Configuration API
+  description: APIs for managing email inbox configurations and setting
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - email-inbox-configuration
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-email-inbox-configuration-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-email-inbox-message-alerts-api
+  name: ObservePoint Email Inbox Message Alerts API
+  description: Email inbox message alerts
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - email-inbox-message-alerts
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-email-inbox-message-alerts-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-email-inbox-messages-api
+  name: ObservePoint Email Inbox Messages API
+  description: Get Email Inbox message details
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - email-inbox-messages
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-email-inbox-messages-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-email-inboxes-api
+  name: ObservePoint Email Inboxes API
+  description: APIs for getting email messages and results from email inboxes
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - email-inboxes
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-email-inboxes-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-exports-api
+  name: ObservePoint Exports API
+  description: Access requested exports status/information
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - exports
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-exports-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-file-changes-report-api
+  name: ObservePoint File Changes Report API
+  description: File changes report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - file-changes-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-file-changes-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-folders-api
+  name: ObservePoint Folders API
+  description: >-
+    Endpoints for managing folders including creation, organization, access control, and folder-based
+    resource management
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Folders
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-folders-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-geo-locations-api
+  name: ObservePoint Geo Locations API
+  description: APIs for geo locations
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - geo-locations
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-geo-locations-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-labels-api
+  name: ObservePoint Labels API
+  description: >-
+    Endpoints for managing labels including creation, assignment, and retrieval for organizing audits,
+    journeys, and other resources
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Labels
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-labels-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-manual-journey-run-export-api
+  name: ObservePoint Manual Journey Run Export API
+  description: Export manual journey run data
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - manual-journey-run-export
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-manual-journey-run-export-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-manual-journeys-api
+  name: ObservePoint Manual Journeys API
+  description: >-
+    Endpoints for managing manual journeys including real device testing, HAR file ingestion, and journey
+    execution control. These endpoints power Live Connect and HAR Analyzer features in the ObservePoint
+    UI, enabling users to perform manual testing on real devices and analyze HAR files for tag validation
+    and troubleshooting.
+
+
+    For more information, see the [HAR File Processing API Recipe](/sections/api-recipes/har-file-processing).
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Manual Journeys
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-manual-journeys-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-notification-center-api
+  name: ObservePoint Notification Center API
+  description: Find and manage email subscriptions
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - notification-center
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-notification-center-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-page-details-report-api
+  name: ObservePoint Page Details Report API
+  description: >-
+    Detailed information about specific pages including tags, cookies, request logs, and console logs
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - page-details-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-page-details-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-page-summary-report-api
+  name: ObservePoint Page Summary Report API
+  description: Page Summary report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - page-summary-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-page-summary-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-remote-file-mappings-api
+  name: ObservePoint Remote File Mappings API
+  description: APIs for managing Remote File Mappings
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - remote-file-mappings
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-remote-file-mappings-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-reports-api
+  name: ObservePoint Reports API
+  description: The Reports API from ObservePoint — 6 operation(s) for reports.
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Reports
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-reports-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-request-privacy-report-api
+  name: ObservePoint Request Privacy Report API
+  description: Request Privacy report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - request-privacy-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-request-privacy-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-rule-summary-report-api
+  name: ObservePoint Rule Summary Report API
+  description: Rule Summary report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - rule-summary-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-rule-summary-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-rules-api
+  name: ObservePoint Rules API
+  description: >-
+    Endpoints for managing rules including creation, configuration, assignment, and rule-based validation
+    logic
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Rules
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-rules-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-scheduled-exports-api
+  name: ObservePoint Scheduled Exports API
+  description: Manage scheduled grid report data exports
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - scheduled-exports
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-scheduled-exports-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-schedules-api
+  name: ObservePoint Schedules API
+  description: APIs for item schedules and calendars
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - schedules
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-schedules-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-site-censuses-api
+  name: ObservePoint Site Censuses API
+  description: APIs for managing Site Census
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - site-censuses
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-site-censuses-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-sub-folders-api
+  name: ObservePoint Sub Folders API
+  description: >-
+    Endpoints for managing sub-folders including creation, configuration, and sub-folder-based audit and
+    journey management
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Sub-Folders
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-sub-folders-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-tag-duplicates-and-multiples-report-api
+  name: ObservePoint Tag Duplicates And Multiples Report API
+  description: Tag Duplicates and Multiples report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - tag-duplicates-and-multiples-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-tag-duplicates-and-multiples-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-tag-health-report-api
+  name: ObservePoint Tag Health Report API
+  description: Tag Health report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - tag-health-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-tag-health-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-tag-inventory-report-api
+  name: ObservePoint Tag Inventory Report API
+  description: Tag Inventory report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - tag-inventory-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-tag-inventory-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-tag-privacy-report-api
+  name: ObservePoint Tag Privacy Report API
+  description: Tag privacy report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - tag-privacy-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-tag-privacy-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-tags-api
+  name: ObservePoint Tags API
+  description: >-
+    Endpoints for managing tags and tag-related operations including tag metadata and configuration
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Tags
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-tags-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-user-events-api
+  name: ObservePoint User Events API
+  description: APIs for managing User Events
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - user-events
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-user-events-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-users-api
+  name: ObservePoint Users API
+  description: >-
+    Endpoints for managing users including creation, authentication, permissions, and user account management
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-users-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-variable-inventory-report-api
+  name: ObservePoint Variable Inventory Report API
+  description: Variable Inventory report endpoints
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - variable-inventory-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-variable-inventory-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-web-audits-api
+  name: ObservePoint Web Audits API
+  description: >-
+    Retrieve audit run data including pages, cookies, geo-locations, network requests, JS variables and
+    failures for web audit runs
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - web-audits
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-web-audits-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-web-journey-blocking-config-api
+  name: ObservePoint Web Journey Blocking Config API
+  description: APIs for managing web journey request blocking configuration
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - web-journey-blocking-config
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-web-journey-blocking-config-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-web-journey-cookie-report-api
+  name: ObservePoint Web Journey Cookie Report API
+  description: Cookie analysis and reporting for web journeys
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - web-journey-cookie-report
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-web-journey-cookie-report-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-web-journey-custom-headers-api
+  name: ObservePoint Web Journey Custom Headers API
+  description: APIs for managing web journey custom headers
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - web-journey-custom-headers
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-web-journey-custom-headers-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-web-journey-run-export-api
+  name: ObservePoint Web Journey Run Export API
+  description: Export web journey run data
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - web-journey-run-export
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-web-journey-run-export-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-web-journeys-internal-api
+  name: ObservePoint Web Journeys Internal API
+  description: >-
+    The web-journeys-internal API from ObservePoint — 2 operation(s) for web-journeys-internal.
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - web-journeys-internal
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-web-journeys-internal-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
+- aid: observepoint:observepoint-web-journeys-management-api
+  name: ObservePoint Web Journeys Management API
+  description: APIs for managing Web Journeys
+  humanURL: https://api-docs.observepoint.com/sections/v3-index
+  baseURL: https://api.observepoint.com
+  tags:
+  - web-journeys-management
+  properties:
+  - type: OpenAPI
+    url: openapi/observepoint-web-journeys-management-api-openapi.yml
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v3-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/combined.openapi
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/grid-api-intro
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/grid-api.openapi
+  - type: Examples
+    url: https://api-docs.observepoint.com/sections/grid-api-examples
+  - type: Documentation
+    url: https://api-docs.observepoint.com/sections/v2-index
+  - type: APIReference
+    url: https://api-docs.observepoint.com/openapi/scala-api.openapi
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/observepoint-v3-api-overlay.yaml
+- type: Overlay
+  url: overlays/observepoint-grid-reports-api-overlay.yaml
+- type: Overlay
+  url: overlays/observepoint-v2-api-overlay.yaml
 - type: DomainSecurity
   url: security/observepoint-domain-security.yml
 - type: Authentication
