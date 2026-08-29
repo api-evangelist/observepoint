@@ -10,6 +10,18 @@ description: >-
   API that returns any report as rows and columns with filtering, sorting, grouping, pagination and export. API access
   is included with every ObservePoint subscription at no additional cost, and audits and journeys can push completion
   webhooks (HMAC-SHA256 signed) into CI/CD pipelines, BI tools and ticketing systems.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://www.observepoint.com/wp-content/themes/observepoint/assets/images/op-fallback-img.png
 url: https://raw.githubusercontent.com/api-evangelist/observepoint/refs/heads/main/apis.yml
 x-type: company
@@ -1633,6 +1645,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/observepoint-capability-edges.yml
+  name: ObservePoint Business Capability Map
 - type: Overlay
   url: overlays/observepoint-v3-api-overlay.yaml
 - type: Overlay
