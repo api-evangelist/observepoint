@@ -30,18 +30,18 @@ specificationVersion: '0.20'
 created: '2026-08-26'
 modified: '2026-08-26'
 tags:
-- Company
-- Web Governance
-- Tag Management
-- Analytics Validation
-- Privacy Compliance
-- Consent Management
-- Web Accessibility
-- Data Quality
-- Marketing Technology
-- Website Auditing
-- Digital Analytics
-- Webhooks
+- company
+- web-governance
+- tag-management
+- analytics-validation
+- privacy-compliance
+- consent-management
+- web-accessibility
+- data-quality
+- marketing-technology
+- website-auditing
+- digital-analytics
+- Webhook
 tags_raw:
 - company
 - web-governance
@@ -254,6 +254,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Alert Export
+  tags_raw:
   - alert-export
   properties:
   - type: OpenAPI
@@ -302,6 +304,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Alerts
+  tags_raw:
   - alerts
   properties:
   - type: OpenAPI
@@ -326,6 +330,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Audit Actions
+  tags_raw:
   - audit-actions
   properties:
   - type: OpenAPI
@@ -664,6 +670,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Data Sources
+  tags_raw:
   - data-sources
   properties:
   - type: OpenAPI
@@ -688,6 +696,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Email Finder
+  tags_raw:
   - email-finder
   properties:
   - type: OpenAPI
@@ -808,6 +818,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Export
+  tags_raw:
   - exports
   properties:
   - type: OpenAPI
@@ -882,6 +894,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Geo Locations
+  tags_raw:
   - geo-locations
   properties:
   - type: OpenAPI
@@ -1206,6 +1220,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Schedules
+  tags_raw:
   - schedules
   properties:
   - type: OpenAPI
@@ -1426,6 +1442,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI

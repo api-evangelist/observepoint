@@ -1,0 +1,14 @@
+{
+  "repo": "observepoint",
+  "feeds": [
+    {
+      "source": "https://help.observepoint.com/",
+      "feed_url": "https://help.observepoint.com/feed.xml",
+      "title": "",
+      "saved": 16,
+      "method": "discovered"
+    }
+  ],
+  "post_count": 16,
+  "fetched": "2026-08-30T22:33:40Z"
+}
