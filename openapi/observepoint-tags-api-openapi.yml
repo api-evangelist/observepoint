@@ -1,0 +1,122 @@
+openapi: 3.2.0
+info:
+  description: Endpoints for managing tags and tag-related operations including tag metadata and configuration
+  title: V2 Tags API
+  version: null
+servers:
+- url: https://api.observepoint.com/v2
+tags:
+- description: Endpoints for managing tags and tag-related operations including tag metadata and configuration
+  name: Tags
+paths:
+  /tags:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/tags</div>
+      operationId: getAllTags
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Tag'
+                type: array
+      security:
+      - API_Key: []
+      summary: Returns all tags
+      tags:
+      - Tags
+  /tags/{tagId}:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/tags/<span class="op-path-parameter">{tagId}</span></div>
+      operationId: getTag
+      parameters:
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '403':
+          description: User doesn't have permissions to get tag by given tagId
+        '404':
+          description: Not found tag by given tagId
+      security:
+      - API_Key: []
+      summary: Return tag by tagId
+      tags:
+      - Tags
+components:
+  schemas:
+    TagVendor:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    TagCategory:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: Tag category data
+    Tag:
+      type: object
+      required:
+      - category
+      - duplicateScoring
+      - icon
+      - id
+      - name
+      properties:
+        category:
+          $ref: '#/components/schemas/TagCategory'
+        duplicateScoring:
+          type: boolean
+        icon:
+          description: Tag icon URI
+          type: string
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        numSignatures:
+          type: number
+        numVariables:
+          type: number
+        type:
+          $ref: '#/components/schemas/TagType'
+        vendor:
+          $ref: '#/components/schemas/TagVendor'
+      description: Tag data
+    TagType:
+      type: object
+  securitySchemes:
+    API_Key:
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`'
+      in: header
+      name: Authorization
+      type: apiKey

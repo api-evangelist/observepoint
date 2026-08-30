@@ -1,0 +1,849 @@
+openapi: 3.2.0
+info:
+  title: V3 Web Audits API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: web-audits
+  x-displayName: Audit Run Data
+  description: Retrieve audit run data including pages, cookies, geo-locations, network requests, JS variables and failures for web audit runs
+paths:
+  /v3/web-audits/{auditId}/runs/{runId}/scores:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - web-audits
+      summary: Get scores for specified audit run
+      operationId: getAuditRunScores
+      responses:
+        '200':
+          description: Audit scores data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_ScoresDTO'
+        '400':
+          $ref: '#/components/responses/responses-BadRequest'
+        '401':
+          $ref: '#/components/responses/responses-UnAuthorized'
+        '404':
+          $ref: '#/components/responses/responses-NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/scores</div>
+  /v3/web-audits/{auditId}/runs/{runId}/pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_PagesSort'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    get:
+      tags:
+      - web-audits
+      operationId: getAuditRunPages
+      summary: Return pages found in the run
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/pages</div>
+
+
+        Get all the pages in a given audit run'
+      responses:
+        '200':
+          description: OK, return a list of unique pages found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_Pages_DTO'
+        '400':
+          $ref: '#/components/responses/responses-BadRequest'
+        '401':
+          $ref: '#/components/responses/responses-UnAuthorized'
+        '404':
+          $ref: '#/components/responses/responses-NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs/{runId}/cookies:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - web-audits
+      operationId: getCookies
+      summary: Return a list of unique cookies
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/cookies</div>
+
+
+        Get all unique cookie name and domain found on all the pages in a given audit run'
+      responses:
+        '200':
+          description: OK, return a list of unique cookies found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CookieDTO'
+        '400':
+          $ref: '#/components/responses/responses-BadRequest'
+        '401':
+          $ref: '#/components/responses/responses-UnAuthorized'
+        '404':
+          $ref: '#/components/responses/responses-NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs/{runId}/geo-locations:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - web-audits
+      operationId: getGeoLocation
+      summary: Return a list of unique geo-locations
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/geo-locations</div>
+
+
+        Get all unique geo-locations found on all the pages in a given audit run'
+      responses:
+        '200':
+          description: OK, return a list of unique geo-locations found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GeoLocationDTO'
+        '400':
+          $ref: '#/components/responses/responses-BadRequest'
+        '401':
+          $ref: '#/components/responses/responses-UnAuthorized'
+        '404':
+          $ref: '#/components/responses/responses-NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs/{runId}/request-domains:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - web-audits
+      operationId: getRequestDomain
+      summary: Return a list of unique request-domains
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/request-domains</div>
+
+
+        Get all unique request domains found on all the pages in a given audit run'
+      responses:
+        '200':
+          description: OK, return a list of request-domains found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestDomainDTO'
+        '400':
+          $ref: '#/components/responses/responses-BadRequest'
+        '401':
+          $ref: '#/components/responses/responses-UnAuthorized'
+        '404':
+          $ref: '#/components/responses/responses-NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs/{runId}/javascript-variables:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - name: size
+      in: query
+      required: false
+      description: Number of items to be returned at once
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    - name: startAfterPageId
+      in: query
+      required: false
+      description: 'Offset result, start from pageId next to `startAfterPageId`.
+
+        To fetch first page, don''t supply this parameter.
+
+        To fetch subsequent pages, supply `metadata.pagination.lastPageId` from previous response
+
+        '
+      schema:
+        $ref: '#/components/schemas/PageId'
+    get:
+      tags:
+      - web-audits
+      operationId: getJavaScriptVariables
+      summary: Return a list of pages with JS variables
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/javascript-variables</div>
+
+
+        Get all JS variables found on all the pages in a given audit run'
+      responses:
+        '200':
+          description: Pages with JS variables
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagesWithJsVariablesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs/{runId}/reports/failures:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - web-audits
+      operationId: getAuditFailureResults
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/failures</div>
+
+
+        Returns a summary of failures for the given run.
+
+        Failures summary includes details for Pre-Audit Actions, On-Page Actions, all found links excluded and starting URLs navigation results.
+
+        '
+      summary: Get run failures summary
+      responses:
+        '200':
+          description: The result of the execution of the Audit Pre-Audit Actions if any
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditFailureResults'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs/{runId}/pages/{pageId}/screenshot:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/PageId'
+    get:
+      tags:
+      - web-audits
+      operationId: generateAuditRunPageScreenshot
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/pages/<span class="op-path-parameter">{pageId}</span>/screenshot</div>
+
+
+        Returns an pre-signed S3 URL for audit run page card'
+      summary: Get audit run page screenshot URL
+      responses:
+        '302':
+          description: redirect with pre-signed S3 URL for screenshot of a page of an audit run
+          headers:
+            Location:
+              description: The URL to which the client will be redirected
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+components:
+  schemas:
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    GeoLocationDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        countryCode:
+          type: integer
+        countryName:
+          type: string
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
+    RequestDomainParsingResult:
+      oneOf:
+      - $ref: '#/components/schemas/RequestDomainDTO-parsed1'
+      - $ref: '#/components/schemas/RequestDomainDTO-parsed2'
+      - $ref: '#/components/schemas/RequestDomainDTO-failedToParse'
+    RequestDomainDTO-parsed1:
+      type: object
+      properties:
+        domain:
+          type: string
+          example: observepoint.com
+        scheme:
+          type: string
+          example: https
+        isValid:
+          type: boolean
+          example: true
+    AuditPage:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/PageId'
+        url:
+          type: string
+        loadTime:
+          type: number
+        statusCode:
+          type: integer
+        size:
+          type: number
+    JsVariable:
+      type: object
+      required:
+      - name
+      - value
+      properties:
+        name:
+          description: Name of collected JS variable
+          example: dataLayer
+          type: string
+        value:
+          description: 'Raw value of collected JS variable as it appeared on a page.
+
+            Can be any value - string, number, boolean, array, object or `null`
+
+            '
+          type:
+          - object
+          - 'null'
+    PreAuditActionResults:
+      type: object
+      required:
+      - zeroAndOut
+      properties:
+        zeroAndOut:
+          description: Indicates whether pre-audit actions failed executing in all allocated engine containers.
+          type: boolean
+        preAuditActionFailures:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AuditActionResult'
+          description: 'Pre-audit action results failures. A a set of failed actions with their failure messages.
+
+            Uniqueness is determined by the combination of `failureMessage` and `auditActionSnapshotId`.
+
+            '
+    AuditRun_Pages_DTO:
+      description: DTO returning pages of a particular run in paged way.
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditPage'
+    S3IterableResponseMetadata:
+      description: Metadata for iterable results from S3
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/S3PaginationMetadata'
+    AuditRun_PagesSort:
+      description: possible ways to sort pages in a given run
+      type: string
+      enum:
+      - url
+      - load_time
+      - status_code
+      - size
+    AuditActionSnapshotId:
+      type: integer
+      format: int64
+      minimum: 0
+      description: An ID assigned to actions of all types on an audit - unique in the context of an individual run
+    OnPagesActionResultItem:
+      type: object
+      required:
+      - pageUrl
+      - results
+      properties:
+        pageUrl:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditActionResult'
+    RequestDomainDTO-parsed2:
+      type: object
+      properties:
+        domain:
+          type: string
+          example: obs_ervepoint.com
+        scheme:
+          type: string
+          example: https
+        isValid:
+          type: boolean
+          example: false
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    RequestDomainDTO-failedToParse:
+      type: object
+      properties:
+        isValid:
+          type: boolean
+          example: false
+        OriginalUrl:
+          type: string
+          example: fadsjguianvasnkd
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    PagesWithJsVariablesDTO:
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/S3IterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageWithJsVariables'
+    AuditRun_AuditSummary_Score:
+      type: object
+      required:
+      - score
+      - max
+      properties:
+        score:
+          type: number
+          format: float
+          description: Amount of points obtained in given score category. Rounded to one digit after dot
+        max:
+          type: integer
+          description: Max points for given score category, inclusive
+    AuditActionResult:
+      type: object
+      required:
+      - auditActionSnapshotId
+      - failureMessage
+      properties:
+        auditActionSnapshotId:
+          $ref: '#/components/schemas/AuditActionSnapshotId'
+        failureMessage:
+          type: string
+    StartingUrlResults:
+      type: object
+      description: "Provide information for the following use cases:\n  One and Out - All starting URLs failed to launch\n  One and Out - All links found were excluded by filters\n"
+      required:
+      - failureType
+      properties:
+        failureType:
+          description: "Possible types:\n  - `no_links_scanned_one_and_out` All conditions must be met:\n    1. Number of scanned pages matches number of starting URLs\n    2. Scan limit is higher than number of scanned pages\n    3. At least 1 link has been excluded.\n  - `all_starting_urls_failed_one_and_out` Flag indicating if all starting Urls failed navigation.\n    Navigation resulted in status codes:\n     - zero\n     - 403\n     - 500+\n    Details for this data is available from the page summary pages endpoint\n  - `all_starting_urls_failed_zero_and_out` Flag indicating if all starting Urls failed navigation but without records.\n"
+          type: string
+          enum:
+          - no_links_scanned_one_and_out
+          - all_starting_urls_failed_one_and_out
+          - all_starting_urls_failed_zero_and_out
+        linksExcludedSample:
+          description: '(Optional) Present if failureType is `no_links_scanned_one_and_out`
+
+            A sample of links found from starting URLs that were excluded from the audit.
+
+            '
+          type: array
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/PageUrl'
+        startingUrlFailures:
+          description: (Optional) Present when `all_starting_urls_failed_one_and_out` is true
+          type: array
+          items:
+            $ref: '#/components/schemas/StartingUrlFailureItem'
+    StartingUrlFailureItem:
+      required:
+      - statusCode
+      - pageCount
+      properties:
+        statusCode:
+          $ref: '#/components/schemas/PageStatusCode'
+        pageCount:
+          type: integer
+        browserError:
+          type: string
+          description: error produced by browser upon opening the page
+          example: This site can’t be reached. example.com’s server IP address could not be found. ERR_NAME_NOT_RESOLVED
+    CookieDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        domain:
+          type: string
+      description: Cookie name and domain
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    RequestDomainDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/RequestDomainParsingResult'
+    S3PaginationMetadata:
+      description: 'Represents pagination metadata for results from S3, where each result page contains multiple pageIds.
+
+        It''s not possible to efficiently get total count of files in S3, so metadata is missing fields like `totalCount` and `totalPageCount`
+
+        '
+      type: object
+      required:
+      - pageSize
+      - currentPageSize
+      - lastPageId
+      properties:
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          example: 50
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          example: 1
+          type: integer
+        lastPageId:
+          description: 'Last pageId on current result page, pass it as `startAfterPageId` query param to retrieve next page.
+
+            Null if no items were returned
+
+            '
+          example: f9d32cc7cc2046d6decb145a80289287f5226323
+          type:
+          - string
+          - 'null'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    OnPagesActionResults:
+      description: (Optional) Present if failure/s is/are present for any Page's On-Page Actions execution
+      type: object
+      required:
+      - totalConfiguredCount
+      - totalFailedCount
+      - resultsSample
+      properties:
+        totalConfiguredCount:
+          type: integer
+          description: Total number of pages configured with On-Page Actions for the Audit run
+        totalFailedCount:
+          type: integer
+          description: Total number of Pages in the Audit run with On-Page Action failures
+        resultsSample:
+          description: A sample of On-Page actions failures.
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/OnPagesActionResultItem'
+    AuditFailureResults:
+      type: object
+      required:
+      - preAuditActionResults
+      properties:
+        preAuditActionResults:
+          $ref: '#/components/schemas/PreAuditActionResults'
+        onPagesActionResults:
+          $ref: '#/components/schemas/OnPagesActionResults'
+        startingUrlResults:
+          $ref: '#/components/schemas/StartingUrlResults'
+    PageWithJsVariables:
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      - pageInitialStatusCode
+      - pageFinalStatusCode
+      - variables
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+        pageInitialStatusCode:
+          $ref: '#/components/schemas/PageStatusCode'
+        pageFinalStatusCode:
+          $ref: '#/components/schemas/PageStatusCode'
+        variables:
+          description: All JS variables found on specific page
+          type: array
+          items:
+            $ref: '#/components/schemas/JsVariable'
+    AuditRun_AuditSummary_ScoresDTO:
+      type: object
+      required:
+      - total
+      - tagPresence
+      - tagPerformance
+      - rules
+      - pagePerformance
+      - cookies
+      properties:
+        total:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        tagPresence:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        tagPerformance:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        rules:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        pagePerformance:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        cookies:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+  responses:
+    responses-NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    responses-BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    responses-UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    PageId:
+      name: pageId
+      in: path
+      required: true
+      description: Unique identification number for web audit run-page, it is different from dcUUID
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/PageId'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

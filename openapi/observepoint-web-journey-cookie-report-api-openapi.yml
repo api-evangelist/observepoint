@@ -1,0 +1,571 @@
+openapi: 3.2.0
+info:
+  title: V3 Web Journey Cookie Report API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: web-journey-cookie-report
+  x-displayName: Web Journey Cookie Report
+  description: Cookie analysis and reporting for web journeys
+paths:
+  /v3/web-journeys/{webJourneyId}/runs/{runId}/actions/{actionSequenceId}/cookies:
+    get:
+      tags:
+      - web-journey-cookie-report
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/actions/<span class="op-path-parameter">{actionSequenceId}</span>/cookies</div>
+
+
+        Get all cookies affected by the given action'
+      summary: Get cookies for action
+      operationId: getWebJourneyActionCookies
+      parameters:
+      - $ref: '#/components/parameters/WebJourneyId'
+      - $ref: '#/components/parameters/RunId'
+      - $ref: '#/components/parameters/ActionSequenceId'
+      responses:
+        '200':
+          description: Cookies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyActionCookiesDTO'
+        '400':
+          $ref: '#/components/responses/responses-BadRequest'
+        '401':
+          $ref: '#/components/responses/responses-UnAuthorized'
+        '404':
+          $ref: '#/components/responses/responses-NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/runs/{runId}/cookies/origin:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - web-journey-cookie-report
+      operationId: getWebJourneyRunCookieOriginStory
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/cookies/origin</div>
+
+
+        Get the origin story for a cookie'
+      summary: Get cookie origin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CookieOriginRequestDTO'
+      responses:
+        '200':
+          description: OK, return a list of origin story actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyRunCookieOrigin'
+        '400':
+          $ref: '#/components/responses/responses-BadRequest'
+        '401':
+          $ref: '#/components/responses/responses-UnAuthorized'
+        '404':
+          $ref: '#/components/responses/responses-NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/runs/{runId}/actions/{actionId}/cookies/origin:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/ActionId'
+    post:
+      tags:
+      - web-journey-cookie-report
+      operationId: getWebJourneyActionCookieOriginStory
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/actions/<span class="op-path-parameter">{actionId}</span>/cookies/origin</div>
+
+
+        Get the origin story for a cookie'
+      summary: Get cookie origin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CookieOriginRequestDTO'
+      responses:
+        '200':
+          description: OK, return a list of story actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyResponseCookieOriginDto'
+        '400':
+          $ref: '#/components/responses/responses-BadRequest'
+        '401':
+          $ref: '#/components/responses/responses-UnAuthorized'
+        '404':
+          $ref: '#/components/responses/responses-NotFound'
+      security:
+      - API_Key: []
+components:
+  schemas:
+    BaseCookieInitiator:
+      type: object
+      required:
+      - initiatorType
+      properties:
+        initiatorType:
+          $ref: '#/components/schemas/CookieInitiatorTypeEnum'
+        tagId:
+          type: integer
+          description: Will include a tag ID when a specific tag signature has been matched to initiating requests
+        requestUrl:
+          type: string
+          description: "For `initiatorType`:\n  - `HTTP` - `requestUrl` will be the URL of the request that created the cookie\n  - `APP`, `OP_ACTION`, `UNKNOWN` - This field will be undefined\n"
+    CookieTrait:
+      type: object
+      required:
+      - name
+      - value
+      - domain
+      - path
+      - httpOnly
+      - secure
+      - sameSite
+      - expires
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        domain:
+          type: string
+        path:
+          type: string
+        httpOnly:
+          type: boolean
+        secure:
+          type: boolean
+        sameSite:
+          type: string
+        expires:
+          type: string
+    CookieChangeInitiator:
+      allOf:
+      - $ref: '#/components/schemas/BaseCookieInitiator'
+      - type: object
+        description: Only `HTTP` initiator have `requestUrl` and `harEntryIndex` properties
+        properties:
+          line:
+            type: integer
+            description: The line number in the JS file that created the cookie
+          column:
+            type: integer
+            description: The column number in the JS file that created the cookie
+          harEntryIndex:
+            $ref: '#/components/schemas/HarEntryIndex'
+    ActionId:
+      type: integer
+      format: int64
+      example: 107239
+    CookieChangeSnapshot:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/CookieTrait'
+      - type: object
+        required:
+        - partyType
+        properties:
+          partyType:
+            $ref: '#/components/schemas/CookiePartyType'
+          cookieTTL:
+            type: integer
+            description: difference (in minutes) between cookie expiration and cookie set time (page scan) cookieTTL
+            format: int64
+          partitionKey:
+            type: string
+    CookieOriginTypeEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - PRE_AUDIT_ACTION
+      - PAGE_LOAD
+      - ON_PAGE_ACTION
+    TagId:
+      type: integer
+      description: Tag ID
+    HarEntryIndex:
+      type: integer
+      minimum: 0
+      description: The 0-based index of the HAR entry that this request corresponds to. Used to uniquely identify a request on a page.
+    WebJourneyResponseCookieChangeItem:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseResponseCookieChangeItemTrait'
+      - type: object
+        required:
+        - action
+        - initiators
+        properties:
+          initiators:
+            type: array
+            items:
+              $ref: '#/components/schemas/BaseCookieInitiator'
+          action:
+            $ref: '#/components/schemas/WebJourneyCookieChangeAction'
+    CookieChangeTypeEnum:
+      type: string
+      enum:
+      - ADD
+      - UPDATE
+      - DELETE
+      - NO_CHANGE
+      - REPEAT_SET
+    CookiePartyType:
+      type: string
+      description: 'Indicates if cookie domain is different from domain of a page it was set on.
+
+        `owned_3rd_party` is deprecated
+
+        '
+      enum:
+      - 1st_party
+      - owned_3rd_party
+      - 3rd_party
+    CookieInitiator:
+      type: object
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        initiatorType:
+          type: string
+          enum:
+          - HTTP
+          - APP
+          - OP_ACTION
+          - UNKNOWN
+    WebJourneyRunCookieOrigin:
+      type: object
+      required:
+      - totalCookieActionCount
+      - totalCookieInitiatorCount
+      - actions
+      properties:
+        totalCookieActionCount:
+          type: integer
+        totalCookieInitiatorCount:
+          type: integer
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebJourneyRunCookieOriginAction'
+    WebJourneyRunCookieOriginAction:
+      type: object
+      required:
+      - action
+      - cookieChangeType
+      - initiators
+      - cookie
+      properties:
+        action:
+          $ref: '#/components/schemas/WebJourneyCookieChangeAction'
+        cookieChangeType:
+          $ref: '#/components/schemas/CookieChangeTypeEnum'
+        initiators:
+          type: array
+          items:
+            $ref: '#/components/schemas/CookieChangeInitiator'
+        cookie:
+          $ref: '#/components/schemas/CookieChangeSnapshot'
+    BaseCookieInsights:
+      type: object
+      required:
+      - noOfUniqueCookies
+      - noOfUniqueDomains
+      - noOf3rdPartyCookies
+      properties:
+        noOfUniqueCookies:
+          type: integer
+        noOfUniqueDomains:
+          type: integer
+        noOf3rdPartyCookies:
+          type: integer
+    BaseResponseCookieChangeItemTrait:
+      type: object
+      required:
+      - cookieChangeType
+      - cookie
+      properties:
+        cookieChangeType:
+          $ref: '#/components/schemas/CookieChangeTypeEnum'
+        cookie:
+          $ref: '#/components/schemas/CookieChangeSnapshot'
+    BaseCookieChangeActionTrait:
+      type: object
+      required:
+      - sequence
+      - label
+      properties:
+        sequence:
+          type: integer
+        label:
+          type: string
+    CookieInitiatorTypeEnum:
+      type: string
+      description: Type of event that created the cookie
+      enum:
+      - HTTP
+      - APP
+      - OP_ACTION
+      - UNKNOWN
+    CookieOriginRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        domain:
+          type: string
+        path:
+          type: string
+    WebJourneyId:
+      type: integer
+      format: int64
+      example: 107239
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    WebJourneyCookieChangeAction:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseCookieChangeActionTrait'
+    ActionSequenceId:
+      type: integer
+      format: int64
+      example: 107239
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    WebJourneyActionCookieItem:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/FullCookieTrait'
+      - type: object
+        properties:
+          expirationTimestamp:
+            type: integer
+            format: int64
+          opChangeType:
+            $ref: '#/components/schemas/CookieChangeTypeEnum'
+    WebJourneyActionCookiesDTO:
+      type: object
+      required:
+      - insights
+      - create
+      properties:
+        insights:
+          $ref: '#/components/schemas/WebJourneyCookieInsights'
+        create:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebJourneyActionCookieItem'
+    FullCookieTrait:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        domain:
+          type: string
+        path:
+          type: string
+        httpOnly:
+          type: boolean
+        secure:
+          type: boolean
+        samesite:
+          type: string
+        expires:
+          type: string
+        partyType:
+          $ref: '#/components/schemas/CookiePartyType'
+        origin:
+          $ref: '#/components/schemas/CookieOriginDto'
+        initiators:
+          type: array
+          items:
+            $ref: '#/components/schemas/CookieInitiator'
+        partitionKey:
+          type: string
+    WebJourneyResponseCookieOriginDto:
+      type: object
+      required:
+      - changes
+      properties:
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebJourneyResponseCookieChangeItem'
+    WebJourneyCookieInsights:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseCookieInsights'
+    CookieOriginDto:
+      type: object
+      properties:
+        originType:
+          $ref: '#/components/schemas/CookieOriginTypeEnum'
+        action:
+          $ref: '#/components/schemas/CookieChangeTypeEnum'
+  responses:
+    responses-NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    responses-BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    responses-UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    ActionSequenceId:
+      name: actionSequenceId
+      in: path
+      required: true
+      description: Unique identification number for web-journey action
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/ActionSequenceId'
+    ActionId:
+      name: actionId
+      in: path
+      required: true
+      description: Unique identification number for web-journey action
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/ActionId'
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

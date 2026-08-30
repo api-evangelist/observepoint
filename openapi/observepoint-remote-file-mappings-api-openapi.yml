@@ -1,0 +1,403 @@
+openapi: 3.2.0
+info:
+  title: V3 Remote File Mappings API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: remote-file-mappings
+  x-displayName: Remote File Mappings
+  description: APIs for managing Remote File Mappings
+paths:
+  /v3/remote-file-mappings:
+    get:
+      tags:
+      - remote-file-mappings
+      summary: Get remote file mappings
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/remote-file-mappings</div>
+
+
+        Retrieve all remote file mappings with optional account filtering'
+      operationId: getRemoteFileMappings
+      parameters:
+      - in: query
+        name: accountId
+        description: Filter by account ID
+        required: false
+        schema:
+          type: integer
+          example: 123
+      responses:
+        '200':
+          description: List of remote file mappings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RemoteFileMapping'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+    post:
+      tags:
+      - remote-file-mappings
+      summary: Create remote file mapping
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/remote-file-mappings</div>
+
+
+        Create a new remote file mapping configuration'
+      operationId: createRemoteFileMapping
+      parameters:
+      - in: query
+        name: accountId
+        description: Account ID to create the mapping for
+        required: false
+        schema:
+          type: integer
+          example: 123
+      requestBody:
+        description: Remote file mapping data for creation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoteFileMappingRequest'
+      responses:
+        '200':
+          description: Remote file mapping created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteFileMapping'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/remote-file-mappings/{rfmId}:
+    parameters:
+    - in: path
+      name: rfmId
+      description: The ID of the remote file mapping
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 123
+    get:
+      tags:
+      - remote-file-mappings
+      summary: Get remote file mapping by ID
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/remote-file-mappings/<span class="op-path-parameter">{rfmId}</span></div>
+
+
+        Retrieve a specific remote file mapping by its ID'
+      operationId: getRemoteFileMapping
+      responses:
+        '200':
+          description: Remote file mapping retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteFileMapping'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - remote-file-mappings
+      summary: Update remote file mapping
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/remote-file-mappings/<span class="op-path-parameter">{rfmId}</span></div>
+
+
+        Update an existing remote file mapping'
+      operationId: updateRemoteFileMapping
+      requestBody:
+        description: Updated remote file mapping data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoteFileMappingRequest'
+      responses:
+        '200':
+          description: Remote file mapping updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteFileMapping'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    delete:
+      tags:
+      - remote-file-mappings
+      summary: Delete remote file mapping
+      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/remote-file-mappings/<span class="op-path-parameter">{rfmId}</span></div>
+
+
+        Delete a specific remote file mapping by its ID'
+      operationId: deleteRemoteFileMapping
+      responses:
+        '204':
+          description: Remote file mapping deleted successfully
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    RemoteFileMappingRequest:
+      type: object
+      description: Request data for creating or updating remote file mapping
+      required:
+      - name
+      - matchType
+      - matchValue
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          description: A user-supplied name to identify this RFM config
+          example: Google Analytics Replacement
+        fileId:
+          type:
+          - string
+          - 'null'
+          description: A string GUID used as the uploaded replacement file's "name" in S3
+          example: 8c59d02b-6ebc-4893-9391-9be26c6d34cc
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          maxLength: 5000
+          description: The replacement URL, or else the name of the replacement file before it was uploaded
+          example: https://example.com/replacement-script.js
+        matchType:
+          type: string
+          enum:
+          - equals
+          - regex
+          description: Either "regex" or "equals"
+          example: equals
+        matchValue:
+          type: string
+          description: The request URL to be replaced (or the regex that matches URLs to replace)
+          example: https://www.google-analytics.com/analytics.js
+    RemoteFileMapping:
+      type: object
+      description: Remote file mapping configuration
+      required:
+      - id
+      - name
+      - matchType
+      - matchValue
+      - accountId
+      - createdBy
+      - createdAt
+      - updatedBy
+      - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Simple surrogate key in the database for this RFM config
+          example: 123
+        name:
+          type: string
+          maxLength: 255
+          description: A user-supplied name to identify this RFM config
+          example: Google Analytics Replacement
+        fileId:
+          type:
+          - string
+          - 'null'
+          description: A string GUID used as the uploaded replacement file's "name" in S3
+          example: 8c59d02b-6ebc-4893-9391-9be26c6d34cc
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          maxLength: 5000
+          description: The replacement URL, or else the name of the replacement file before it was uploaded
+          example: https://example.com/replacement-script.js
+        matchType:
+          type: string
+          enum:
+          - equals
+          - regex
+          description: Either "regex" or "equals"
+          example: equals
+        matchValue:
+          type: string
+          description: The request URL to be replaced (or the regex that matches URLs to replace)
+          example: https://www.google-analytics.com/analytics.js
+        accountId:
+          type: integer
+          description: Foreign key reference to accounts table. The owner of this RemoteFileMapping
+          example: 343
+        createdBy:
+          type: integer
+          description: Foreign key reference to the users table. Who created this RFM?
+          example: 1362
+        createdAt:
+          type: string
+          format: date-time
+          description: When this RFM was created
+          example: '2024-01-01T10:15:00.000Z'
+        updatedBy:
+          type: integer
+          description: Foreign key reference to the users table. Who updated this RFM most recently?
+          example: 1362
+        updatedAt:
+          type: string
+          format: date-time
+          description: When this RFM was last updated
+          example: '2024-01-02T10:15:00.000Z'
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

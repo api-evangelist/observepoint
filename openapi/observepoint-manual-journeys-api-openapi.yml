@@ -1,0 +1,1390 @@
+openapi: 3.2.0
+info:
+  description: 'Endpoints for managing manual journeys including real device testing, HAR file ingestion, and journey execution control. These endpoints power Live Connect and HAR Analyzer features in the ObservePoint UI, enabling users to perform manual testing on real devices and analyze HAR files for tag validation and troubleshooting.
+
+
+    For more information, see the [HAR File Processing API Recipe](/sections/api-recipes/har-file-processing).'
+  title: V2 Manual Journeys API
+  version: null
+servers:
+- url: https://api.observepoint.com/v2
+tags:
+- description: 'Endpoints for managing manual journeys including real device testing, HAR file ingestion, and journey execution control. These endpoints power Live Connect and HAR Analyzer features in the ObservePoint UI, enabling users to perform manual testing on real devices and analyze HAR files for tag validation and troubleshooting.
+
+
+    For more information, see the [HAR File Processing API Recipe](/sections/api-recipes/har-file-processing).'
+  name: Manual Journeys
+paths:
+  /manual-journeys:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys</div>
+      operationId: allJourneys
+      requestBody:
+        $ref: '#/components/requestBodies/SeqValue'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Journey'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+      - API_Key: []
+      summary: Get all manual journeys
+      tags:
+      - Manual Journeys
+    post:
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/manual-journeys</div>
+      operationId: createJourney
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JourneyRequest'
+        description: New manual journey info
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journey'
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+      - API_Key: []
+      summary: Create new manual journey
+      tags:
+      - Manual Journeys
+  /manual-journeys/certificates/default:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/certificates/default</div>
+      operationId: observepoint$api$manualjourney$ManualJourneyRoute$$getDefaultCertificate
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certificate'
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+      - API_Key: []
+      summary: Get default certificate metadata
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span></div>
+      operationId: journey
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journey'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get manual journey
+      tags:
+      - Manual Journeys
+    post:
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span></div>
+      operationId: initialize
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitializedJourney'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Initialize manual journey run
+      tags:
+      - Manual Journeys
+    put:
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span></div>
+      operationId: updateJourney
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JourneyRequest'
+        description: Update manual journey info
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journey'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+        '422':
+          description: Supplied entity didn't pass a validation
+      security:
+      - API_Key: []
+      summary: Update manual journey
+      tags:
+      - Manual Journeys
+    delete:
+      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span></div>
+
+
+        See also POST /v2/manual-journeys/{manualJourneyId}/delete for an equivalent endpoint that supports browser sendBeacon() calls.'
+      operationId: deleteJourney
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+        '423':
+          description: This item has active run. Please stop & discard active run first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemIsRunningApiError'
+      security:
+      - API_Key: []
+      summary: Delete manual journey
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/delete:
+    post:
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/delete</div>
+
+
+        This endpoint provides the same functionality as DELETE /v2/manual-journeys/{manualJourneyId}. It exists to support browser sendBeacon() calls, which can only perform POST requests. This is used when users abruptly leave the live-connect page to ensure proper cleanup of the live-connect session (including stopping any ECS tasks associated with the run and removing the run from the database).'
+      operationId: deleteJourneyViaPost
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+        '423':
+          description: This item has active run. Please stop & discard active run first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemIsRunningApiError'
+      security:
+      - API_Key: []
+      summary: Delete manual journey via POST request
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/har-runs:
+    post:
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/har-runs</div>
+      operationId: createHarRun
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HarJourneyRunCreateRequest'
+        description: New har manual journey request
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                format: int64
+                type: integer
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+      - API_Key: []
+      summary: Create a manual journey run within the manualJourneyId based on uploaded har files.
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/labels:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/labels</div>
+      operationId: journeyLabels
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: number
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get manual journey labels
+      tags:
+      - Manual Journeys
+    put:
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/labels</div>
+      operationId: updateJourneyLabels
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/LabelArray'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: number
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Update manual journey labels
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/labels/{labelId}:
+    delete:
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/labels/<span class="op-path-parameter">{labelId}</span></div>
+      operationId: deleteJourneyLabel
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: labelId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Delete manual journey label
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/rules:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/rules</div>
+      operationId: journeyRules
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  format: int32
+                  type: integer
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get manual journey rules
+      tags:
+      - Manual Journeys
+    put:
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/rules</div>
+      operationId: updateJourneyRules
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: int32
+                type: integer
+              type: array
+        description: Rules ids
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  format: int32
+                  type: integer
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Update manual journey rules
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs</div>
+      operationId: allRuns
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/SeqValue'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/JourneyRun'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get all available manual journey runs
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span></div>
+      operationId: run
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JourneyRun'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get specified manual journey run
+      tags:
+      - Manual Journeys
+    delete:
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span></div>
+      operationId: deleteJourneyRun
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Delete manual journey run
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/actions:
+    post:
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/actions</div>
+      operationId: nextJourneyRunAction
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Create new action in specified manual journey run
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/actions/{actionId}:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/actions/<span class="op-path-parameter">{actionId}</span></div>
+      operationId: journeyRunAction
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: actionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get specified manual journey run action
+      tags:
+      - Manual Journeys
+    delete:
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/actions/<span class="op-path-parameter">{actionId}</span></div>
+      operationId: deleteJourneyRunAction
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: actionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Function1RequestContextFutureRouteResult'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Deletes specified manual journey run action
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/control:
+    post:
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/control</div>
+      operationId: processRunControlRequest
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Value'
+        description: Control request
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Function1RequestContextFutureRouteResult'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Manual journey run control request
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/labels:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/labels</div>
+      operationId: runLabels
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: number
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get manual journey run labels
+      tags:
+      - Manual Journeys
+    put:
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/labels</div>
+      operationId: updateRunLabels
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/LabelArray'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: number
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Update manual journey run labels
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/labels/{labelId}:
+    delete:
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/labels/<span class="op-path-parameter">{labelId}</span></div>
+      operationId: deleteRunLabel
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: labelId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Delete manual journey run label
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/request-filters:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/request-filters</div>
+      operationId: getRequestFilters
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get request filters of specified manual journey run
+      tags:
+      - Manual Journeys
+    put:
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/request-filters</div>
+      operationId: setRequestFilters
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqString'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Set request filters for specified manual journey run
+      tags:
+      - Manual Journeys
+    delete:
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/request-filters</div>
+      operationId: removeRequestFilters
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Function1RequestContextFutureRouteResult'
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Reset request filters for specified manual journey run
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/request-logs:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/request-logs</div>
+      operationId: getRequestLogs
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/Pagination'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RequestLog'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get request logs of specified manual journey run
+      tags:
+      - Manual Journeys
+  /manual-journeys/{manualJourneyId}/runs/{runId}/tags:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/manual-journeys/<span class="op-path-parameter">{manualJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/tags</div>
+      operationId: getRunTags
+      parameters:
+      - name: manualJourneyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/Pagination'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Tag'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+        '404':
+          description: Requested item not found
+      security:
+      - API_Key: []
+      summary: Get tags of specified manual journey run
+      tags:
+      - Manual Journeys
+components:
+  schemas:
+    SeqString:
+      type: object
+      required:
+      - empty
+      - traversableAgain
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    Value:
+      type: object
+    RuleResultOverview:
+      type: object
+      required:
+      - broken
+      - failed
+      - notApplied
+      - passed
+      properties:
+        broken:
+          format: int32
+          type: integer
+        failed:
+          format: int32
+          type: integer
+        notApplied:
+          format: int32
+          type: integer
+        passed:
+          format: int32
+          type: integer
+    Journey:
+      type: object
+      required:
+      - createdAt
+      - emails
+      - folderId
+      - id
+      - name
+      - osOfDevice
+      - updatedAt
+      - userId
+      - versionOfOs
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        journeyType:
+          format: int32
+          type: integer
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        name:
+          type: string
+        osOfDevice:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: int32
+          type: integer
+        versionOfOs:
+          type: string
+    Authorization:
+      type: object
+      required:
+      - login
+      - password
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    Pagination:
+      type: object
+      required:
+      - limit
+      - offset
+      properties:
+        limit:
+          format: int32
+          type: integer
+        offset:
+          format: int32
+          type: integer
+    Label:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    InitializedJourney:
+      type: object
+      required:
+      - journeyId
+      - name
+      - proxyInfo
+      - runId
+      properties:
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        journeyId:
+          format: int32
+          type: integer
+        name:
+          type: string
+        proxyInfo:
+          $ref: '#/components/schemas/ProxyInfo'
+        runId:
+          format: int32
+          type: integer
+    TagType:
+      type: object
+    TagVendor:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    Function1RequestContextFutureRouteResult:
+      type: object
+    RequestLogProperty:
+      type: object
+      required:
+      - propName
+      - propValue
+      properties:
+        propName:
+          type: string
+        propValue:
+          type: string
+    UploadedHarFile:
+      type: object
+      required:
+      - s3Key
+      properties:
+        name:
+          type: string
+        s3Key:
+          type: string
+    Certificate:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    SeqValue:
+      type: object
+      required:
+      - empty
+      - traversableAgain
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    RunRuleDetails:
+      type: object
+      required:
+      - actionRuleOverview
+      - globalRuleOverview
+      properties:
+        actionRuleOverview:
+          $ref: '#/components/schemas/RuleResultOverview'
+        globalRuleOverview:
+          $ref: '#/components/schemas/RuleResultOverview'
+    JourneyRequest:
+      type: object
+      required:
+      - emails
+      - folderId
+      - name
+      - osOfDevice
+      - versionOfOs
+      properties:
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int32
+          type: integer
+        journeyType:
+          format: int32
+          type: integer
+        name:
+          type: string
+        osOfDevice:
+          type: string
+        versionOfOs:
+          type: string
+    RequestLog:
+      type: object
+      required:
+      - enabledSsl
+      - id
+      - journeyTagIds
+      - requestInfo
+      - requestLog
+      - responseInfo
+      - stepId
+      - timestamp
+      properties:
+        enabledSsl:
+          type: boolean
+        id:
+          type: string
+        journeyTagIds:
+          items:
+            type: string
+          type: array
+        requestInfo:
+          items:
+            $ref: '#/components/schemas/RequestLogProperty'
+          type: array
+        requestLog:
+          type: string
+        responseInfo:
+          items:
+            $ref: '#/components/schemas/RequestLogProperty'
+          type: array
+        stepId:
+          format: int32
+          type: integer
+        timestamp:
+          format: int64
+          type: integer
+    HarJourneyRunCreateRequest:
+      type: object
+      required:
+      - harFiles
+      properties:
+        harFiles:
+          items:
+            $ref: '#/components/schemas/UploadedHarFile'
+          type: array
+        journeyRunName:
+          type: string
+        webhookUrl:
+          type: string
+      description: Model for creation of live connect run based on har files
+    ProxyInfo:
+      type: object
+      required:
+      - interface
+      - port
+      properties:
+        authorization:
+          $ref: '#/components/schemas/Authorization'
+        interface:
+          type: string
+        port:
+          format: int32
+          type: integer
+    Action:
+      type: object
+      required:
+      - actionType
+      - id
+      - name
+      - runId
+      - sequence
+      properties:
+        actionType:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        note:
+          type: string
+        runId:
+          format: int32
+          type: integer
+        sequence:
+          format: int32
+          type: integer
+    TagCategory:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: Tag category data
+    ItemIsRunningApiError:
+      type: object
+      required:
+      - errorCode
+      - message
+      - runId
+      properties:
+        errorCode:
+          format: int32
+          type: integer
+        message:
+          type: string
+        runId:
+          format: int64
+          type: integer
+    Tag:
+      type: object
+      required:
+      - category
+      - duplicateScoring
+      - icon
+      - id
+      - name
+      properties:
+        category:
+          $ref: '#/components/schemas/TagCategory'
+        duplicateScoring:
+          type: boolean
+        icon:
+          description: Tag icon URI
+          type: string
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        numSignatures:
+          type: number
+        numVariables:
+          type: number
+        type:
+          $ref: '#/components/schemas/TagType'
+        vendor:
+          $ref: '#/components/schemas/TagVendor'
+      description: Tag data
+    JourneyRun:
+      type: object
+      required:
+      - id
+      - journeyId
+      - manageSSL
+      - name
+      - osOfDevice
+      - requestedAt
+      - status
+      - versionOfOs
+      properties:
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        completedAt:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        journeyId:
+          format: int32
+          type: integer
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        manageSSL:
+          type: boolean
+        name:
+          type: string
+        osOfDevice:
+          type: string
+        proxyInfo:
+          type: string
+        requestedAt:
+          format: date-time
+          type: string
+        rulesDetails:
+          $ref: '#/components/schemas/RunRuleDetails'
+        startedAt:
+          format: date-time
+          type: string
+        status:
+          $ref: '#/components/schemas/Value'
+        versionOfOs:
+          type: string
+  requestBodies:
+    LabelArray:
+      content:
+        application/json:
+          schema:
+            items:
+              $ref: '#/components/schemas/Label'
+            type: array
+    Pagination:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pagination'
+    SeqValue:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SeqValue'
+  securitySchemes:
+    API_Key:
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`'
+      in: header
+      name: Authorization
+      type: apiKey

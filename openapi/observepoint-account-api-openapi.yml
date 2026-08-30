@@ -1,0 +1,111 @@
+openapi: 3.2.0
+info:
+  description: Endpoints for managing account settings, configurations, and account-level information
+  title: V2 Account API
+  version: null
+servers:
+- url: https://api.observepoint.com/v2
+tags:
+- description: Endpoints for managing account settings, configurations, and account-level information
+  name: Account
+paths:
+  /account:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/account</div>
+      operationId: getAccount
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+      - API_Key: []
+      summary: Returns account for current user
+      tags:
+      - Account
+components:
+  schemas:
+    Account:
+      type: object
+      required:
+      - accountType
+      - appTestsUsed
+      - appsUsed
+      - auditsUsed
+      - customProxySupport
+      - id
+      - maxApps
+      - maxAudits
+      - maxUsers
+      - maxWebJourneys
+      - name
+      - strongPasswordPolicy
+      - urlsUsed
+      - usersUsed
+      - vpnSupport
+      - webJourneysUsed
+      properties:
+        accountType:
+          format: int32
+          type: integer
+        appTestsUsed:
+          format: int32
+          type: integer
+        appsUsed:
+          format: int32
+          type: integer
+        auditPageLimit:
+          type: number
+        auditsUsed:
+          format: int32
+          type: integer
+        customProxySupport:
+          type: boolean
+        id:
+          format: int32
+          type: integer
+        maxApps:
+          format: int32
+          type: integer
+        maxAudits:
+          format: int32
+          type: integer
+        maxUsers:
+          format: int32
+          type: integer
+        maxWebJourneys:
+          format: int32
+          type: integer
+        name:
+          type: string
+        strongPasswordPolicy:
+          type: boolean
+        subDomainIdentifier:
+          type: string
+        urlsUsed:
+          format: int32
+          type: integer
+        usersUsed:
+          format: int32
+          type: integer
+        vpnSupport:
+          type: boolean
+        webJourneyRunLimit:
+          type: number
+        webJourneysUsed:
+          format: int32
+          type: integer
+      description: Account data
+  securitySchemes:
+    API_Key:
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`'
+      in: header
+      name: Authorization
+      type: apiKey

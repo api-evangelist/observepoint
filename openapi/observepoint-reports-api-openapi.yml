@@ -1,0 +1,1251 @@
+openapi: 3.2.0
+info:
+  title: Grid API by Observepoint Reports API
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+  description: This section documents the API endpoints for using the ObservePoint Grid API, which provides access to ObservePoint data in row/column format.
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+security:
+- API_Key: []
+tags:
+- name: Reports
+paths:
+  /v3/reports/grid/{gridEntityType}:
+    parameters:
+    - name: gridEntityType
+      in: path
+      required: true
+      description: The grid entity type for which you want to query data
+      schema:
+        $ref: '#/components/schemas/GridApi_GridEntityTypeInPathEnum'
+    post:
+      operationId: getGridData
+      summary: Get Grid Data
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/reports/grid/<span class="op-path-parameter">{gridEntityType}</span></div>
+
+
+        This is the main endpoint for the Grid API. It lets you request data in row/column format for the
+
+        entities that ObservePoint has collected about your website
+
+        '
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GridApi_RequestDTO'
+      responses:
+        '200':
+          description: Grid Data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridApi_ResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      tags:
+      - Reports
+  /v3/reports/grid/{gridEntityType}/schema:
+    parameters:
+    - name: gridEntityType
+      in: path
+      required: true
+      description: Grid entity type
+      schema:
+        $ref: '#/components/schemas/GridApi_GridEntityTypeInPathEnum'
+    get:
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/reports/grid/<span class="op-path-parameter">{gridEntityType}</span>/schema</div>
+
+
+        Returns the list of columns that area available for the specified entity type, along with each column''s ID, type, supported filter operators, and supported aggreate functions'
+      operationId: getGridSchema
+      summary: Get Grid Schema
+      responses:
+        '200':
+          description: Grid Schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridApi_GetSchemaResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      tags:
+      - Reports
+  /v3/reports/grid/saved:
+    post:
+      operationId: createSavedReport
+      summary: Create Saved Report
+      description: A saved report contains information about the report, such as its name and permissions, and also the Grid API query definition that is applied when users view the report. The query definition uses the same JSON format as a [Grid API request](#operation/getGridData)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GridApi_CreateSavedReportRequestDTO'
+      responses:
+        '201':
+          description: Saved report created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridApi_CreateSavedReportResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      tags:
+      - Reports
+    get:
+      operationId: getSavedReportsList
+      summary: List Saved Reports
+      parameters:
+      - $ref: '#/components/parameters/GridAPI_SavedReports_NameParam'
+      - $ref: '#/components/parameters/GridAPI_SavedReports_IsFavoriteParam'
+      - $ref: '#/components/parameters/GridAPI_SavedReports_IsOwnedByCurrentUserParam'
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/GridAPI_SavedReports_PageSizeParam'
+      - $ref: '#/components/parameters/GridAPI_SavedReports_SortColumn'
+      - $ref: '#/components/parameters/SortDescendingParam'
+      - $ref: '#/components/parameters/GridAPI_SavedReports_IsManagedByOPParam'
+      - $ref: '#/components/parameters/GridAPI_SavedReports_VisibilityParam'
+      responses:
+        '200':
+          description: List of saved reports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridApi_GetSavedReportsListResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/reports/grid/saved</div>
+      tags:
+      - Reports
+  /v3/reports/grid/saved/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/GridApi_SavedReportId'
+    get:
+      operationId: getSavedReportById
+      summary: Get Saved Report
+      responses:
+        '200':
+          description: Saved report details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridApi_SavedReportDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/reports/grid/saved/<span class="op-path-parameter">{id}</span></div>
+      tags:
+      - Reports
+    put:
+      operationId: updateSavedReport
+      summary: Update Saved Report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GridApi_UpdateSavedReportRequestDTO'
+      responses:
+        '204':
+          description: Saved report updated successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/reports/grid/saved/<span class="op-path-parameter">{id}</span></div>
+      tags:
+      - Reports
+    delete:
+      operationId: deleteSavedReport
+      summary: Delete Saved Report
+      responses:
+        '204':
+          description: Saved report deleted successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/reports/grid/saved/<span class="op-path-parameter">{id}</span></div>
+      tags:
+      - Reports
+  /v3/reports/grid/saved/{id}/favorites:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/GridApi_SavedReportId'
+    post:
+      operationId: addSavedReportToFavorites
+      summary: Favorite Saved Report
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/reports/grid/saved/<span class="op-path-parameter">{id}</span>/favorites</div>
+
+
+        Mark a saved report as a "favorite" for the user to whom the API key belongs'
+      responses:
+        '204':
+          description: Saved report added to favorites successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - Reports
+    delete:
+      operationId: removeSavedReportFromFavorites
+      summary: Unfavorite Saved Report
+      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/reports/grid/saved/<span class="op-path-parameter">{id}</span>/favorites</div>
+
+
+        Mark a saved report as not a favorite for the user to whom the API key belongs'
+      responses:
+        '204':
+          description: Saved report removed from favorites successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - Reports
+  /v3/reports/grid/{gridEntityType}/exports:
+    parameters:
+    - name: gridEntityType
+      in: path
+      required: true
+      description: grid entity type
+      schema:
+        $ref: '#/components/schemas/GridApi_GridEntityTypeInPathEnum'
+    post:
+      operationId: initiateGridDataExport
+      summary: Start a grid data export
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/reports/grid/<span class="op-path-parameter">{gridEntityType}</span>/exports</div>
+
+
+        Use this endpoint to start an export for a Grid request. After calling this endpoint, use the `/v3/exports` endpoint to poll the status of
+
+        the export until it''s finished. Then, you can download the results with the URL given by the `/v3/exports` endpoint.
+
+
+        [Learn how to use the Grid export API](../sections/grid-api-exports.md)
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GridApi_ExportRequestDTO'
+      responses:
+        '200':
+          description: Grid export ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridExportResultDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      tags:
+      - Reports
+components:
+  schemas:
+    GridApi_RequestDTO:
+      type: object
+      x-parent: true
+      description: 'Default Grid request body properties.
+
+        Default behaviour:
+
+        - if no page number is specified, default is 0 (the first results page)
+
+        - if no size is specified, default is 100
+
+        - if no filters are specified, default is to return all runs
+
+        Default behaviour for exports:
+
+        - if page and size are not specified, all available rows will be exported
+
+        '
+      properties:
+        size:
+          description: how many rows to include in the paginated response
+          type: integer
+          maximum: 10000
+          minimum: 10
+        page:
+          description: paginated response page number, starts with 0
+          type: integer
+          minimum: 0
+        filters:
+          $ref: '#/components/schemas/GridApi_Requests_FiltersDTO'
+        columns:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/GridApi_Request_ColumnExpression'
+        sortBy:
+          type: array
+          description: Sorts the result by the specified columns, in the same order as in the columns array.
+          minItems: 0
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/GridApi_Request_SortByItem'
+        totals:
+          x-field-extra-annotation: '@JsonInclude(JsonInclude.Include.NON_DEFAULT)'
+          type: array
+          description: Dynamic Aggregation Row totals for `columns`. As for now, only one aggregation is supported for each column (same `columnIndex`) in the `columns` array.
+          minItems: 0
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/GridApi_Request_TotalItem'
+    GridApi_Response_MetadataHeader_TotalItem:
+      type: object
+      required:
+      - aggregateFunction
+      - value
+      properties:
+        aggregateFunction:
+          $ref: '#/components/schemas/GridApi_AggregateFunctionEnum'
+        value:
+          type: object
+          description: Value of the total, depends on the type of the column and the aggregate function
+    GridApi_CreateSavedReportRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/GridApi_SavedReportRequestTrait'
+      - type: object
+        required:
+        - gridEntityType
+        - queryDefinition
+        properties:
+          gridEntityType:
+            $ref: '#/components/schemas/GridApi_GridEntityTypeEnum'
+    GridApi_Response_MetadataHeader:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.GridApiMetadataHeader
+      description: 'Represents a single returned column in the grid.
+
+        `column` matches one of columns from the "get grid metadata" response.
+
+        '
+      required:
+      - column
+      properties:
+        column:
+          $ref: '#/components/schemas/GridApi_Request_ColumnExpression'
+        totals:
+          x-field-extra-annotation: '@JsonInclude(JsonInclude.Include.NON_DEFAULT)'
+          type: array
+          description: Totals for the column, available only when requested
+          items:
+            $ref: '#/components/schemas/GridApi_Response_MetadataHeader_TotalItem'
+    GridApi_SavedReportVisibilityEnum:
+      type: string
+      enum:
+      - private
+      - public
+    GridApi_PivotValue:
+      type: object
+      description: "Pivot value used to filter rows during aggregation. The value should be passed in the same format\nas received from the Grid API response. Type depends on the `pivotValuesColumnId` column type:\n- `entity_reference` (enum): integer (enum ID), e.g., `1`\n- `entity_reference` (non-enum, single field): integer (entity ID), e.g., `123`\n- `entity_reference` (non-enum, multiple fields): array matching Grid API response format,\n  e.g., `[\"Tag Name\", 123]` or `[\"Schedule Name\", \"preset_type\"]`. Array elements correspond to the\n  entity's fields in the same order as returned by the Grid API. For entity references with `id` field,\n  only the `id` field is actually used for pivoting, so other fields can have arbitrary values\n  (null or empty strings are acceptable).\n- `id`: integer, e.g., `456`\n- `number` (integer subtype): integer, e.g., `42`\n- `number` (decimal subtype): number (exact match, no epsilon tolerance), e.g., `3.14`\n- `string`: string (exact match), e.g., `\"value\"`\n- `timestamp`: string (ISO 8601 format), e.g., `\"2025-01-15T10:30:00Z\"`\n"
+    GridApi_Request_ColumnExpression:
+      oneOf:
+      - $ref: '#/components/schemas/GridApi_Request_ColumnExpression_ColumnId'
+      - $ref: '#/components/schemas/GridApi_Request_ColumnExpression_AggregateFunction'
+    GridApi_ConditionsMatchModeEnum:
+      type: string
+      description: 'Specifies how to combine results of multiple conditions when determining if a row should be included in the result:
+
+        - `all` - all conditions must be met;
+
+        - `any` - at least one condition must be met.
+
+        Default is `all`.
+
+        '
+      enum:
+      - all
+      - any
+    DataDictionaryColumnOriginTypeEnum:
+      type: string
+      enum:
+      - definition_config
+      - op_field
+      - custom_field
+    GridApi_SavedReportRequestTrait:
+      type: object
+      required:
+      - name
+      - visibility
+      properties:
+        name:
+          type: string
+          description: Name of the saved report
+          minLength: 1
+        description:
+          type: string
+          description: Optional description of the saved report
+        labels:
+          type: array
+          description: List of label IDs to associate with the saved report
+          items:
+            $ref: '#/components/schemas/LabelId'
+        isFavorite:
+          type: boolean
+          description: Indicates if the saved report is marked as favorite by the current user
+        visibility:
+          $ref: '#/components/schemas/GridApi_SavedReportVisibilityEnum'
+        queryDefinition:
+          $ref: '#/components/schemas/GridApi_RequestDTO'
+        displayMetadata:
+          $ref: '#/components/schemas/GridApi_DisplayMetadataDTO'
+        libraryMetadata:
+          $ref: '#/components/schemas/GridApi_LibraryMetadataDTO'
+        visualizations:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/GridApi_VisualizationDTO'
+    GridApi_Request_SortByItem:
+      type: object
+      description: 'Sorts the result by the specified column index.
+
+        Default sorting order is ascending.
+
+        '
+      required:
+      - columnIndex
+      properties:
+        columnIndex:
+          type: integer
+          description: Index of the column in the `columns` array
+          minimum: 0
+        sortDesc:
+          type: boolean
+          description: If true, the column will be sorted in descending order. Default is ascending
+          default: false
+    GridExportFileFormatEnum:
+      description: 'Format of the exported file
+
+        '
+      type: string
+      default: xlsx
+      enum:
+      - csv
+      - tsv
+      - xlsx
+    GridApi_GridEntityTypeEnum:
+      type: string
+      enum:
+      - web_audit_runs
+      - web_journey_runs
+      - pages
+      - cookies
+      - tags
+      - tag_variables
+      - links
+      - accessibility_issues
+      - network_requests
+      - browser_logs
+      - rules
+      x-enum-varnames:
+      - AUDIT_RUNS
+      - JOURNEY_RUNS
+      - PAGES
+      - COOKIES
+      - TAGS
+      - TAG_VARIABLES
+      - LINKS
+      - ACCESSIBILITY_ISSUES
+      - NETWORK_REQUESTS
+      - BROWSER_LOGS
+      - RULES
+    LabelId:
+      type: integer
+      format: int64
+      description: ID of a label
+    GridApi_GetSchemaResponseDTO:
+      type: object
+      required:
+      - columns
+      properties:
+        columns:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/GridApi_SchemaColumnDef'
+    GridApi_SavedReportResponseTrait:
+      type: object
+      required:
+      - id
+      - name
+      - visibility
+      - gridEntityType
+      - isFavorite
+      - createdByUserId
+      - myLastViewed
+      - isEditable
+      - isSharable
+      - isManagedByOP
+      - scheduledExportCount
+      properties:
+        id:
+          $ref: '#/components/schemas/GridApi_SavedReportId'
+        name:
+          type: string
+        description:
+          type: string
+        labels:
+          type: array
+          description: List of labels associated with the saved report
+          items:
+            $ref: '#/components/schemas/LabelId'
+        visibility:
+          $ref: '#/components/schemas/GridApi_SavedReportVisibilityEnum'
+        gridEntityType:
+          $ref: '#/components/schemas/GridApi_GridEntityTypeEnum'
+        isFavorite:
+          type: boolean
+          description: Indicates if the saved report is marked as favorite by the current user
+        createdByUserId:
+          type: integer
+          format: int64
+        myLastViewed:
+          $ref: '#/components/schemas/DateAndTime'
+        isEditable:
+          type: boolean
+          description: TRUE if specified `saved report` can be changed by the user who made the API request, FALSE otherwise
+        libraryMetadata:
+          $ref: '#/components/schemas/GridApi_LibraryMetadataDTO'
+        isSharable:
+          type: boolean
+          description: TRUE if specified `saved report` does not use cross-account grid querying mode, FALSE otherwise
+        isManagedByOP:
+          type: boolean
+          description: TRUE if specified `saved report` is managed by ObservePoint, FALSE otherwise
+        scheduledExportCount:
+          type: integer
+          description: Number of Scheduled Exports associated with this report
+        sequenceNumber:
+          type: integer
+          description: Ordering sequence number for ObservePoint-managed reports. Only available for ObservePoint-managed reports.
+        isHighlighted:
+          type: boolean
+          description: Indicates if the report should be displayed in the top row. Only available for ObservePoint-managed reports.
+        isExperimental:
+          type: boolean
+          description: Indicates if the report is experimental and should only be visible to OpAdmin users. Only available for ObservePoint-managed reports.
+        publishedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    GridApi_Request_ColumnExpression_ColumnId:
+      type: object
+      required:
+      - columnId
+      properties:
+        groupBy:
+          type: boolean
+          description: If true, the column is used for grouping
+          default: false
+          x-field-extra-annotation: '@JsonInclude(JsonInclude.Include.NON_DEFAULT)'
+        columnId:
+          $ref: '#/components/schemas/GridApi_ColumnId'
+        format:
+          x-field-extra-annotation: '@JsonInclude(JsonInclude.Include.NON_DEFAULT)'
+          type: string
+          maxLength: 256
+          description: 'The format to use for the timestamp column.
+
+            As for now, it is applicable only for timestamp columns,
+
+            and specifying this property for non-timestamp columns will result in an error.
+
+
+            When the `format` is applied to a timestamp column, it effectively becomes a string column,
+
+            so it will accept only:
+
+            - `string_*` filters,
+
+            - `count_distinct` aggregation function.
+
+
+            Format is specified using the following case-insensitive elements:
+
+            - `YYYY`: Four-digit year.
+
+            - `YY`: Two-digit year.
+
+            - `MM`: Two-digit month (01 = January, and so on).
+
+            - `Q`: One-digit quarter of year (1-4).
+
+            - `WY`: Week number of year (1-54).
+
+            - `MON`: Abbreviated month name.
+
+            - `MMMM`: Full month name.
+
+            - `DD`: Two-digit day of month (01 through 31).
+
+            - `DY`: Abbreviated day of week.
+
+            - `HH24`: Two digits for hour (00 through 23). You must not specify AM / PM.
+
+            - `HH12`: Two digits for hour (01 through 12). You can specify AM / PM.
+
+            - `AM`, `PM`: Ante meridiem (AM) / post meridiem (PM). Use this only with HH12 (not with HH24).
+
+            - `MI`: Two digits for minute (00 through 59).
+
+            - `SS`: Two digits for second (00 through 59).
+
+            - `FF[0-9]`: Fractional seconds with precision 0 (seconds) to 9 (nanoseconds), e.g. FF, FF0, FF3, FF9. Specifying FF is equivalent to FF9 (nanoseconds).
+
+            - `TZH:TZM`, `TZHTZM`, `TZH`: Two-digit time zone hour and minute, offset from UTC. Zero offset is `Z`, otherwise offset is prefixed by +/- for sign.
+
+            - `UUUU`: Four-digit year in ISO format, which are negative for BCE years.
+
+
+            Anything in the format between double quotes or other than the above elements is parsed/formatted without being interpreted.
+
+
+            Example for date `2025-11-14 16:42:55`:
+
+            - `YYYY-MM-DD HH24:MI:SS`: 2025-11-14 16:42:55
+
+            - `mon dd, yyyy @ HH24:MI:SS`: Nov 14, 2025 @ 16:42:55
+
+            - `DD/MM/YYYY`: 14/11/2025
+
+            - `YYYY-MM-DD`: 2025-11-14
+
+            - `"completed on" mon dd, yyyy`: completed on Nov 14, 2025
+
+            - `YYYY/Q`: 2025/4
+
+            - `YYYY"-Q"Q`: 2025-Q4
+
+            - `YYYY/WY`: 2025/46
+
+            - `YYYY "week" WY`: 2025 week 46
+
+            '
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    GridApi_DisplayMetadataDTO:
+      type: object
+      description: Display metadata for the saved report
+    GridApi_Request_FilterBase:
+      allOf:
+      - $ref: '#/components/schemas/GridApi_FilterTrait_Negated'
+      - type: object
+        description: 'For top level filters (filters specified in request''s `filters.conditions` array), `filteredColumn` is required,
+
+          except for the `any_column_contains` filter, which targets all columns and must NOT specify `filteredColumn`.
+
+          For nested filters (like `itemConditions` in `list_item_matches` filter), it''s not required.
+
+          `fieldName` can be used for entity reference field filtering in combination with `filteredColumn`.
+
+          '
+        required:
+        - operator
+        properties:
+          operator:
+            $ref: '#/components/schemas/GridApi_FilterOperatorEnum'
+          filteredColumn:
+            $ref: '#/components/schemas/GridApi_Request_ColumnExpression'
+          fieldName:
+            $ref: '#/components/schemas/GridApi_EntityReference_FieldTypeEnum'
+      discriminator:
+        propertyName: operator
+        mapping:
+          string_contains: '#/components/schemas/GridApi_Requests_Filter_StringContains'
+          string_contains_multi: '#/components/schemas/GridApi_Requests_Filter_StringContainsMulti'
+          string_regex: '#/components/schemas/GridApi_Requests_Filter_StringRegex'
+          integer_in: '#/components/schemas/GridApi_Requests_Filter_IntegerIn'
+          integer_list_contains: '#/components/schemas/GridApi_Requests_Filter_IntegerListContains'
+          number_between: '#/components/schemas/GridApi_Requests_Filter_NumberBetween'
+          date_time_between: '#/components/schemas/GridApi_Requests_Filter_DateTimeBetween'
+          date_time_relative: '#/components/schemas/GridApi_Requests_Filter_DateTimeRelative'
+          is_present: '#/components/schemas/GridApi_Requests_Filter_IsPresent'
+          metric_alert_any: '#/components/schemas/GridApi_Requests_Filter_MetricAlertAny'
+          list_item_matches: '#/components/schemas/GridApi_Requests_Filter_ListItemMatches'
+          any_column_contains: '#/components/schemas/GridApi_Requests_Filter_AnyColumnContains'
+    GridApi_ResponseRow:
+      type: array
+      description: 'Each row represents a single run. The order of values corresponds to the order of columns in the `headers`.
+
+        Nested objects are represented as array of fields.
+
+        '
+      items:
+        type: object
+    GridApi_ExportRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/GridApi_RequestDTO'
+      - type: object
+        properties:
+          itemName:
+            type: string
+          customExportFileName:
+            type: string
+            description: Override for export file name (without file extension)
+          fileFormat:
+            $ref: '#/components/schemas/GridExportFileFormatEnum'
+    GridApi_AggregateFunctionEnum:
+      type: string
+      description: See what aggregate functions are supported for each column in the `supportedAggregateFunctions` property of the `GridApi_SchemaColumnDef` schema
+      enum:
+      - avg
+      - count_distinct
+      - count_rows
+      - max
+      - median
+      - min
+      - sum
+      - youngest
+      - oldest
+      - percentile_25
+      - percentile_50
+      - percentile_75
+      - percentile_90
+      - percentile_95
+      - percentile_99
+      - percentile_99_9
+      - standard_deviation
+      - list_unique_items
+    GridApi_UpdateSavedReportRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/GridApi_SavedReportRequestTrait'
+    GridApi_FilterTrait_Negated:
+      type: object
+      properties:
+        negated:
+          type: boolean
+          description: If true, the filter will match entities where the value does not match
+          default: false
+    GridApi_VisualizationDefinitionDTO:
+      type: object
+      description: JSON object containing FE definition for the visualization
+    GridApi_SavedReports_SortColumn:
+      type: string
+      enum:
+      - type
+      - name
+      - creator
+      - lastViewed
+      - sequenceNumber
+      - visibility
+    GridApi_SchemaColumnDef:
+      type: object
+      required:
+      - columnId
+      - type
+      - name
+      - canGroupBy
+      - canPivot
+      - supportedFilterOperators
+      - supportedAggregateFunctions
+      - isIncludedByDefault
+      - isNullable
+      properties:
+        columnId:
+          $ref: '#/components/schemas/GridApi_ColumnId'
+        type:
+          $ref: '#/components/schemas/GridApi_ColumnTypeEnum'
+        name:
+          type: string
+          description: Human-readable value for column, to be shown for users
+        canGroupBy:
+          type: boolean
+          default: true
+        canPivot:
+          type: boolean
+          default: false
+        supportedFilterOperators:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/GridApi_FilterOperatorEnum'
+        supportedAggregateFunctions:
+          type: array
+          minItems: 0
+          description: 'If not empty, then this column can be aggregated by the functions listed in this array. Default aggregation
+
+            function is the first one in the list.
+
+            If empty, then this column cannot be aggregated.
+
+            '
+          items:
+            $ref: '#/components/schemas/GridApi_AggregateFunctionEnum'
+        isIncludedByDefault:
+          type: boolean
+          description: If true and no columns are specified in the request, this column will be included in the response.
+          default: false
+        isNullable:
+          type: boolean
+          description: If true, column value can be null or empty string
+          default: false
+        dataDictionaryColumnOriginType:
+          $ref: '#/components/schemas/DataDictionaryColumnOriginTypeEnum'
+      discriminator:
+        propertyName: type
+        mapping:
+          id: '#/components/schemas/GridApi_SchemaColumnDef_Simple'
+          entity_reference: '#/components/schemas/GridApi_SchemaColumnDef_EntityReference'
+          string: '#/components/schemas/GridApi_SchemaColumnDef_Simple'
+          number: '#/components/schemas/GridApi_SchemaColumnDef_Number'
+          timestamp: '#/components/schemas/GridApi_SchemaColumnDef_Timestamp'
+          image: '#/components/schemas/GridApi_SchemaColumnDef_Image'
+    GridApi_ResponseDTO:
+      type: object
+      required:
+      - metadata
+      - rows
+      properties:
+        metadata:
+          $ref: '#/components/schemas/GridApi_Response_Metadata'
+        rows:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/GridApi_ResponseRow'
+    GridApi_Request_ColumnExpression_AggregateFunction:
+      type: object
+      description: 'Represents an aggregate function with optional pivot setting applied to a column:
+
+        - if `aggregateFunction` and `aggregatedColumn` are specified, `pivotValuesColumnId` and `pivotValue` are not specified, then the column is used for aggregation only
+
+        - if `aggregateFunction` and `aggregatedColumn` are not specified, `pivotValuesColumnId` and `pivotValue` are specified, then the column is used for pivot only with default aggregation function (count)
+
+        - if `aggregateFunction` and `aggregatedColumn` are specified, `pivotValuesColumnId` and `pivotValue` are also specified, then the column is used for pivot with supplied aggregation function
+
+        '
+      properties:
+        aggregateFunction:
+          $ref: '#/components/schemas/GridApi_AggregateFunctionEnum'
+        aggregatedColumn:
+          $ref: '#/components/schemas/GridApi_Request_ColumnExpression'
+        pivotValuesColumnId:
+          $ref: '#/components/schemas/GridApi_ColumnId'
+        pivotValue:
+          $ref: '#/components/schemas/GridApi_PivotValue'
+    GridApi_Requests_FiltersDTO:
+      type: object
+      properties:
+        conditions:
+          type: array
+          minItems: 0
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/GridApi_Request_FilterBase'
+        conditionMatchMode:
+          $ref: '#/components/schemas/GridApi_ConditionsMatchModeEnum'
+    GridApi_SavedReportId:
+      type: integer
+      format: int64
+      description: ID of the saved report
+    GridApi_SavedReportDTO:
+      allOf:
+      - $ref: '#/components/schemas/GridApi_SavedReportResponseTrait'
+      - type: object
+        required:
+        - queryDefinition
+        properties:
+          displayMetadata:
+            $ref: '#/components/schemas/GridApi_DisplayMetadataDTO'
+          queryDefinition:
+            $ref: '#/components/schemas/GridApi_RequestDTO'
+          visualizations:
+            type: array
+            items:
+              $ref: '#/components/schemas/GridApi_VisualizationDTO'
+    GridApi_Request_TotalItem:
+      type: object
+      required:
+      - columnIndex
+      - aggregateFunction
+      properties:
+        columnIndex:
+          type: integer
+          description: Index of the column in the `columns` array
+          minimum: 0
+        aggregateFunction:
+          $ref: '#/components/schemas/GridApi_AggregateFunctionEnum'
+    GridApi_EntityReference_FieldTypeEnum:
+      type: string
+      description: name of field of the entity reference object
+      enum:
+      - id
+      - name
+      - preset_type
+      - domain
+      - link
+      - value
+      - first_name
+      - last_name
+      - email
+      - full_url_or_domain
+      - tag_id
+      - tag_category_id
+      - tag_vendor_id
+      - tag_account
+      - data_dictionary_match_criteria_property
+      - data_dictionary_match_criteria_operator
+      - data_dictionary_match_criteria_operand
+      - data_dictionary_match_criteria_negated
+      - status
+    GridApi_ColumnId:
+      type: string
+      description: 'Depends on the Grid type:
+
+        - Audit Runs Grid: one of the `AuditRunsGridColumnEnum` values
+
+        - Web Journey Runs Grid: one of the `WebJourneyRunsGridColumnEnum` values
+
+        - Pages Grid: one of the `PagesGridColumnEnum` values
+
+        - Cookies Grid: one of the `CookiesGridColumnEnum` values
+
+        - Tags Grid: one of the `TagsGridColumnEnum` values
+
+        - Tag Variables Grid: one of the `TagVariablesGridColumnEnum` values
+
+        - Links Grid: one of the `LinksGridColumnEnum` values
+
+        - Network Requests Grid: one of the `NetworkRequestsGridColumnEnum` values
+
+        - Accessibility Issues Grid: one of the `AccessibilityIssuesGridColumnEnum` values
+
+        - Browser Logs Grid: one of the `BrowserLogsGridColumnEnum` values
+
+        - Rules Grid: one of the `RulesGridColumnEnum` values
+
+        '
+    GridApi_VisualizationDTO:
+      type: object
+      required:
+      - name
+      - definition
+      properties:
+        name:
+          type: string
+          description: Name of the visualization
+          minLength: 1
+          maxLength: 190
+        definition:
+          $ref: '#/components/schemas/GridApi_VisualizationDefinitionDTO'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    GridExportResultDTO:
+      type: object
+      required:
+      - exportId
+      properties:
+        exportId:
+          $ref: '#/components/schemas/GridExportId'
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    GridApi_Response_Metadata:
+      description: 'Contains information about the response, such as pagination and returned columns/headers.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/CommonIterableResponseMetadata'
+      - type: object
+        required:
+        - headers
+        properties:
+          headers:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/GridApi_Response_MetadataHeader'
+    GridApi_ColumnTypeEnum:
+      type: string
+      enum:
+      - id
+      - entity_reference
+      - string
+      - number
+      - timestamp
+      - image
+    GridApi_LibraryMetadataDTO:
+      type: object
+      description: Metadata required to show the saved report in the library
+    GridApi_GetSavedReportsListResponseDTO:
+      type: object
+      required:
+      - reports
+      - metadata
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        reports:
+          type: array
+          items:
+            $ref: '#/components/schemas/GridApi_SavedReportDTO'
+    GridApi_FilterOperatorEnum:
+      type: string
+      enum:
+      - string_contains
+      - string_contains_multi
+      - string_regex
+      - integer_in
+      - integer_list_contains
+      - number_between
+      - date_time_between
+      - date_time_relative
+      - is_present
+      - metric_alert_any
+      - list_item_matches
+      - any_column_contains
+    GridExportId:
+      type: integer
+      format: int64
+      description: Unique ID of a grid export
+    GridApi_CreateSavedReportResponseDTO:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/GridApi_SavedReportId'
+    GridApi_GridEntityTypeInPathEnum:
+      type: string
+      enum:
+      - web-audit-runs
+      - web-journey-runs
+      - pages
+      - cookies
+      - tags
+      - tag-variables
+      - links
+      - accessibility-issues
+      - network-requests
+      - browser-logs
+      - rules
+      x-enum-varnames:
+      - AUDIT_RUNS
+      - JOURNEY_RUNS
+      - PAGES
+      - COOKIES
+      - TAGS
+      - TAG_VARIABLES
+      - LINKS
+      - ACCESSIBILITY_ISSUES
+      - NETWORK_REQUESTS
+      - BROWSER_LOGS
+      - RULES
+  parameters:
+    GridAPI_SavedReports_IsManagedByOPParam:
+      name: isManagedByOP
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: Filter by managed by ObservePoint
+    GridAPI_SavedReports_IsOwnedByCurrentUserParam:
+      name: isOwnedByCurrentUser
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: Filter by ownership status
+    GridAPI_SavedReports_SortColumn:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/GridApi_SavedReports_SortColumn'
+      description: Sort by field
+    GridAPI_SavedReports_VisibilityParam:
+      name: visibility
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/GridApi_SavedReportVisibilityEnum'
+      description: Filter by visibility status
+    GridAPI_SavedReports_IsFavoriteParam:
+      name: isFavorite
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: Filter by favorite status
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    GridAPI_SavedReports_PageSizeParam:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 10
+        maximum: 1000
+        default: 100
+      description: Number of items per page
+    GridAPI_SavedReports_NameParam:
+      name: name
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Filter by report name, works as "saved report name contains substring" case-insensitive filter
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '

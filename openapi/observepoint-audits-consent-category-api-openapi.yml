@@ -1,0 +1,394 @@
+openapi: 3.2.0
+info:
+  title: V3 Audits Consent Category API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: audits-consent-category
+  x-displayName: Audits Consent Category
+  description: APIs for managing audit consent categories
+paths:
+  /v3/web-audits/{auditId}/consent-categories:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    get:
+      tags:
+      - audits-consent-category
+      summary: Get all the consent categories assigned to an audit
+      operationId: getAuditConsentCategories
+      responses:
+        '200':
+          description: OK, return a list of consent-categories assigned to an audit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAudit_ConsentCategories_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/consent-categories</div>
+    patch:
+      tags:
+      - audits-consent-category
+      summary: Update the consent categories assigned to an audit
+      description: '<div class="op-path-box"><span class="op-http-method-patch">PATCH</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/consent-categories</div>
+
+
+        Update the consent categories assigned to an audit. The request will be rejected if trying to assign conflicting consent category types to the same audit'
+      operationId: patchAuditConsentCategories
+      requestBody:
+        required: true
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/AttachmentPatchDocument_RequestDTO'
+      responses:
+        '200':
+          description: OK, return the modified consent category assignments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAudit_ConsentCategories_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs/{runId}/consent-categories:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - audits-consent-category
+      summary: 'Retrieve all consent categories snapshots that are applied to a specific audit run. '
+      operationId: getAuditRunConsentCategories
+      responses:
+        '200':
+          description: OK, return a list of consent category snapshots assigned to this run
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAudit_ConsentCategorySnapshots_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/consent-categories</div>
+  /v3/web-audits/{auditId}/runs/{runId}/consent-categories/reprocess:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - audits-consent-category
+      summary: Reprocess consent-category for the selected auditId and runIds
+      operationId: reprocessConsentCategories
+      responses:
+        '200':
+          description: OK, start reprocessing specified audit with specified consent category
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/consent-categories/reprocess</div>
+components:
+  schemas:
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    AttachmentPatchDocument_ItemDTO:
+      description: A JSONPatch document for modifying consent preference attachments
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+          - add
+          - remove
+        path:
+          type: string
+        value:
+          type: integer
+          description: id of the item to assign
+      example:
+      - op: add
+        path: /-
+        value: 1
+      - op: remove
+        path: /
+        value: 2
+    WebAudit_ConsentCategorySnapshots_ResponseDTO:
+      type: object
+      description: 'NOTE: For individual consent category snapshot, Field consentCategoryId is omitted when the consent category is deleted'
+      properties:
+        consentCategorySnapshots:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
+    ConsentCategory_TypeEnum:
+      type: string
+      enum:
+      - approved
+      - unapproved
+    ConsentCategorySnapshotDTO:
+      type: object
+      description: A consent category snapshot dto
+      required:
+      - name
+      - type
+      - consentCategoryId
+      - consentCategorySnapshotId
+      - consentCategoryConfigExists
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+        type:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        consentCategoryId:
+          $ref: '#/components/schemas/ConsentCategoryId'
+        consentCategorySnapshotId:
+          $ref: '#/components/schemas/ConsentCategorySnapshotId'
+        consentCategoryConfigExists:
+          type: boolean
+          description: If false, the consent category config doesn't exist anymore
+    WebAudit_ConsentCategories_ResponseDTO:
+      type: object
+      required:
+      - consentCategories
+      properties:
+        consentCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategoryDTO'
+    ConsentCategory_Cmp_Data:
+      type: object
+      required:
+      - cmpVendor
+      - oneTrustCookieGroupDomain
+      - oneTrustCookieGroupId
+      - oneTrustCookieGroupGeo
+      properties:
+        cmpVendor:
+          $ref: '#/components/schemas/ConsentCategory_VendorTypeEnum'
+        oneTrustCookieGroupDescription:
+          type: string
+          description: The OneTrust provided description of the group
+        oneTrustCookieGroupDomain:
+          type: string
+          description: The domain reported by OneTrust for which the consent group applies
+          example: observepoint.com
+        oneTrustCookieGroupId:
+          type: string
+          description: The OneTrust ID for the group
+          example: C001
+        oneTrustCookieGroupGeo:
+          type: string
+          description: The geographic location for which the consent group applies
+          example: us, ut
+        sourceUrl:
+          type: string
+          description: The full URL of the page where the CMP import was run
+          example: https://example.com
+    AttachmentPatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
+    ConsentCategoryDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+        type:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        id:
+          $ref: '#/components/schemas/ConsentCategoryId'
+        isDefaultCC:
+          type: boolean
+          description: If true, this is the default consent category
+        cmpData:
+          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
+        updatedType:
+          $ref: '#/components/schemas/ConsentCategory_updatedType'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last time this consent category was updated in UTC timezone
+    ConsentCategory_VendorTypeEnum:
+      type: string
+      enum:
+      - ONE_TRUST
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ConsentCategoryId:
+      type: integer
+      example: 3301
+      description: ID of consent category
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    ConsentCategorySnapshotId:
+      type: integer
+      format: int64
+      example: 33010
+      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
+    ConsentCategory_updatedType:
+      type: string
+      enum:
+      - ONETRUST_IMPORT
+      - FILE_IMPORT
+      - APP_CREATE
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

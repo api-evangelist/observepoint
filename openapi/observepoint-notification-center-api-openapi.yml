@@ -1,0 +1,471 @@
+openapi: 3.2.0
+info:
+  title: V3 Notification Center API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: notification-center
+  x-displayName: Notification Center
+  description: Find and manage email subscriptions
+paths:
+  /v3/notification-center/emails:
+    get:
+      tags:
+      - notification-center
+      operationId: getNotificationCenterEmails
+      summary: Get all emails in an account
+      responses:
+        '200':
+          description: All emails in account, their usage and corresponding users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationCenter_GetEmails_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/notification-center/emails</div>
+    post:
+      tags:
+      - notification-center
+      operationId: getNotificationCenterEmailsSubscribedToItems
+      summary: Get emails subscribed to given items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationCenter_GetEmails_RequestDTO'
+      responses:
+        '200':
+          description: List of emails subscribed to given items that accessible by user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationCenter_GetEmails_ResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/notification-center/emails</div>
+  /v3/notification-center/target-items/{itemType}/search:
+    parameters:
+    - in: path
+      name: itemType
+      required: true
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/NotificationCenter_AssignmentItemTypeEnum'
+    - in: query
+      name: size
+      required: false
+      allowEmptyValue: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    - in: query
+      name: sortBy
+      required: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/NotificationCenter_AssignmentsSortColumn'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - notification-center
+      operationId: searchTargetItemsForEmails
+      summary: Search assignable items (audits, journeys, rules etc) for specified email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationCenter_SearchForAssignments_RequestDTO'
+      responses:
+        '200':
+          description: Items that have specified email both assigned and not assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationCenter_SearchForAssignments_ResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/notification-center/target-items/<span class="op-path-parameter">{itemType}</span>/search</div>
+components:
+  schemas:
+    NotificationCenter_SearchForAssignments_ResponseDTO:
+      type: object
+      required:
+      - metadata
+      - items
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        items:
+          type: array
+          items:
+            title: NotificationCenter_AssignmentItem
+            type: object
+            description: '`itemLastRunAt` property available only for audits and web-journeys.
+
+              '
+            required:
+            - isAssigned
+            - isEditable
+            - itemType
+            - itemId
+            - itemName
+            properties:
+              isAssigned:
+                type: boolean
+                description: TRUE if specified `email` is assigned to this item, FALSE otherwise
+              isEditable:
+                type: boolean
+                description: TRUE if specified `email` can be assigned or unassigned from this item, FALSE otherwise
+              itemType:
+                $ref: '#/components/schemas/NotificationCenter_AssignmentItemTypeEnum'
+              itemId:
+                $ref: '#/components/schemas/ItemId'
+              itemName:
+                type: string
+                description: Name of audit/WJ/rule/alert etc
+              itemLastRunAt:
+                $ref: '#/components/schemas/DateAndTime'
+              itemLabels:
+                description: may be absent if item does not support labels
+                type: array
+                minItems: 0
+                items:
+                  $ref: '#/components/schemas/LabelId'
+    NotificationCenter_GetEmails_RequestDTO:
+      type: object
+      description: Filters for searching for emails
+      required:
+      - itemType
+      - itemIds
+      properties:
+        itemType:
+          $ref: '#/components/schemas/NotificationCenter_EmailSubscriptionItemTypeEnum'
+        itemIds:
+          type: array
+          description: Non-empty array of item IDs. Emails for selected items only will be shown
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ItemId'
+    NotificationCenter_AssignmentItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+      - RULE
+      - ALERT
+      - USAGE_ALERT
+      - EMAIL_INBOX_MESSAGE_RECEIVED
+      - EMAIL_INBOX_MESSAGE_PROCESSED
+      - SCHEDULED_EXPORT
+    ItemId:
+      type: integer
+      format: int64
+      description: ID of a data collector, see ItemType
+      example: 107239
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    NotificationCenter_SearchForAssignments_RequestDTO:
+      type: object
+      description: Filters for searching for items that may have specific email assigned or not assigned
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          minLength: 1
+          description: email to search for
+        itemName:
+          type: string
+          minLength: 1
+          description: optional "item name contains substring" filter
+        itemLabels:
+          type: array
+          description: non-empty array of labels present on an item. When multiple labels specified, target item is expected to have all of them (condition works as "AND" for all labels specified)
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        isAssigned:
+          type: boolean
+          description: '- when TRUE - only target items with the specified `email` currently assigned will be returned;
+
+            - when FALSE - only target items with the specified `email` currently NOT assigned will be returned;
+
+            - when UNDEFINED or NULL - flag is ignored.
+
+            '
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    NotificationCenter_AssignmentsSortColumn:
+      type: string
+      enum:
+      - IS_ASSIGNED
+      - ITEM_NAME
+      - RUN_DATE
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    NotificationCenter_EmailSubscriptionItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    NotificationCenter_GetEmails_ResponseDTO:
+      type: object
+      description: All emails in an account
+      required:
+      - emails
+      properties:
+        emails:
+          type: array
+          minItems: 0
+          items:
+            title: NotificationCenter_EmailItem
+            type: object
+            required:
+            - email
+            - usage
+            properties:
+              email:
+                type: string
+              usage:
+                $ref: '#/components/schemas/NotificationCenter_EmailUsage'
+    NotificationCenter_EmailUsage:
+      type: object
+      required:
+      - auditCount
+      - webJourneyCount
+      - ruleCount
+      - alertCount
+      - emailInboxMessageReceivedCount
+      - emailInboxMessageProcessedCount
+      properties:
+        auditCount:
+          type: integer
+        webJourneyCount:
+          type: integer
+        ruleCount:
+          type: integer
+        alertCount:
+          type: integer
+          description: Number of alerts excluding usage alerts
+        usageAlertCount:
+          type: integer
+        emailInboxMessageReceivedCount:
+          type: integer
+        emailInboxMessageProcessedCount:
+          type: integer
+        scheduledExportCount:
+          type: integer
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

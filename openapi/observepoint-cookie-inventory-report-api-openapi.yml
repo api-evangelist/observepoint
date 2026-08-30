@@ -1,0 +1,1179 @@
+openapi: 3.2.0
+info:
+  title: V3 Cookie Inventory Report API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: cookie-inventory-report
+  x-displayName: Cookie Inventory Report
+  description: Cookie Inventory report endpoints
+paths:
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - cookie-inventory-report
+      summary: Get Cookie Inventory summary for specified audit run
+      operationId: getAuditRunCookieInventorySummary
+      requestBody:
+        description: Filters applicable to Cookie Inventory report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_CookieInventory_RequestDTO'
+      responses:
+        '200':
+          description: Cookie Inventory summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookieInventory_SummaryDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/trends:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - cookie-inventory-report
+      summary: Get Cookie Inventory trends relative to specified audit run
+      operationId: getAuditRunCookieInventoryTrends
+      responses:
+        '200':
+          description: Cookie Inventory trends data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookieInventory_TrendsDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/trends</div>
+  /v3/web-audits/{auditId}/reports/cookie-inventory/trends/{trendName}:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - name: trendName
+      in: path
+      required: true
+      description: name of requested trend
+      schema:
+        $ref: '#/components/schemas/AuditRun_CookieInventory_TrendsEnum'
+    - $ref: '#/components/parameters/AuditRun_Trends_DaysParam'
+    get:
+      tags:
+      - cookie-inventory-report
+      summary: Get Cookie Inventory specific trend values relative to current time
+      operationId: getAuditRunCookieInventoryTrend
+      responses:
+        '200':
+          description: Cookie Inventory specific trend values data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemRun_SpecificTrendValuesDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/reports/cookie-inventory/trends/<span class="op-path-parameter">{trendName}</span></div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/cookies:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_CookieList_PageSizeParam'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - cookie-inventory-report
+      summary: Get Cookie Inventory cookie list for specified audit run
+      operationId: getAuditRunCookieInventoryCookies
+      requestBody:
+        description: Filters applicable to Cookie Inventory report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_CookieInventory_RequestDTO'
+      responses:
+        '200':
+          description: Cookie Inventory cookies data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/cookies</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_CookieInventory_PagesSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - cookie-inventory-report
+      summary: Get Cookie Inventory page list for specified audit run
+      operationId: getAuditRunCookieInventoryPages
+      requestBody:
+        description: Filters applicable to Cookie Inventory report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_CookieInventory_RequestDTO'
+      responses:
+        '200':
+          description: Cookie Inventory pages data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookieInventory_PagesListDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/pages</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/cookie-pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_CookieInventory_PagesSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - cookie-inventory-report
+      summary: Get Cookie Inventory page list for specific cookie in specified audit run
+      operationId: getAuditRunCookieInventoryCookiePages
+      requestBody:
+        description: Filters applicable to Cookie Inventory report + specific cookie to check out its pages
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_CookieInventory_CookiePagesRequestDTO'
+      responses:
+        '200':
+          description: Cookie Inventory specific cookie pages data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookieInventory_PagesListDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/cookie-pages</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/domains:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_CookieInventory_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_CookieInventory_DomainsSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - cookie-inventory-report
+      summary: Get Cookie Domains list in specified audit run
+      operationId: getAuditRunCookieInventoryCookieDomains
+      requestBody:
+        description: Filters applicable to Cookie Inventory report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_CookieInventory_RequestDTO'
+      responses:
+        '200':
+          description: Cookie Inventory domains data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookieInventory_DomainsListDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/domains</div>
+components:
+  schemas:
+    AuditRun_CookieInventory_RequestDTO:
+      description: Request body with filters for Cookie Inventory report
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - $ref: '#/components/schemas/CookieFiltersTrait'
+      - type: object
+        properties:
+          cookieName:
+            $ref: '#/components/schemas/StringInclusionFilter'
+          cookieDomain:
+            $ref: '#/components/schemas/StringInclusionFilter'
+          partyType:
+            $ref: '#/components/schemas/CookiePartyType'
+          secure:
+            type: boolean
+          sameSite:
+            $ref: '#/components/schemas/CookieSameSiteExtended'
+          cookieSize:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_CookieSizeRangeFilter'
+          allThirdPartyCookies:
+            type: boolean
+            description: Conflicts with `partyType`, but has higher priority
+          httpOnly:
+            type: boolean
+          expirationType:
+            $ref: '#/components/schemas/CookieExpirationType'
+          cookieDuration:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_CookieDurationRangeFilter'
+          initiatorUrl:
+            $ref: '#/components/schemas/StringInclusionFilter'
+          initiatorUrlDomain:
+            $ref: '#/components/schemas/StringInclusionFilter'
+          anyRelatedTag:
+            type: boolean
+            description: Show all cookies with any related tag
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagCategoryId:
+            $ref: '#/components/schemas/TagCategoryId'
+          tagVendorId:
+            $ref: '#/components/schemas/TagVendorId'
+          partitionKeyIsSet:
+            type: boolean
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
+    CookieOriginTypeEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - PRE_AUDIT_ACTION
+      - PAGE_LOAD
+      - ON_PAGE_ACTION
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    TagId:
+      type: integer
+      description: Tag ID
+    AuditRun_CookieInventory_CookieInitiatorItem:
+      type: object
+      description: Represents unique initiator for the cookie, deduplicated by `initiatorType`, `tagId` and `urlDomain`
+      required:
+      - initiatorType
+      - foundDuring
+      - instanceCount
+      properties:
+        initiatorType:
+          $ref: '#/components/schemas/CookieInitiatorTypeEnum'
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        urlDomain:
+          type: string
+          description: Domain part of initiator's URL
+        foundDuring:
+          type: array
+          description: List of phases during which this initiator was observed
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CookieOriginTypeEnum'
+        instanceCount:
+          type: integer
+          description: Number of instances of this initiator across all pages
+    CookiePartyType:
+      type: string
+      description: 'Indicates if cookie domain is different from domain of a page it was set on.
+
+        `owned_3rd_party` is deprecated
+
+        '
+      enum:
+      - 1st_party
+      - owned_3rd_party
+      - 3rd_party
+    AuditRun_CookieInventory_PagesListItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - cookieCount
+        - totalCookieSize
+        properties:
+          cookieCount:
+            type: integer
+            description: Number of cookies on a page
+          totalCookieSize:
+            $ref: '#/components/schemas/CookieSize'
+    AuditRun_CookieInventory_CookiesListDTO:
+      type: object
+      required:
+      - metadata
+      - cookies
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListItem'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    PageFiltersTrait:
+      type: object
+      description: Common trait for page filters
+      properties:
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
+    CookiePartitionKey:
+      type: object
+      properties:
+        value:
+          type: string
+    CookieOriginInclusionTypeEnum:
+      type: string
+      description: '- `exclude_pre_audit_action_only_cookies` - exclude cookies which were only changed during pre-audit actions
+
+        '
+      enum:
+      - exclude_pre_audit_action_only_cookies
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    AuditRun_CookieInventory_TrendsItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - totalUniqueCookieCount
+        - totalFirstPartyCookieCount
+        - totalThirdPartyCookieCount
+        - totalNonSecureCookieCount
+        - totalSameSiteEmptyCookieCount
+        properties:
+          totalUniqueCookieCount:
+            type: integer
+          totalFirstPartyCookieCount:
+            type: integer
+          totalThirdPartyCookieCount:
+            type: integer
+          totalNonSecureCookieCount:
+            type: integer
+          totalSameSiteEmptyCookieCount:
+            type: integer
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
+      properties:
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    CookieFiltersTrait:
+      type: object
+      description: Common trait for cookie filters
+      properties:
+        cookieOriginInclusion:
+          $ref: '#/components/schemas/CookieOriginInclusionTypeEnum'
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    CookieName:
+      type: string
+      description: Cookie name
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    AuditRun_CookieInventory_CookiePagesRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - $ref: '#/components/schemas/CookieFiltersTrait'
+      - type: object
+        required:
+        - cookie
+        properties:
+          cookie:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_SelectedCookie'
+          cookieSize:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_CookieSizeRangeFilter'
+          initiatorUrl:
+            $ref: '#/components/schemas/StringInclusionFilter'
+          initiatorUrlDomain:
+            $ref: '#/components/schemas/StringInclusionFilter'
+          anyRelatedTag:
+            type: boolean
+            description: Show all cookies with any related tag
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagCategoryId:
+            $ref: '#/components/schemas/TagCategoryId'
+          tagVendorId:
+            $ref: '#/components/schemas/TagVendorId'
+    AuditRun_CookieInventory_DomainsListDTO:
+      type: object
+      required:
+      - metadata
+      - domains
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        domains:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_DomainsItem'
+    CookieSameSite:
+      type:
+      - string
+      - 'null'
+      enum:
+      - None
+      - Lax
+      - Strict
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
+    AuditRun_CookieInventory_CookiesListItemTrait:
+      type: object
+      required:
+      - name
+      - domain
+      - partyType
+      - expirationType
+      - secure
+      - httpOnly
+      properties:
+        name:
+          $ref: '#/components/schemas/CookieName'
+        domain:
+          $ref: '#/components/schemas/CookieDomain'
+        partyType:
+          $ref: '#/components/schemas/CookiePartyType'
+        expirationType:
+          $ref: '#/components/schemas/CookieExpirationType'
+        sameSite:
+          $ref: '#/components/schemas/CookieSameSite'
+        secure:
+          type: boolean
+        httpOnly:
+          type: boolean
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    AggregatedCookieTrait:
+      type: object
+      description: Common trait for cookies from Cookie Inventory Cookies and Cookie Privacy Compliance
+      properties:
+        cookieChangedDuring:
+          type: array
+          description: List of phases during which this cookie was changed, aggregated across all pages
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CookieOriginTypeEnum'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CookieSameSiteExtended:
+      type:
+      - string
+      - 'null'
+      enum:
+      - None
+      - Lax
+      - Strict
+      - Empty
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    AuditRun_CookieInventory_DomainSortColumn:
+      type: string
+      enum:
+      - domain
+      - page_count
+      - party_type
+      default: domain
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    AuditRunPageTrait:
+      description: Common trait for audit page with mandatory page properties
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+    AuditRun_CookieInventory_PagesListDTO:
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_PagesListItem'
+    AuditRun_CookieInventory_PageSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_status_code
+      - final_page_status_code
+      - page_load_time
+      - cookie_count
+      - total_cookie_size
+    AuditRun_CookieInventory_CookiesSortColumn:
+      type: string
+      enum:
+      - page_count
+      - name
+      - domain
+      - party_type
+      - expiration_type
+      - secure
+      - same_site
+      - http_only
+      - avg_size
+      - min_duration_in_minutes
+      - max_duration_in_minutes
+      - initiator_tag_count
+      - unique_initiator_count
+      - partition_key
+      - cookie_changed_during
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRun_CookieInventory_CookieDurationRangeFilter:
+      description: Cookie duration in minutes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. Ignored when expirationType == "session"
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRun_CookieInventory_SelectedCookie:
+      description: '- `partitionKey` is absent — property is ignored for backward compatibility,
+
+        - `partitionKey` is present and `partitionKey.value` is absent — cookies in old runs without partition key and new runs with partition key set to null,
+
+        - `partitionKey` is present and `partitionKey.value` is present — cookies in new runs with requested partition key
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListItemTrait'
+      - type: object
+        properties:
+          partitionKey:
+            $ref: '#/components/schemas/CookiePartitionKey'
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    CookieExpirationType:
+      type: string
+      enum:
+      - session
+      - timestamp
+    AuditRun_CookieInventory_CookiesListItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListItemTrait'
+      - $ref: '#/components/schemas/AggregatedCookieTrait'
+      - type: object
+        required:
+        - averageSize
+        - filteredPageCount
+        properties:
+          averageSize:
+            $ref: '#/components/schemas/CookieSize'
+          filteredPageCount:
+            type: integer
+            description: Number of pages this cookie was found on
+          minDurationInMinutes:
+            type: integer
+            description: Minimum cookie duration in minutes
+          maxDurationInMinutes:
+            type: integer
+            description: Maximum cookie duration in minutes
+          initiators:
+            type: array
+            items:
+              $ref: '#/components/schemas/AuditRun_CookieInventory_CookieInitiatorItem'
+          initiatorTagIds:
+            type: array
+            description: List of tag IDs, associated with initiators that set this cookie
+            minItems: 0
+            items:
+              type: integer
+          initiatorTotalCount:
+            type: integer
+            description: Total number of unique initiators that set this cookie
+          partitionKey:
+            type: string
+    AuditRun_CookieInventory_CookieSizeRangeFilter:
+      description: Cookie size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    CookieDomain:
+      type: string
+      description: Cookie domain; preceding dot removed
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
+    CookieSize:
+      type:
+      - integer
+      - 'null'
+      description: Cookie value size, in bytes. May not be available for old runs
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    CookieInitiatorTypeEnum:
+      type: string
+      description: Type of event that created the cookie
+      enum:
+      - HTTP
+      - APP
+      - OP_ACTION
+      - UNKNOWN
+    AuditRun_CookieInventory_TrendsEnum:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      type: string
+      enum:
+      - unique_cookies
+      - first_party
+      - third_party
+      - non_secure_count
+      - same_site_empty
+    StringInclusionFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          minLength: 1
+    AuditRun_CookieInventory_TrendsDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_TrendsItem'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRun_CookieInventory_SummaryDTO:
+      description: Cookie Inventory report summary
+      type: object
+      required:
+      - totalPageCount
+      - filteredPageCount
+      - totalUniqueCookieCount
+      - filteredUniqueCookieCount
+      - totalFirstPartyCookieCount
+      - filteredFirstPartyCookieCount
+      - totalThirdPartyCookieCount
+      - filteredThirdPartyCookieCount
+      - filteredNonSecureCookieCount
+      - filteredSameSiteEmptyCookieCount
+      - totalUniqueCookieDomainCount
+      - filteredUniqueCookieDomainCount
+      properties:
+        totalPageCount:
+          type: integer
+          description: Total number of pages audited
+        filteredPageCount:
+          type: integer
+          description: Number of pages passing all applied filters
+        totalUniqueCookieCount:
+          type: integer
+          description: Total number of unique cookies discovered
+        filteredUniqueCookieCount:
+          type: integer
+          description: Number of unique cookies passing all applied filters
+        totalFirstPartyCookieCount:
+          type: integer
+          description: Total number of first-party cookies discovered
+        filteredFirstPartyCookieCount:
+          type: integer
+          description: Number of first-party cookies passing all applied filters
+        totalThirdPartyCookieCount:
+          type: integer
+          description: Total number of third-party cookies discovered
+        filteredThirdPartyCookieCount:
+          type: integer
+          description: Number of third-party cookies passing all applied filters
+        filteredNonSecureCookieCount:
+          type: integer
+          description: Number of non-secure cookies passing all applied filters
+        filteredSameSiteEmptyCookieCount:
+          type: integer
+          description: Number of cookies with empty same site attribute passing all applied filters
+        totalUniqueCookieDomainCount:
+          type: integer
+          description: Total number of unique cookie domains discovered
+        filteredUniqueCookieDomainCount:
+          type: integer
+          description: Number of unique cookie domains passing all applied filters
+    AuditRun_CookieInventory_DomainsItem:
+      type: object
+      required:
+      - domain
+      - partyType
+      - pageCount
+      properties:
+        domain:
+          $ref: '#/components/schemas/CookieDomain'
+        partyType:
+          $ref: '#/components/schemas/CookiePartyType'
+        pageCount:
+          type: integer
+  parameters:
+    AuditRun_Trends_DaysParam:
+      name: days
+      in: query
+      required: true
+      schema:
+        type: integer
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    AuditRun_CookieInventory_PagesSortParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_CookieInventory_PageSortColumn'
+    AuditRun_CookieInventory_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    AuditRun_CookieList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    AuditRun_CookieInventory_DomainsSortParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_CookieInventory_DomainSortColumn'
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

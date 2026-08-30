@@ -1,0 +1,1267 @@
+openapi: 3.2.0
+info:
+  title: V3 Alerts API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: alerts
+  x-displayName: Alerts
+  description: Alert management and configuration
+paths:
+  /v3/alerts:
+    post:
+      tags:
+      - alerts
+      operationId: createAlert
+      summary: Create Alert
+      requestBody:
+        description: Alert definition
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAlertRequestDTO'
+      responses:
+        '201':
+          description: created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAlertResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/alerts</div>
+  /v3/alerts/{alertId}:
+    parameters:
+    - $ref: '#/components/parameters/PathParamAlertId'
+    get:
+      tags:
+      - alerts
+      operationId: getAlertById
+      summary: Get specific Alert by ID
+      responses:
+        '200':
+          description: alert definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAlertDefinitionResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/alerts/<span class="op-path-parameter">{alertId}</span></div>
+    put:
+      tags:
+      - alerts
+      operationId: updateAlertById
+      summary: Update specific Alert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAlertRequestDTO'
+      responses:
+        '204':
+          description: updated successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/alerts/<span class="op-path-parameter">{alertId}</span></div>
+    delete:
+      tags:
+      - alerts
+      operationId: deleteAlertById
+      summary: Delete specific Alert
+      responses:
+        '204':
+          description: deleted successfully
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/alerts/<span class="op-path-parameter">{alertId}</span></div>
+  /v3/alerts/{alertId}/labels:
+    parameters:
+    - $ref: '#/components/parameters/PathParamAlertId'
+    put:
+      tags:
+      - alerts
+      operationId: updateAlertLabels
+      summary: Update labels for an Alert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: AlertSetLabelsRequestDTO
+              description: existing labels will be overwritten by labels listed here
+              type: object
+              properties:
+                labels:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/LabelId'
+      responses:
+        '204':
+          description: alert labels updated successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/alerts/<span class="op-path-parameter">{alertId}</span>/labels</div>
+  /v3/alerts/library:
+    parameters:
+    - $ref: '#/components/parameters/QueryParamAlertsSearchPageSize'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    - name: sortBy
+      in: query
+      required: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/GetAlertsLibrarySortColumn'
+    post:
+      tags:
+      - alerts
+      operationId: getAlertsForLibrary
+      summary: Get Alerts Library items
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetAlertsLibraryRequestDTO'
+      responses:
+        '200':
+          description: Alerts Library items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAlertsLibraryResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/alerts/library</div>
+  /v3/alerts/metrics/{metricType}:
+    parameters:
+    - name: metricType
+      in: path
+      required: true
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AlertMetricTypeEnum'
+    - $ref: '#/components/parameters/QueryParamAlertsSearchPageSize'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    - name: sortBy
+      in: query
+      required: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/GetAlertsByMetricSortColumn'
+    get:
+      tags:
+      - alerts
+      operationId: getAlertsByMetric
+      summary: Get Alerts by metric
+      responses:
+        '200':
+          description: All alerts in an account with the same metric
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAlertsByMetricResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/alerts/metrics/<span class="op-path-parameter">{metricType}</span></div>
+  /v3/alerts/target-items/{itemType}/search:
+    parameters:
+    - $ref: '#/components/parameters/PathParamAlertAssignmentItemType'
+    - $ref: '#/components/parameters/QueryParamAlertAssignmentsPageSize'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/QueryParamAlertAssignmentsSort'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - alerts
+      operationId: searchTargetItemsForAlert
+      summary: Search target items (data sources - audits, journeys etc) that may have specified Alert assigned or not assigned
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchAlertAssignmentsRequestDTO'
+      responses:
+        '200':
+          description: Items (data sources) that may have specified Alert assigned or not assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchAlertAssignmentsResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/alerts/target-items/<span class="op-path-parameter">{itemType}</span>/search</div>
+  /v3/alerts/{alertId}/target-items:
+    parameters:
+    - $ref: '#/components/parameters/PathParamAlertId'
+    patch:
+      tags:
+      - alerts
+      operationId: updateTargetItemsOfAlert
+      summary: Update target items (data sources) that have specified Alert assigned
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSpecificAlertAssignmentsRequestDTO'
+      responses:
+        '204':
+          description: Updated successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-patch">PATCH</span> /v3/alerts/<span class="op-path-parameter">{alertId}</span>/target-items</div>
+  /v3/alerts/search/assignments:
+    parameters:
+    - $ref: '#/components/parameters/QueryParamAlertsSearchPageSize'
+    - $ref: '#/components/parameters/pageParam'
+    - name: sortBy
+      in: query
+      required: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/SearchAlertsForAssignmentSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - alerts
+      operationId: searchAlertsForAssignment
+      summary: Search Alerts for assigning them to other items (audits, WJs etc)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchAlertsForAssignmentRequestDTO'
+      responses:
+        '200':
+          description: Assignments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchAlertsForAssignmentResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/alerts/search/assignments</div>
+  /v3/alerts/assignments/{itemType}/{itemId}:
+    parameters:
+    - $ref: '#/components/parameters/PathParamAlertAssignmentItemType'
+    - $ref: '#/components/parameters/PathParamAlertAssignmentItemId'
+    patch:
+      tags:
+      - alerts
+      operationId: updateAlertsAssignedToItem
+      summary: Update Alerts assigned to specified item (audit, journey etc)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSpecificItemAlertsRequestDTO'
+      responses:
+        '204':
+          description: updated successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-patch">PATCH</span> /v3/alerts/assignments/<span class="op-path-parameter">{itemType}</span>/<span class="op-path-parameter">{itemId}</span></div>
+components:
+  schemas:
+    SearchAlertsForAssignmentResponseDTO:
+      type: object
+      required:
+      - metadata
+      - alerts
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        alerts:
+          type: array
+          minItems: 0
+          items:
+            title: SearchAlertsForAssignmentAlertItem
+            type: object
+            required:
+            - id
+            - name
+            - metricType
+            - labels
+            properties:
+              id:
+                $ref: '#/components/schemas/AlertId'
+              name:
+                $ref: '#/components/schemas/AlertName'
+              metricType:
+                $ref: '#/components/schemas/AlertMetricTypeEnum'
+              labels:
+                type: array
+                minItems: 0
+                items:
+                  $ref: '#/components/schemas/LabelId'
+    GetAlertsLibraryRequestDTO:
+      type: object
+      description: All filters are optional. All populated filters are combined via `AND` boolean operator
+      properties:
+        alertName:
+          minLength: 1
+          type: string
+          description: when present works as "alert `name` contains give substring` filter
+        metricType:
+          $ref: '#/components/schemas/AlertMetricTypeEnum'
+        labels:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        createdByUserId:
+          $ref: '#/components/schemas/UserId'
+        isSubscribed:
+          type: boolean
+          default: false
+          description: When `true` then only those alerts will be returned that have Notification Profile of a requestor user assigned onto them
+    AlertMetricValueComparator:
+      type: object
+      description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
+
+        '
+      required:
+      - operator
+      properties:
+        operator:
+          $ref: '#/components/schemas/AlertMetricValueComparisonOperatorEnum'
+      discriminator:
+        propertyName: operator
+        mapping:
+          GREATER: '#/components/schemas/AlertMetricSpecificValueComparator'
+          GREATER_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          NOT_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
+          BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
+          NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
+    SearchAlertsForAssignmentSortColumn:
+      type: string
+      description: 'Behaviour per type:
+
+        - REPORT_METRIC: sort by name of data/report type corresponding to alert''s `metricType`
+
+        '
+      enum:
+      - ALERT_NAME
+      - REPORT_METRIC
+    GetAlertsLibraryResponseDTO:
+      type: object
+      required:
+      - metadata
+      - alerts
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        alerts:
+          type: array
+          items:
+            title: GetAlertsLibraryItem
+            type: object
+            required:
+            - id
+            - name
+            - metricType
+            - labels
+            - updatedAt
+            - targetItemCount
+            - subscribedCount
+            - isOwner
+            properties:
+              id:
+                $ref: '#/components/schemas/AlertId'
+              name:
+                $ref: '#/components/schemas/AlertName'
+              metricType:
+                $ref: '#/components/schemas/AlertMetricTypeEnum'
+              labels:
+                type: array
+                minItems: 0
+                items:
+                  $ref: '#/components/schemas/LabelId'
+              updatedAt:
+                $ref: '#/components/schemas/DateAndTime'
+              targetItemCount:
+                type: integer
+                description: Number of audits/journeys that have this alert configured
+              subscribedCount:
+                type: integer
+                description: Number of notification profiles configured for this alert
+              isOwner:
+                type: boolean
+                description: Indicates whether the current user is the owner of this alert
+    FoldersFilter:
+      type: array
+      description: non-empty array of folders with domains (subfolders), items from which will be included in response
+      minItems: 1
+      items:
+        $ref: '#/components/schemas/FoldersFilterItem'
+    CreateAlertRequestDTO:
+      type: object
+      description: 'Alert is triggered when comparison holds: `actual value` &lt;targetValueComparisonOperator&gt; `targetValue`
+
+        '
+      required:
+      - name
+      - metricType
+      - targetValueComparator
+      - filtersV0
+      properties:
+        name:
+          $ref: '#/components/schemas/AlertName'
+        labels:
+          type: array
+          description: Passing null instead of this array while updating an entity will prevent API from changing associated labels
+          items:
+            $ref: '#/components/schemas/LabelId'
+        metricType:
+          $ref: '#/components/schemas/AlertMetricTypeEnum'
+        metricChangeType:
+          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
+        targetValueComparator:
+          $ref: '#/components/schemas/AlertMetricValueComparator'
+        filtersV0:
+          type: object
+          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
+
+            '
+        emails:
+          type: array
+          description: List of email addresses that receive notifications when alert triggers. Will be replaced with Notification Profiles
+          items:
+            $ref: '#/components/schemas/EmailAddress'
+        customAlertMessage:
+          type: string
+        notificationPolicy:
+          $ref: '#/components/schemas/AlertNotificationPolicyEnum'
+        isDefaultForNewDataSources:
+          $ref: '#/components/schemas/AlertIsDefaultForNewDataSources'
+        assignments:
+          type: array
+          description: 'Passing null instead of this array while updating an alert will prevent API from changing its assignments.
+
+            To pass only updates of assignments (additions/removals) for existing alert use `PATCH /v3/alerts/{alertId}/target-items` endpoint
+
+            '
+          items:
+            $ref: '#/components/schemas/AlertAssignmentItem'
+        skipSendingAlertSharedWithYouEmail:
+          type: boolean
+          description: 'When TRUE, "Alert shared with you" email will NOT be sent to newly added email addresses.
+
+            When NOT specified or FALSE, it will be sent.
+
+            '
+    AlertMetricValueComparisonOperatorEnum:
+      type: string
+      enum:
+      - GREATER
+      - GREATER_OR_EQUAL
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_OR_EQUAL
+      - LESS
+      - BETWEEN
+      - NOT_BETWEEN
+    GetAlertsByMetricSortColumn:
+      type: string
+      enum:
+      - ALERT_NAME
+      - SUBSCRIBERS
+    CreateAlertResponseDTO:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/AlertId'
+    GetAlertsByMetricResponseDTO:
+      type: object
+      required:
+      - metadata
+      - alerts
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetAlertsByMetricItem'
+    AlertNotificationPolicyEnum:
+      type: string
+      description: 'Behaviour per type:
+
+        - WHEN_NEWLY_TRIGGERED: (*default*) send alert when goes from "ok" to "triggered" (resets when no longer triggered)
+
+        - ALWAYS_WHEN_TRIGGERED: send alert notification each time it is triggered per run
+
+        '
+      enum:
+      - WHEN_NEWLY_TRIGGERED
+      - ALWAYS_WHEN_TRIGGERED
+    FolderId:
+      type: integer
+      format: int32
+      description: ID of a folder
+      example: 123
+    AlertAssignmentUpdateOperationTypeEnum:
+      type: string
+      description: 'Meaning by type:
+
+        - ASSIGN: add (if not exist) or update (if already exists) alert assignment
+
+        - UNASSIGN: remove alert assignment. Does nothing if assignment does not exist
+
+        '
+      enum:
+      - ASSIGN
+      - UNASSIGN
+    EmailAddress:
+      type: string
+      format: email
+      minLength: 3
+      example: user@example.com
+    SearchAlertAssignmentsResponseDTO:
+      type: object
+      required:
+      - metadata
+      - items
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        items:
+          type: array
+          items:
+            title: AlertAssignmentItem
+            type: object
+            description: '`itemLastRunAt` property available only for audits and web-journeys.
+
+              '
+            required:
+            - isAssigned
+            - itemType
+            - itemId
+            - itemName
+            properties:
+              isAssigned:
+                type: boolean
+                description: TRUE if Alert is assigned to this item, FALSE otherwise
+              itemType:
+                $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+              itemId:
+                $ref: '#/components/schemas/AlertAssignmentItemId'
+              itemName:
+                type: string
+                description: Name of audit/WJ etc
+              itemLastRunAt:
+                $ref: '#/components/schemas/DateAndTime'
+              itemLabels:
+                description: may be absent if item does not support labels
+                type: array
+                minItems: 0
+                items:
+                  $ref: '#/components/schemas/LabelId'
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    AlertId:
+      type: integer
+      format: int64
+    AlertAssignmentItem:
+      type: object
+      required:
+      - itemType
+      - itemId
+      properties:
+        itemType:
+          $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+        itemId:
+          $ref: '#/components/schemas/AlertAssignmentItemId'
+    FoldersFilterItem:
+      type: object
+      required:
+      - folderId
+      properties:
+        folderId:
+          $ref: '#/components/schemas/FolderId'
+        domains:
+          type: array
+          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
+          items:
+            $ref: '#/components/schemas/DomainId'
+    AlertIsDefaultForNewDataSources:
+      type: boolean
+      description: 'Makes this alert selected by default in data-source (audit/WJ) creation UI.
+
+        This is a user-specific flag.
+
+        '
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AlertAssignmentItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    AlertName:
+      type: string
+      minLength: 1
+      description: User-defined name of the alert
+    UpdateSpecificAlertAssignmentsRequestDTO:
+      type: object
+      required:
+      - assignmentUpdates
+      properties:
+        assignmentUpdates:
+          type: array
+          items:
+            title: UpdateSpecificAlertAssignments_Item
+            type: object
+            required:
+            - scope
+            - itemType
+            - itemId
+            - operation
+            properties:
+              scope:
+                description: For forward-compatibility
+                type: string
+                enum:
+                - SINGLE_ITEM
+              itemType:
+                $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+              itemId:
+                $ref: '#/components/schemas/AlertAssignmentItemId'
+              operation:
+                $ref: '#/components/schemas/AlertAssignmentUpdateOperationTypeEnum'
+    SearchAlertAssignmentsRequestDTO:
+      type: object
+      description: 'Filters for searching for items that may have specific Alert assigned or not assigned.
+
+        - when `alertId` is specified, `isAssigned` field in response object will be set to true
+
+        for items already assigned to alert with the specified ID
+
+        '
+      properties:
+        alertId:
+          $ref: '#/components/schemas/AlertId'
+        assignedToAlert:
+          type: boolean
+          description: 'if `alertId` is NOT specified, `assignedToAlert` is ignored.
+
+            if `alertId` IS specified `assignedToAlert` has 3 states:
+
+            when TRUE - only items assigned to the specified alert will be returned;
+
+            when FALSE - only NOT assigned;
+
+            when NOT specified or NULL - both assigned and not assigned items will be returned
+
+            '
+        itemName:
+          type: string
+          minLength: 1
+          description: optional "item name contains substring" filter
+        itemId:
+          $ref: '#/components/schemas/AlertAssignmentItemId'
+        itemLabels:
+          type: array
+          description: non-empty array of labels present on an item, works as "item has all specified labels" filter
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        folders:
+          $ref: '#/components/schemas/FoldersFilter'
+    AlertAssignmentsSortColumn:
+      type: string
+      enum:
+      - IS_ASSIGNED
+      - ITEM_NAME
+      - RUN_DATE
+    GetAlertsByMetricItem:
+      allOf:
+      - $ref: '#/components/schemas/AlertConfigTrait'
+      - type: object
+        required:
+        - id
+        - emails
+        properties:
+          id:
+            $ref: '#/components/schemas/AlertId'
+          emails:
+            type: array
+            description: List of email addresses that receive notifications when alert triggers. Will be replaced with Notification Profiles
+            minItems: 0
+            items:
+              $ref: '#/components/schemas/EmailAddress'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AlertMetricChangeTypeEnum:
+      type: string
+      description: 'Behaviour per type:
+
+        - VALUE_CHANGE: current - previous
+
+        - VALUE_CHANGE_ABS: ABS(current - previous)
+
+        - RELATIVE_VALUE_CHANGE: 100% * (current - previous) / previous
+
+        - RELATIVE_VALUE_CHANGE: ABS(100% * (current - previous) / previous)
+
+
+        Composite metric change operators shown on ObservePoint UI should be defined as described below:
+
+        - `Changes by (∆)` = VALUE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+)` = VALUE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-)` = VALUE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        - `Any change` = VALUE_CHANGE_ABS (or VALUE_CHANGE) + NOT_EQUAL(0)
+
+        - `Changes by (∆ %)` = RELATIVE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+%)` = RELATIVE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-%)` = RELATIVE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        '
+      enum:
+      - VALUE_CHANGE
+      - VALUE_CHANGE_ABS
+      - RELATIVE_VALUE_CHANGE
+      - RELATIVE_VALUE_CHANGE_ABS
+    AlertMetricTypeEnum:
+      type: string
+      description: "Deprecated metric types:\n  - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT\n  - PAGE_SUMMARY_FAILED_RULE_COUNT\n"
+      enum:
+      - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT
+      - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT
+      - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT
+      - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT
+      - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT
+      - ACCOUNT_USAGE_V2_THIS_MONTH_AUDIT_PAGE_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_CURRENT_TERM_PAGE_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_CURRENT_TERM_WJ_RUN_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_THIS_MONTH_WJ_RUN_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_LAST_30_DAYS_LOGIN_USER_COUNT
+      - SCORE_TOTAL
+      - SCORE_TAG_PRESENCE
+      - SCORE_TAG_PERFORMANCE
+      - SCORE_RULES
+      - SCORE_PAGE_PERFORMANCE
+      - SCORE_COOKIE
+      - PAGE_SUMMARY_PAGE_COUNT
+      - PAGE_SUMMARY_AVG_PAGE_LOAD_TIME
+      - PAGE_SUMMARY_BROKEN_INITIAL_PAGE_COUNT
+      - PAGE_SUMMARY_BROKEN_FINAL_PAGE_COUNT
+      - PAGE_SUMMARY_PAGE_WITH_BROKEN_LINKS_COUNT
+      - PAGE_SUMMARY_FAILED_RULE_COUNT
+      - PAGE_SUMMARY_WEB_VITALS_P75_LARGEST_CONTENTFUL_PAINT
+      - PAGE_SUMMARY_WEB_VITALS_P75_FIRST_CONTENTFUL_PAINT
+      - PAGE_SUMMARY_WEB_VITALS_P75_TIME_TO_FIRST_BYTE
+      - PAGE_SUMMARY_WEB_VITALS_P75_CUMULATIVE_LAYOUT_SHIFT
+      - TAG_INVENTORY_PAGE_COUNT
+      - TAG_INVENTORY_UNIQUE_TAG_COUNT
+      - TAG_INVENTORY_BROKEN_TAG_COUNT
+      - TAG_INVENTORY_BROKEN_PAGE_COUNT
+      - TAG_HEALTH_PAGE_COUNT
+      - TAG_HEALTH_AVG_TAG_LOAD_TIME
+      - TAG_HEALTH_AVG_TAG_REQUEST_SIZE
+      - TAG_HEALTH_SLOW_TAG_PERCENTAGE
+      - TAG_HEALTH_BROKEN_TAG_PERCENTAGE
+      - TAG_HEALTH_TAG_REQUEST_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_PAGE_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_UNIQUE_TAG_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_TAG_REQUEST_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_TAG_DUPLICATE_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_TAG_MULTIPLE_COUNT
+      - VARIABLE_INVENTORY_PAGE_COUNT
+      - VARIABLE_INVENTORY_UNIQUE_TAG_COUNT
+      - VARIABLE_INVENTORY_TAG_REQUEST_COUNT
+      - VARIABLE_INVENTORY_UNIQUE_VARIABLE_COUNT
+      - VARIABLE_INVENTORY_UNIQUE_VARIABLE_VALUE_COUNT
+      - BROWSER_LOGS_PAGE_COUNT
+      - BROWSER_LOGS_ERROR_LOG_COUNT
+      - BROWSER_LOGS_WARN_LOG_COUNT
+      - BROWSER_LOGS_INFO_LOG_COUNT
+      - BROWSER_LOGS_DEBUG_LOG_COUNT
+      - BROWSER_LOGS_OTHER_LOG_COUNT
+      - COOKIE_INVENTORY_PAGE_COUNT
+      - COOKIE_INVENTORY_UNIQUE_COOKIE_COUNT
+      - COOKIE_INVENTORY_FIRST_PARTY_COOKIE_COUNT
+      - COOKIE_INVENTORY_THIRD_PARTY_COOKIE_COUNT
+      - COOKIE_INVENTORY_NON_SECURE_COOKIE_COUNT
+      - COOKIE_INVENTORY_SAME_SITE_EMPTY_COOKIE_COUNT
+      - PRIVACY_COOKIES_PAGE_COUNT
+      - PRIVACY_COOKIES_PAGE_WITH_UNAPPROVED_COOKIES_COUNT
+      - PRIVACY_COOKIES_UNIQUE_COOKIE_COUNT
+      - PRIVACY_COOKIES_APPROVED_COOKIE_COUNT
+      - PRIVACY_COOKIES_UNAPPROVED_COOKIE_COUNT
+      - PRIVACY_TAGS_PAGE_COUNT
+      - PRIVACY_TAGS_PAGE_WITH_UNAPPROVED_TAGS_COUNT
+      - PRIVACY_TAGS_UNIQUE_TAG_COUNT
+      - PRIVACY_TAGS_APPROVED_TAG_COUNT
+      - PRIVACY_TAGS_UNAPPROVED_TAG_COUNT
+      - PRIVACY_REQUESTS_PAGE_COUNT
+      - PRIVACY_REQUESTS_PAGE_WITH_UNAPPROVED_REQUESTS_COUNT
+      - PRIVACY_REQUESTS_REQUEST_COUNT
+      - PRIVACY_REQUESTS_UNIQUE_DOMAIN_COUNT
+      - PRIVACY_REQUESTS_UNIQUE_LOCATION_COUNT
+      - PRIVACY_REQUESTS_APPROVED_REQUEST_COUNT
+      - PRIVACY_REQUESTS_UNAPPROVED_REQUEST_COUNT
+      - FILE_CHANGES_PAGE_COUNT
+      - FILE_CHANGES_CHANGED_FILE_COUNT
+      - FILE_CHANGES_NEW_FILE_COUNT
+      - FILE_CHANGES_FILE_DATE_CHANGE_COUNT
+      - FILE_CHANGES_FILE_SIZE_CHANGE_COUNT
+      - RULE_RESULTS_PAGE_COUNT
+      - RULE_RESULTS_RULE_COUNT
+      - RULE_RESULTS_RULE_FAILURE_COUNT
+      - RULE_RESULTS_FAILED_RULE_COUNT
+      - RULE_RESULTS_PASSED_RULE_COUNT
+      - RULE_RESULTS_NOT_APPLIED_RULE_COUNT
+      - RULE_RESULTS_FAILED_RULE_PAGE_COUNT
+      - RULE_RESULTS_PASSED_RULE_PAGE_COUNT
+      - RULE_RESULTS_NOT_APPLIED_RULE_PAGE_COUNT
+    GetAlertDefinitionResponseDTO:
+      allOf:
+      - $ref: '#/components/schemas/AlertConfigTrait'
+      - type: object
+        description: 'Alert is triggered when comparison holds: `actual value` &lt;targetValueComparisonOperator&gt; `targetValue`
+
+          '
+        required:
+        - id
+        - labels
+        - emails
+        - notificationPolicy
+        - isDefaultForNewDataSources
+        properties:
+          id:
+            $ref: '#/components/schemas/AlertId'
+          labels:
+            type: array
+            minItems: 0
+            items:
+              $ref: '#/components/schemas/LabelId'
+          emails:
+            type: array
+            description: List of email addresses that receive notifications when alert triggers. Will be replaced with Notification Profiles
+            minItems: 0
+            items:
+              $ref: '#/components/schemas/EmailAddress'
+          customAlertMessage:
+            type: string
+          notificationPolicy:
+            $ref: '#/components/schemas/AlertNotificationPolicyEnum'
+          isDefaultForNewDataSources:
+            $ref: '#/components/schemas/AlertIsDefaultForNewDataSources'
+    AlertConfigTrait:
+      description: Core parts of alert definition
+      type: object
+      required:
+      - name
+      - metricType
+      - targetValueComparator
+      - filtersV0
+      properties:
+        name:
+          $ref: '#/components/schemas/AlertName'
+        metricType:
+          $ref: '#/components/schemas/AlertMetricTypeEnum'
+        metricChangeType:
+          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
+        targetValueComparator:
+          $ref: '#/components/schemas/AlertMetricValueComparator'
+        filtersV0:
+          type: object
+          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
+
+            '
+    UpdateSpecificItemAlertsRequestDTO:
+      type: object
+      required:
+      - assignmentUpdates
+      properties:
+        assignmentUpdates:
+          type: array
+          items:
+            title: UpdateSpecificItemAlertAssignments_Item
+            type: object
+            required:
+            - alertId
+            - operation
+            properties:
+              alertId:
+                $ref: '#/components/schemas/AlertId'
+              operation:
+                $ref: '#/components/schemas/AlertAssignmentUpdateOperationTypeEnum'
+    AlertAssignmentItemId:
+      type: integer
+      format: int64
+      description: ID of the item that can have assigned Alert(s) onto it. See also `AlertAssignmentTypeEnum`
+    DomainId:
+      type: integer
+      format: int32
+      description: ID of a domain
+      example: 123
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
+    SearchAlertsForAssignmentRequestDTO:
+      type: object
+      description: All included filters are optional. All populated filters are combined via `AND` boolean operator
+      properties:
+        targetItem:
+          title: SearchAlertsForAssignmentSpecificTargetItem
+          description: Item (audit/journey) alerts are assigned or not assigned to
+          type: object
+          required:
+          - itemType
+          - itemId
+          - isAssigned
+          properties:
+            itemType:
+              $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+            itemId:
+              $ref: '#/components/schemas/AlertAssignmentItemId'
+            isAssigned:
+              type: boolean
+              description: When TRUE it works as "alert IS assigned to specified target item (audit/journey)" and if false "alert IS NOT assigned to specified target item
+        search:
+          type: string
+          minLength: 1
+          description: When value is present it works as "alert `name` contains given substring" filter
+        labels:
+          type: array
+          description: non-empty array of labels present on an alert, works as "alert has all specified labels" filter
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        isDefaultForNewDataSources:
+          $ref: '#/components/schemas/AlertIsDefaultForNewDataSources'
+    GetAlertsLibrarySortColumn:
+      type: string
+      enum:
+      - ALERT_NAME
+      - TARGET_ITEMS
+      - REPORT_METRIC
+      - UPDATED_AT
+      - SUBSCRIBERS
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    PathParamAlertAssignmentItemId:
+      name: itemId
+      in: path
+      required: true
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AlertAssignmentItemId'
+    QueryParamAlertAssignmentsSort:
+      in: query
+      name: sortBy
+      required: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AlertAssignmentsSortColumn'
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    PathParamAlertId:
+      name: alertId
+      in: path
+      required: true
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AlertId'
+    QueryParamAlertsSearchPageSize:
+      in: query
+      name: size
+      required: false
+      allowEmptyValue: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    PathParamAlertAssignmentItemType:
+      name: itemType
+      in: path
+      required: true
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    QueryParamAlertAssignmentsPageSize:
+      in: query
+      name: size
+      required: false
+      allowEmptyValue: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

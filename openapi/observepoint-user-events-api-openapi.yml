@@ -1,0 +1,303 @@
+openapi: 3.2.0
+info:
+  title: V3 User Events API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: user-events
+  x-displayName: User Events
+  description: APIs for managing User Events
+paths:
+  /v3/user-events:
+    get:
+      tags:
+      - user-events
+      summary: Get user events in the account
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/user-events</div>
+
+
+        This endpoint will get all the changes made by users in the account. This endpoint is only for Admins'
+      operationId: getUserEvents
+      parameters:
+      - in: query
+        name: userId
+        description: filter events by UserId
+        required: false
+        schema:
+          $ref: '#/components/schemas/UserId'
+      - in: query
+        name: eventType
+        description: filter events by event type
+        required: false
+        schema:
+          $ref: '#/components/schemas/UserEventTypeApi'
+      - in: query
+        name: itemType
+        description: filter events by event item type
+        required: true
+        schema:
+          $ref: '#/components/schemas/UserEventItemTypeApi'
+      - in: query
+        name: itemName
+        description: filter events that matches the itemName
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: itemId
+        description: filter events by itemId
+        required: false
+        schema:
+          type: integer
+      - in: query
+        name: fromTimeStamp
+        description: filter events from this timeStamp
+        required: false
+        schema:
+          type: string
+          format: date-time
+          example: '2021-06-01T01:30:00.000-05:00'
+      - in: query
+        name: toTimeStamp
+        description: filter events up to this timeStamp
+        required: false
+        schema:
+          type: string
+          format: date-time
+          example: '2021-06-01T01:30:00.000-05:00'
+      - $ref: '#/components/parameters/PageParam'
+      - $ref: '#/components/parameters/PageSize'
+      - in: query
+        name: sortBy
+        required: false
+        schema:
+          $ref: '#/components/schemas/UserEventSortByEnum'
+      - $ref: '#/components/parameters/SortDescendingParam'
+      responses:
+        '200':
+          description: Retrieve user events in the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEvents_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    UserEvents_ResponseDTO:
+      type: object
+      properties:
+        nextPage:
+          type: boolean
+          description: true if there are more pages of data to return
+        userEvents:
+          items:
+            $ref: '#/components/schemas/UserEvent_ItemDTO'
+    UserEvent_ItemDTO:
+      description: event log by user
+      type: object
+      properties:
+        userId:
+          $ref: '#/components/schemas/UserId'
+        userName:
+          type: string
+        eventType:
+          $ref: '#/components/schemas/UserEventTypeApi'
+        itemType:
+          $ref: '#/components/schemas/UserEventItemTypeApi'
+        itemId:
+          type: integer
+        itemName:
+          type: string
+        eventTimeStamp:
+          type: string
+          format: date-time
+    UserEventSortByEnum:
+      type: string
+      enum:
+      - userId
+      - userName
+      - eventType
+      - itemId
+      - itemName
+      - eventTimeStamp
+      default: eventTimeStamp
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
+    UserEventItemTypeApi:
+      type: string
+      enum:
+      - audit
+      - web-journey
+      - mobile-journey
+      - mobile-app-file
+      - folder
+      - subfolder
+      - consent-category
+      - account
+      - email-inbox
+      - grid-saved-report
+      - custom-http-header-group
+    UserEventTypeApi:
+      type: string
+      enum:
+      - created
+      - deleted
+      - run-requested
+      - uploaded
+      - edited
+      - overage-enabled
+      - overage-disabled
+      - undeleted
+  parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    PageSize:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

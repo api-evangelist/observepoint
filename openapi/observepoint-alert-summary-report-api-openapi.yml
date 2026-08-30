@@ -1,0 +1,710 @@
+openapi: 3.2.0
+info:
+  title: V3 Alert Summary Report API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: alert-summary-report
+  x-displayName: Alert Summary Report
+  description: Alert Summary report endpoints
+paths:
+  /v3/web-audits/{auditId}/runs/{runId}/reports/alert-summary/overview:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - alert-summary-report
+      summary: Get Alerts statuses overview for specified audit run
+      operationId: getAuditRunAlertSummaryAlertsOverview
+      responses:
+        '200':
+          description: Alert Summary alerts overview data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AlertSummary_AlertsOverviewResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/alert-summary/overview</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/alert-summary/alerts:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - name: size
+      in: query
+      required: false
+      allowEmptyValue: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    - name: sortBy
+      in: query
+      required: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - alert-summary-report
+      summary: Get Alert Summary alerts table data for specified audit run
+      operationId: getAuditRunAlertSummaryAlerts
+      requestBody:
+        description: Filters applicable to Alert Summary report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_AlertSummary_SummaryRequestDTO'
+      responses:
+        '200':
+          description: Alert Summary alerts data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/alert-summary/alerts</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/alert-summary/alerts/{alertId}:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/PathParamAlertId'
+    get:
+      tags:
+      - alert-summary-report
+      summary: Get specific alert data (config + result) for specified audit run
+      operationId: getAuditRunAlertSummaryAlertById
+      responses:
+        '200':
+          description: Alert Summary specific alert data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_SpecificAlertResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/alert-summary/alerts/<span class="op-path-parameter">{alertId}</span></div>
+components:
+  schemas:
+    AlertMetricValueComparator:
+      type: object
+      description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
+
+        '
+      required:
+      - operator
+      properties:
+        operator:
+          $ref: '#/components/schemas/AlertMetricValueComparisonOperatorEnum'
+      discriminator:
+        propertyName: operator
+        mapping:
+          GREATER: '#/components/schemas/AlertMetricSpecificValueComparator'
+          GREATER_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          NOT_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
+          BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
+          NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
+    AuditRun_AuditSummary_AlertsResponseItemConfig:
+      allOf:
+      - $ref: '#/components/schemas/AlertConfigTrait'
+      - type: object
+        required:
+        - subscriberCount
+        - isUserSubscribed
+        properties:
+          subscriberCount:
+            type: integer
+          isUserSubscribed:
+            type: boolean
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    AuditRun_AlertSummary_AlertsOverviewResponseDTO:
+      type: object
+      required:
+      - alerts
+      properties:
+        alerts:
+          type: array
+          minItems: 0
+          items:
+            title: AuditRun_AlertSummary_AlertsOverviewItem
+            type: object
+            required:
+            - id
+            - name
+            - metricType
+            - status
+            - isSubscribed
+            - alertConfigExists
+            properties:
+              id:
+                $ref: '#/components/schemas/AlertId'
+              name:
+                $ref: '#/components/schemas/AlertName'
+              metricType:
+                $ref: '#/components/schemas/AlertMetricTypeEnum'
+              status:
+                $ref: '#/components/schemas/AlertResultStatusEnum'
+              isSubscribed:
+                type: boolean
+              alertConfigExists:
+                $ref: '#/components/schemas/AlertConfigExistsFlag'
+    AuditRun_AuditSummary_AlertsItem_HistoryItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - $ref: '#/components/schemas/AlertResultDetails'
+    AuditRun_AuditSummary_SpecificAlertResponseDTO:
+      type: object
+      required:
+      - id
+      - config
+      - result
+      - alertConfigExists
+      properties:
+        id:
+          $ref: '#/components/schemas/AlertId'
+        config:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
+        result:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
+        alertConfigExists:
+          $ref: '#/components/schemas/AlertConfigExistsFlag'
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    AlertMetricValueComparisonOperatorEnum:
+      type: string
+      enum:
+      - GREATER
+      - GREATER_OR_EQUAL
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_OR_EQUAL
+      - LESS
+      - BETWEEN
+      - NOT_BETWEEN
+    AuditRun_AuditSummary_AlertResult:
+      allOf:
+      - $ref: '#/components/schemas/AlertResultDetails'
+    AuditRun_AuditSummary_AlertsResponseItem:
+      type: object
+      required:
+      - id
+      - config
+      - result
+      - history
+      - alertConfigExists
+      properties:
+        id:
+          $ref: '#/components/schemas/AlertId'
+        config:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
+        result:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
+        history:
+          $ref: '#/components/schemas/AlertResultsHistoryArray'
+        alertConfigExists:
+          $ref: '#/components/schemas/AlertConfigExistsFlag'
+    AlertId:
+      type: integer
+      format: int64
+    AlertResultsHistoryArray:
+      type: array
+      description: Returns up to 20 runs with alert results
+      minItems: 0
+      maxItems: 20
+      items:
+        $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsItem_HistoryItem'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AlertResultDetails:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          $ref: '#/components/schemas/AlertResultStatusEnum'
+        actualValue:
+          description: Value of the computed metric or its change.
+          type: number
+          format: double
+        currentRunValue:
+          description: Value of computed metric for current run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+        previousRunValue:
+          description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+    AlertName:
+      type: string
+      minLength: 1
+      description: User-defined name of the alert
+    AuditRun_AlertSummary_SummaryRequestDTO:
+      description: Request body with filters for Alert Summary report
+      type: object
+      properties:
+        alertName:
+          type: string
+          description: when populated works as "alert `name` contains given substring" filter
+        metricTypes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AlertMetricTypeEnum'
+        status:
+          $ref: '#/components/schemas/AlertResultSimplifiedStatusEnum'
+        subscribedOnly:
+          type: boolean
+          description: when `false` or `null` then all alerts are returned, otherwise only alerts user is subscribed to are returned
+    AuditRun_AuditSummary_AlertsSortColumn:
+      type: string
+      enum:
+      - ALERT_NAME
+      - ALERT_LOGIC
+      - ACTUAL_VALUE
+      - SUBSCRIBERS
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRun_AuditSummary_AlertsResponseDTO:
+      type: object
+      required:
+      - metadata
+      - alerts
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItem'
+    AlertConfigExistsFlag:
+      type: boolean
+      description: when `true` then alert config exists and can be edited, otherwise it is deleted
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AlertMetricChangeTypeEnum:
+      type: string
+      description: 'Behaviour per type:
+
+        - VALUE_CHANGE: current - previous
+
+        - VALUE_CHANGE_ABS: ABS(current - previous)
+
+        - RELATIVE_VALUE_CHANGE: 100% * (current - previous) / previous
+
+        - RELATIVE_VALUE_CHANGE: ABS(100% * (current - previous) / previous)
+
+
+        Composite metric change operators shown on ObservePoint UI should be defined as described below:
+
+        - `Changes by (∆)` = VALUE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+)` = VALUE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-)` = VALUE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        - `Any change` = VALUE_CHANGE_ABS (or VALUE_CHANGE) + NOT_EQUAL(0)
+
+        - `Changes by (∆ %)` = RELATIVE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+%)` = RELATIVE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-%)` = RELATIVE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        '
+      enum:
+      - VALUE_CHANGE
+      - VALUE_CHANGE_ABS
+      - RELATIVE_VALUE_CHANGE
+      - RELATIVE_VALUE_CHANGE_ABS
+    AlertMetricTypeEnum:
+      type: string
+      description: "Deprecated metric types:\n  - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT\n  - PAGE_SUMMARY_FAILED_RULE_COUNT\n"
+      enum:
+      - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT
+      - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT
+      - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT
+      - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT
+      - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT
+      - ACCOUNT_USAGE_V2_THIS_MONTH_AUDIT_PAGE_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_CURRENT_TERM_PAGE_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_CURRENT_TERM_WJ_RUN_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_THIS_MONTH_WJ_RUN_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_LAST_30_DAYS_LOGIN_USER_COUNT
+      - SCORE_TOTAL
+      - SCORE_TAG_PRESENCE
+      - SCORE_TAG_PERFORMANCE
+      - SCORE_RULES
+      - SCORE_PAGE_PERFORMANCE
+      - SCORE_COOKIE
+      - PAGE_SUMMARY_PAGE_COUNT
+      - PAGE_SUMMARY_AVG_PAGE_LOAD_TIME
+      - PAGE_SUMMARY_BROKEN_INITIAL_PAGE_COUNT
+      - PAGE_SUMMARY_BROKEN_FINAL_PAGE_COUNT
+      - PAGE_SUMMARY_PAGE_WITH_BROKEN_LINKS_COUNT
+      - PAGE_SUMMARY_FAILED_RULE_COUNT
+      - PAGE_SUMMARY_WEB_VITALS_P75_LARGEST_CONTENTFUL_PAINT
+      - PAGE_SUMMARY_WEB_VITALS_P75_FIRST_CONTENTFUL_PAINT
+      - PAGE_SUMMARY_WEB_VITALS_P75_TIME_TO_FIRST_BYTE
+      - PAGE_SUMMARY_WEB_VITALS_P75_CUMULATIVE_LAYOUT_SHIFT
+      - TAG_INVENTORY_PAGE_COUNT
+      - TAG_INVENTORY_UNIQUE_TAG_COUNT
+      - TAG_INVENTORY_BROKEN_TAG_COUNT
+      - TAG_INVENTORY_BROKEN_PAGE_COUNT
+      - TAG_HEALTH_PAGE_COUNT
+      - TAG_HEALTH_AVG_TAG_LOAD_TIME
+      - TAG_HEALTH_AVG_TAG_REQUEST_SIZE
+      - TAG_HEALTH_SLOW_TAG_PERCENTAGE
+      - TAG_HEALTH_BROKEN_TAG_PERCENTAGE
+      - TAG_HEALTH_TAG_REQUEST_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_PAGE_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_UNIQUE_TAG_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_TAG_REQUEST_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_TAG_DUPLICATE_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_TAG_MULTIPLE_COUNT
+      - VARIABLE_INVENTORY_PAGE_COUNT
+      - VARIABLE_INVENTORY_UNIQUE_TAG_COUNT
+      - VARIABLE_INVENTORY_TAG_REQUEST_COUNT
+      - VARIABLE_INVENTORY_UNIQUE_VARIABLE_COUNT
+      - VARIABLE_INVENTORY_UNIQUE_VARIABLE_VALUE_COUNT
+      - BROWSER_LOGS_PAGE_COUNT
+      - BROWSER_LOGS_ERROR_LOG_COUNT
+      - BROWSER_LOGS_WARN_LOG_COUNT
+      - BROWSER_LOGS_INFO_LOG_COUNT
+      - BROWSER_LOGS_DEBUG_LOG_COUNT
+      - BROWSER_LOGS_OTHER_LOG_COUNT
+      - COOKIE_INVENTORY_PAGE_COUNT
+      - COOKIE_INVENTORY_UNIQUE_COOKIE_COUNT
+      - COOKIE_INVENTORY_FIRST_PARTY_COOKIE_COUNT
+      - COOKIE_INVENTORY_THIRD_PARTY_COOKIE_COUNT
+      - COOKIE_INVENTORY_NON_SECURE_COOKIE_COUNT
+      - COOKIE_INVENTORY_SAME_SITE_EMPTY_COOKIE_COUNT
+      - PRIVACY_COOKIES_PAGE_COUNT
+      - PRIVACY_COOKIES_PAGE_WITH_UNAPPROVED_COOKIES_COUNT
+      - PRIVACY_COOKIES_UNIQUE_COOKIE_COUNT
+      - PRIVACY_COOKIES_APPROVED_COOKIE_COUNT
+      - PRIVACY_COOKIES_UNAPPROVED_COOKIE_COUNT
+      - PRIVACY_TAGS_PAGE_COUNT
+      - PRIVACY_TAGS_PAGE_WITH_UNAPPROVED_TAGS_COUNT
+      - PRIVACY_TAGS_UNIQUE_TAG_COUNT
+      - PRIVACY_TAGS_APPROVED_TAG_COUNT
+      - PRIVACY_TAGS_UNAPPROVED_TAG_COUNT
+      - PRIVACY_REQUESTS_PAGE_COUNT
+      - PRIVACY_REQUESTS_PAGE_WITH_UNAPPROVED_REQUESTS_COUNT
+      - PRIVACY_REQUESTS_REQUEST_COUNT
+      - PRIVACY_REQUESTS_UNIQUE_DOMAIN_COUNT
+      - PRIVACY_REQUESTS_UNIQUE_LOCATION_COUNT
+      - PRIVACY_REQUESTS_APPROVED_REQUEST_COUNT
+      - PRIVACY_REQUESTS_UNAPPROVED_REQUEST_COUNT
+      - FILE_CHANGES_PAGE_COUNT
+      - FILE_CHANGES_CHANGED_FILE_COUNT
+      - FILE_CHANGES_NEW_FILE_COUNT
+      - FILE_CHANGES_FILE_DATE_CHANGE_COUNT
+      - FILE_CHANGES_FILE_SIZE_CHANGE_COUNT
+      - RULE_RESULTS_PAGE_COUNT
+      - RULE_RESULTS_RULE_COUNT
+      - RULE_RESULTS_RULE_FAILURE_COUNT
+      - RULE_RESULTS_FAILED_RULE_COUNT
+      - RULE_RESULTS_PASSED_RULE_COUNT
+      - RULE_RESULTS_NOT_APPLIED_RULE_COUNT
+      - RULE_RESULTS_FAILED_RULE_PAGE_COUNT
+      - RULE_RESULTS_PASSED_RULE_PAGE_COUNT
+      - RULE_RESULTS_NOT_APPLIED_RULE_PAGE_COUNT
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    AlertResultStatusEnum:
+      type: string
+      description: 'All statuses except `TRIGGERED` and `NOT_TRIGGERED` mean that alert/metric could not be computed. Statuses:
+
+        - UNKNOWN_ERROR: data retrieval or alert computation failed
+
+        - RUN_NOT_FOUND: requested run not found
+
+        - NO_VALUE: no data found for requested run (e.g. rules or consent categories were not applied)
+
+        - PREVIOUS_RUN_NOT_FOUND: previous run not found for run-over-run metric change alert
+
+        - PREVIOUS_RUN_NO_VALUE: no data found for previous run for run-over-run metric change alert
+
+        '
+      enum:
+      - TRIGGERED
+      - NOT_TRIGGERED
+      - UNKNOWN_ERROR
+      - RUN_NOT_FOUND
+      - NO_VALUE
+      - PREVIOUS_RUN_NOT_FOUND
+      - PREVIOUS_RUN_NO_VALUE
+    AlertConfigTrait:
+      description: Core parts of alert definition
+      type: object
+      required:
+      - name
+      - metricType
+      - targetValueComparator
+      - filtersV0
+      properties:
+        name:
+          $ref: '#/components/schemas/AlertName'
+        metricType:
+          $ref: '#/components/schemas/AlertMetricTypeEnum'
+        metricChangeType:
+          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
+        targetValueComparator:
+          $ref: '#/components/schemas/AlertMetricValueComparator'
+        filtersV0:
+          type: object
+          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
+
+            '
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    AlertResultSimplifiedStatusEnum:
+      type: string
+      description: Simplified version of `#/components/schemas/AlertResultStatusEnum` for UI filters
+      enum:
+      - TRIGGERED
+      - NOT_TRIGGERED
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    PathParamAlertId:
+      name: alertId
+      in: path
+      required: true
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AlertId'
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

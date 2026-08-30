@@ -1,0 +1,579 @@
+openapi: 3.2.0
+info:
+  title: V3 Custom Headers API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: custom-headers
+  x-displayName: Custom Headers
+  description: APIs for managing custom HTTP header groups
+paths:
+  /v3/custom-headers:
+    get:
+      tags:
+      - custom-headers
+      summary: Get all custom header groups
+      operationId: getCustomHeaderGroupSummary
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomHeaderGroupSummaryResponse'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/custom-headers</div>
+    post:
+      tags:
+      - custom-headers
+      summary: Create a custom header group
+      operationId: createCustomHeaderGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomHeaderBody'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomHeaderBody'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/custom-headers</div>
+  /v3/custom-headers/{customHeaderGroupId}:
+    get:
+      tags:
+      - custom-headers
+      summary: Get a custom header group by ID
+      operationId: getCustomHeaderGroupById
+      parameters:
+      - $ref: '#/components/parameters/CustomHeaderGroupId'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomHeaderBody'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/custom-headers/<span class="op-path-parameter">{customHeaderGroupId}</span></div>
+    put:
+      tags:
+      - custom-headers
+      summary: Update a custom header group
+      operationId: updateCustomHeaderGroup
+      parameters:
+      - $ref: '#/components/parameters/CustomHeaderGroupId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomHeaderBody'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomHeaderBody'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/custom-headers/<span class="op-path-parameter">{customHeaderGroupId}</span></div>
+    delete:
+      tags:
+      - custom-headers
+      summary: Delete a custom header group by ID
+      operationId: deleteCustomHeaderGroupById
+      parameters:
+      - $ref: '#/components/parameters/CustomHeaderGroupId'
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/custom-headers/<span class="op-path-parameter">{customHeaderGroupId}</span></div>
+  /v3/custom-headers/target-items/{itemType}/search:
+    post:
+      tags:
+      - custom-headers
+      summary: Search for target items (audits or web journeys) for custom header assignment
+      operationId: searchCustomHeaderTargetItems
+      parameters:
+      - name: itemType
+        in: path
+        required: true
+        description: Type of items to search for (AUDIT or WEB_JOURNEY)
+        schema:
+          $ref: '#/components/schemas/DataSourceItemTypeCap'
+      - $ref: '#/components/parameters/SortByParam'
+      - $ref: '#/components/parameters/SortDescendingParam'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/PageParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomHeaderTargetItemsSearchRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomHeaderTargetItemsSearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/custom-headers/target-items/<span class="op-path-parameter">{itemType}</span>/search</div>
+components:
+  parameters:
+    SortByParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/CustomHeaderSortByEnum'
+    PageSize:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    CustomHeaderGroupId:
+      name: customHeaderGroupId
+      in: path
+      required: true
+      description: Unique identification number for custom header group
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        type: integer
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+  schemas:
+    CustomHeaderTargetItemsSearchRequest:
+      type: object
+      description: Filters supported by Custom Header Target Items Search
+      properties:
+        customHeaderGroupId:
+          type: integer
+          format: int64
+        assignedToCustomHeaderGroup:
+          type: boolean
+        itemName:
+          type: string
+          minLength: 1
+        itemLabels:
+          type: array
+          description: non-empty array of labels present on an item, works as "item has all specified labels" filter
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        folders:
+          $ref: '#/components/schemas/FolderDomainFilter'
+    CustomHeaderGroupSummaryResponse:
+      type: object
+      required:
+      - customHeaderGroups
+      properties:
+        customHeaderGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomHeaderGroupSummary'
+    CustomHeaderTargetItem:
+      type: object
+      properties:
+        isAssigned:
+          type: boolean
+        itemType:
+          type: string
+          enum:
+          - AUDIT
+          - WEB_JOURNEY
+        itemId:
+          type: integer
+          format: int64
+        itemName:
+          type: string
+        lastRunAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last run for this item
+        itemLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssignedLabel'
+    AssignedLabel:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+    FolderId:
+      type: integer
+      format: int32
+      description: ID of a folder
+      example: 123
+    DataSourceItemTypeCap:
+      description: Type of data source item.
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    CustomHeaderBody:
+      type: object
+      required:
+      - groupName
+      - headers
+      - requestUrlFilters
+      - assignments
+      - applyToAll
+      properties:
+        id:
+          type: integer
+          format: int64
+        groupName:
+          type: string
+        headers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomHeader'
+        requestUrlFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestUrlFilter'
+        assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomHeaderAssignments'
+        applyToAll:
+          type: boolean
+    CustomHeaderAssignments:
+      type: object
+      required:
+      - itemType
+      - itemId
+      properties:
+        itemType:
+          type: string
+          enum:
+          - AUDIT
+          - WEB_JOURNEY
+        itemId:
+          type: integer
+          format: int64
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    FolderDomainFilter:
+      type: object
+      description: non-empty array of folders with domains (subfolders), items from which will be included in response
+      required:
+      - folders
+      properties:
+        folders:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/FolderDomainFilterItem'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    FolderDomainFilterItem:
+      type: object
+      required:
+      - folderId
+      properties:
+        folderId:
+          $ref: '#/components/schemas/FolderId'
+        domains:
+          type: array
+          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
+          items:
+            $ref: '#/components/schemas/DomainId'
+    CustomHeader:
+      type: object
+      required:
+      - name
+      - value
+      - type
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        type:
+          type: string
+          enum:
+          - REQUEST
+          - RESPONSE
+    CustomHeaderTargetItemsSearchResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/PaginationMetadata'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomHeaderTargetItem'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CustomHeaderSortByEnum:
+      type: string
+      default: ITEM_NAME
+      enum:
+      - IS_ASSIGNED
+      - ITEM_NAME
+      - RUN_DATE
+    DomainId:
+      type: integer
+      format: int32
+      description: ID of a domain
+      example: 123
+    RequestUrlFilter:
+      type: object
+      required:
+      - requestUrlFilter
+      - allowSubdomains
+      properties:
+        requestUrlFilter:
+          type: string
+        allowSubdomains:
+          type: boolean
+    CustomHeaderGroupSummary:
+      type: object
+      required:
+      - id
+      - groupName
+      - headerCount
+      - requestUrlFilterCount
+      - createdBy
+      - createdAt
+      - updatedAt
+      - applyToAll
+      - assignments
+      properties:
+        id:
+          type: integer
+          format: int64
+        groupName:
+          type: string
+        headerCount:
+          type: integer
+        requestUrlFilterCount:
+          type: integer
+        createdBy:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        applyToAll:
+          type: boolean
+        assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomHeaderAssignments'
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

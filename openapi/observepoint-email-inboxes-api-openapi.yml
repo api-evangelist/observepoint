@@ -1,0 +1,667 @@
+openapi: 3.2.0
+info:
+  title: V3 Email Inboxes API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: email-inboxes
+  x-displayName: Email Inboxes
+  description: APIs for getting email messages and results from email inboxes
+paths:
+  /v3/email-inboxes/library:
+    post:
+      tags:
+      - email-inboxes
+      summary: Return filtered email inboxes
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/email-inboxes/library</div>
+
+
+        Get all email inboxes that meet the filtering criteria'
+      operationId: getEmailInboxes
+      parameters:
+      - $ref: '#/components/parameters/PageParam'
+      - $ref: '#/components/parameters/PageSize'
+      - in: query
+        name: sortBy
+        required: false
+        schema:
+          $ref: '#/components/schemas/EmailInboxLibrarySortByEnum'
+      - $ref: '#/components/parameters/SortDescendingParam'
+      requestBody:
+        description: Filter params
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailInboxLibraryRequestDTO'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailInboxLibraryResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+  /v3/email-inboxes/{emailInboxId}:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    get:
+      tags:
+      - email-inboxes
+      summary: Get Email Inbox by id
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span></div>
+
+
+        Get a Email Inbox by id'
+      operationId: getEmailInbox
+      responses:
+        '200':
+          description: Successful operation, resource found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailInboxResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/email-inboxes/{emailInboxId}/audit-configurations:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    get:
+      tags:
+      - email-inboxes
+      summary: Read the configurations for an Email Inbox by id
+      operationId: getEmailInboxConfigurations
+      responses:
+        '200':
+          description: Successful operation, resource found
+          content:
+            application/json:
+              schema:
+                type: array
+                description: The collection of the audits associated to an Email Inbox
+                items:
+                  $ref: '#/components/schemas/EmailInboxConfigurationDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/audit-configurations</div>
+  /v3/email-inboxes/{emailInboxId}/messages:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    get:
+      tags:
+      - email-inboxes
+      summary: Get all email messages associated with a given Email Inbox
+      operationId: getEmailInboxMessages
+      parameters:
+      - $ref: '#/components/parameters/PageParam'
+      - $ref: '#/components/parameters/QueryParamPageSize'
+      - in: query
+        name: emailSubject
+        required: false
+        schema:
+          type: string
+        description: filter Email Messages by email subject
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceivedEmailMessageDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/messages</div>
+  /v3/email-inboxes/{emailInboxId}/messages/statuses:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    post:
+      tags:
+      - email-inboxes
+      summary: Get all email messages statuses associated with a given Email Inbox
+      operationId: getEmailInboxMessagesStatuses
+      requestBody:
+        description: List of email received message ids
+        content:
+          application/json:
+            schema:
+              type: array
+              uniqueItems: true
+              items:
+                type: integer
+                maxItems: 200
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReceivedEmailMessageBaseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/messages/statuses</div>
+components:
+  schemas:
+    ReceivedEmailMessageAuditInfo:
+      type: object
+      required:
+      - auditName
+      - auditId
+      - runId
+      properties:
+        auditName:
+          type: string
+          example: Audit Name
+        auditId:
+          type: integer
+          example: 123
+        runId:
+          type: integer
+          example: 123
+        isCompleted:
+          type: boolean
+          description: TRUE if the audit run is completed, otherwise FALSE
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    ReceivedEmailMessageDTO:
+      type: object
+      required:
+      - metadata
+      - messages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        messages:
+          type: array
+          items:
+            allOf:
+            - $ref: '#/components/schemas/ReceivedEmailMessageBaseDTO'
+            - $ref: '#/components/schemas/ReceivedEmailMessageEntryDTO'
+    EmailInboxSubscribersDTO:
+      type: object
+      properties:
+        onReceived:
+          type: array
+          items:
+            type: string
+            description: Email address subscribers to be alerted on email message received.
+        onProcessed:
+          type: array
+          items:
+            type: string
+            description: Email address subscribers to be alerted on email message processed.
+    EmailInboxLibrarySortByEnum:
+      type: string
+      default: name
+      enum:
+      - name
+      - emailAddress
+      - messagesReceived
+      - lastMessageReceived
+      - testScenariosCount
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    EmailInboxConfigurationDTO:
+      type: object
+      required:
+      - auditId
+      - auditName
+      - auditLastRunAt
+      - auditLabels
+      properties:
+        auditId:
+          $ref: '#/components/schemas/AuditId'
+        auditName:
+          type: string
+          description: Name of audit/WJ etc
+        auditLastRunAt:
+          $ref: '#/components/schemas/DateAndTime'
+        auditLabels:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/LabelId'
+    ReceivedEmailMessageEntryDTO:
+      type: object
+      required:
+      - subject
+      - receivedAt
+      - senderEmailAddress
+      - uniqueLinks
+      - runs
+      - screenshotPath
+      - screenshotThumbnailPath
+      properties:
+        receivedAt:
+          $ref: '#/components/schemas/DateAndTime'
+        senderEmailAddress:
+          type: string
+          example: marketing@email.observepoint.com
+        subject:
+          type: string
+          example: Christmas Marketing Campaign
+        uniqueLinks:
+          type: integer
+          format: int64
+          example: 317
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceivedEmailMessageAuditInfo'
+        screenshotPath:
+          type: string
+          description: A url that redirects to a time-limited screenshot of the email.
+          example: /v2/screenshots?token=a.b.c
+        screenshotThumbnailPath:
+          type: string
+          description: Provides a smaller resolution screenshot than the screenshot property.
+          example: /v2/screenshots?token=a.b.c
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    EmailInboxLibraryRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Adobe Campaign Holidays, Marketing Department
+        emailAddress:
+          type: string
+          example: scanTest+<8^[a-z0-9]>-<truncatedInboxName>@email.observepoint.com
+        auditIds:
+          description: The ids of the audits to be associated to the Email Inbox
+          type: array
+          items:
+            type: integer
+            format: int64
+        labelIds:
+          description: The ids of the labels to be associated to the Email Inbox
+          type: array
+          items:
+            $ref: '#/components/schemas/LabelId'
+        createdBy:
+          description: The ids of Email Inbox owners
+          type: array
+          items:
+            $ref: '#/components/schemas/UserId'
+    EmailInboxId:
+      type: integer
+    EmailInboxLibraryResponseDTO:
+      type: object
+      required:
+      - metadata
+      - emailInboxes
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        emailInboxes:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailInboxLibraryDTO'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    EmailInboxLinkExclusionFilters:
+      description: A regex to be used to exclude links in email scans.
+      type: string
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    ReceivedEmailMessageBaseDTO:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        status:
+          type: string
+          enum:
+          - RECEIVED
+          - PROCESSING
+          - AUDITING
+          - NOT_AUDITING
+          - NOTIFYING
+          - COMPLETE
+          - FAILED
+          - CANCELLED
+          example: COMPLETE
+        statusReason:
+          type: string
+          enum:
+          - ITEM_CONCURRENCY_REACHED
+          - ACCOUNT_CONCURRENCY_REACHED
+          - USER_CONCURRENCY_REACHED
+          - USAGE_LIMIT_EXCEEDED_WHEN_OVERAGE_NOT_ALLOWED
+          - NO_AUDITS_ASSIGNED
+          - UNABLE_TO_PROCESS_MESSAGE
+          - NO_LINKS_FOUND
+          - MESSAGE_NOT_FOUND
+          - ABORTED
+          - UNKNOWN
+          example: NO_AUDITS_ASSIGNED
+    EmailInboxLibraryDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        labelIds:
+          description: The ids of the labels associated to the Email Inbox
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+          example: Christmas Marketing Campaign
+        emailAddress:
+          description: The email address that has been assigned to the inbox
+          type: string
+          example: scanTest+<8^[a-z0-9]>@email.observepoint.com
+        notes:
+          type: string
+        messagesReceived:
+          description: The number of messages received by the Email Inbox
+          type: integer
+          default: 0
+        lastMessageReceived:
+          $ref: '#/components/schemas/DateAndTime'
+        testScenariosCount:
+          description: The number of test scenarios performed against the email landing pages.
+          type: integer
+    EmailInboxResponseDTO:
+      type: object
+      required:
+      - id
+      - emailAddress
+      - labelIds
+      - name
+      - linkExclusionFilters
+      - omitSocialLinks
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        labelIds:
+          description: The ids of the labels associated to the Email Inbox
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+          example: Christmas Marketing Campaign
+        emailAddress:
+          description: The email address that has been assigned to the inbox
+          type: string
+          example: scanTest+<8^[a-z0-9]>@email.observepoint.com
+        notes:
+          type: string
+        subscribers:
+          $ref: '#/components/schemas/EmailInboxSubscribersDTO'
+        linkExclusionFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
+        omitSocialLinks:
+          type: boolean
+  parameters:
+    QueryParamPageSize:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    PageSize:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    EmailInboxId:
+      name: emailInboxId
+      in: path
+      required: true
+      description: Unique identification number for email inbox
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/EmailInboxId'
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

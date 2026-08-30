@@ -1,0 +1,1000 @@
+openapi: 3.2.0
+info:
+  title: V3 Audits Management API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: audits-management
+  x-displayName: Audits Management
+  description: APIs for managing audits
+paths:
+  /v3/web-audits:
+    get:
+      tags:
+      - audits-management
+      summary: Get list of web audits
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits</div>
+
+
+        Retrieve all web audits accessible to the authenticated user based on their permissions'
+      operationId: getWebAudits
+      responses:
+        '200':
+          description: List of web audits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebAuditDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+  /v3/web-audits/latest-runs:
+    get:
+      tags:
+      - audits-management
+      summary: Get latest runs for web audits
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/latest-runs</div>
+
+
+        Retrieve latest run information for web audits with optional account filtering. Deprecated: use the grid API instead.'
+      operationId: getWebAuditLatestRuns
+      deprecated: true
+      parameters:
+      - in: query
+        name: accountId
+        description: Optional account ID to filter results
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: List of latest run items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LatestRunItemDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+  /v3/web-audits/undelete:
+    patch:
+      tags:
+      - audits-management
+      summary: Undelete a web audit
+      description: '<div class="op-path-box"><span class="op-http-method-patch">PATCH</span> /v3/web-audits/undelete</div>
+
+
+        Restore a single archived audit into a chosen destination Folder and Sub-folder. The original parents are not reinstated. Historical run data is not restored. Per-item outcomes (including destination_gone and already_restored) are returned in the 200 response body; only authentication and authorization failures use 401/403.'
+      operationId: undeleteWebAudit
+      requestBody:
+        description: Audit id and restore destination
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UndeleteWebAuditRequest'
+      responses:
+        '200':
+          description: Restore outcome for the requested audit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UndeleteWebAuditResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    get:
+      tags:
+      - audits-management
+      summary: Get audit notes by ID
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span></div>
+
+
+        Retrieve notes for a specific audit'
+      operationId: getWebAuditNotes
+      responses:
+        '200':
+          description: Audit notes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditNotesDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - audits-management
+      summary: Update audit notes
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span></div>
+
+
+        Update notes for a specific audit'
+      operationId: updateWebAuditNotes
+      requestBody:
+        description: Updated audit notes
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditNotesDTO'
+      responses:
+        '200':
+          description: Updated audit notes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditNotesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    post:
+      tags:
+      - audits-management
+      summary: run audit now
+      operationId: runAuditNow
+      requestBody:
+        description: 'Run the audit now. The request must contain the web-audit ID.
+
+          Unlike v2 "run now" API, this API does not reject run requests if there is an active run.
+
+          '
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_RunNowRequestDTO'
+      responses:
+        '201':
+          description: Run started successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs</div>
+  /v3/web-audits/{auditId}/runs/{runId}/info:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - in: query
+      name: includeFilters
+      description: Include filters in the response
+      required: false
+      schema:
+        type: boolean
+        default: false
+    get:
+      tags:
+      - audits-management
+      summary: Get audit configuration info for specified audit run
+      operationId: getAuditRunInfo
+      responses:
+        '200':
+          description: Audit run configuration info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_ConfigurationInfoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/info</div>
+  /v3/web-audits/{auditId}/consent-categories:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    get:
+      tags:
+      - audits-management
+      summary: Get all the consent categories assigned to an audit
+      operationId: getAuditConsentCategories
+      responses:
+        '200':
+          description: OK, return a list of consent-categories assigned to an audit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAudit_ConsentCategories_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/consent-categories</div>
+    patch:
+      tags:
+      - audits-management
+      summary: Update the consent categories assigned to an audit
+      description: '<div class="op-path-box"><span class="op-http-method-patch">PATCH</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/consent-categories</div>
+
+
+        Update the consent categories assigned to an audit. The request will be rejected if trying to assign conflicting consent category types to the same audit'
+      operationId: patchAuditConsentCategories
+      requestBody:
+        required: true
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/AttachmentPatchDocument_RequestDTO'
+      responses:
+        '200':
+          description: OK, return the modified consent category assignments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAudit_ConsentCategories_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs/{runId}/consent-categories:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - audits-management
+      summary: 'Retrieve all consent categories snapshots that are applied to a specific audit run. '
+      operationId: getAuditRunConsentCategories
+      responses:
+        '200':
+          description: OK, return a list of consent category snapshots assigned to this run
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAudit_ConsentCategorySnapshots_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/consent-categories</div>
+  /v3/web-audits/{auditId}/runs/{runId}/consent-categories/reprocess:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - audits-management
+      summary: Reprocess consent-category for the selected auditId and runIds
+      operationId: reprocessConsentCategories
+      responses:
+        '200':
+          description: OK, start reprocessing specified audit with specified consent category
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/consent-categories/reprocess</div>
+components:
+  schemas:
+    AuditRun_SitemapData:
+      type: object
+      description: Data about sitemaps that were discovered and visited by the audit
+      properties:
+        sitemapsScannedCount:
+          type: integer
+          description: Number of sitemaps visited successfully by the audit
+        sitemapsScanned:
+          type: array
+          description: List of sitemaps visited successfully by the audit
+          items:
+            $ref: '#/components/schemas/AuditRun_SitemapDataItem'
+        sitemapsBrokenCount:
+          type: integer
+          description: Number of sitemaps that were found, but could not be visited by the audit
+        sitemapsBrokenUrls:
+          type: array
+          items:
+            type: string
+            format: url
+            example: https://www.example.com/sitemap.xml
+          description: List of sitemap URLs that could not be visited
+    LatestRunItemDTO:
+      type: object
+      description: Latest run information for an audit
+      required:
+      - id
+      - name
+      - latestRun
+      - domainInfo
+      properties:
+        id:
+          type: integer
+          description: Audit ID
+        name:
+          type: string
+          description: Audit name
+        latestRun:
+          $ref: '#/components/schemas/RunInfoDTO'
+        domainInfo:
+          $ref: '#/components/schemas/DomainInfoDTO'
+        labels:
+          type: array
+          description: Labels associated with the audit
+          items:
+            $ref: '#/components/schemas/Label'
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    UndeleteWebAuditResponse:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: integer
+          format: int32
+        status:
+          $ref: '#/components/schemas/UndeleteStatus'
+        folderId:
+          type: integer
+          format: int32
+        subFolderId:
+          type: integer
+          format: int32
+        code:
+          $ref: '#/components/schemas/UndeleteFailureCode'
+        reason:
+          type: string
+    AttachmentPatchDocument_ItemDTO:
+      description: A JSONPatch document for modifying consent preference attachments
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+          - add
+          - remove
+        path:
+          type: string
+        value:
+          type: integer
+          description: id of the item to assign
+      example:
+      - op: add
+        path: /-
+        value: 1
+      - op: remove
+        path: /
+        value: 2
+    AuditRun_RunNowRequestDTO:
+      type: object
+      required:
+      - callbackWorkflowEventType
+      - callbackRepositoryOwner
+      - callbackRepositoryName
+      properties:
+        startingUrls:
+          minItems: 0
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        callbackWorkflowEventType:
+          type: string
+          description: 'The workflow file to be used in for starting the callback workflow
+
+            Has to be a file name without extension, e.g. "audit-complete" instead of "audit-complete.yml"
+
+            '
+        callbackRepositoryOwner:
+          type: string
+          description: 'The owner of the repository where the callback workflow is defined
+
+            This is required to correctly invoke the callback workflow
+
+            '
+        callbackRepositoryName:
+          type: string
+          description: 'The name of the repository where the callback workflow is defined
+
+            This is required to correctly invoke the callback workflow
+
+            '
+        callbackContext:
+          type: object
+          description: 'Contains a context for the callback URL to be used in the run
+
+            '
+        maxPages:
+          type:
+          - integer
+          - 'null'
+          description: 'Maximum number of pages to scan during the audit run.
+
+            If not provided, will default to the count of starting URLs if it exceeds the current audit configuration limit.
+
+            '
+        ghAppName:
+          description: 'GitHub App to use for the callback workflow dispatch.
+
+            Defaults to observepoint-integration if not specified (handled in service layer).
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/GhAppNameEnum'
+    WebAuditDTO:
+      type: object
+      description: Web audit information
+      required:
+      - auditId
+      - auditName
+      - folderId
+      - domainId
+      properties:
+        auditId:
+          type: integer
+          description: Unique identifier for the audit
+        auditName:
+          type: string
+          description: Name of the audit
+        ownerId:
+          type: integer
+          description: User ID of the audit owner
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the audit was created
+        folderId:
+          type: integer
+          description: Folder ID where the audit is stored
+        domainId:
+          type: integer
+          description: Domain ID associated with the audit
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the audit was last updated
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    WebAudit_ConsentCategorySnapshots_ResponseDTO:
+      type: object
+      description: 'NOTE: For individual consent category snapshot, Field consentCategoryId is omitted when the consent category is deleted'
+      properties:
+        consentCategorySnapshots:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
+    ConsentCategory_TypeEnum:
+      type: string
+      enum:
+      - approved
+      - unapproved
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    ConsentCategorySnapshotDTO:
+      type: object
+      description: A consent category snapshot dto
+      required:
+      - name
+      - type
+      - consentCategoryId
+      - consentCategorySnapshotId
+      - consentCategoryConfigExists
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+        type:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        consentCategoryId:
+          $ref: '#/components/schemas/ConsentCategoryId'
+        consentCategorySnapshotId:
+          $ref: '#/components/schemas/ConsentCategorySnapshotId'
+        consentCategoryConfigExists:
+          type: boolean
+          description: If false, the consent category config doesn't exist anymore
+    WebAudit_ConsentCategories_ResponseDTO:
+      type: object
+      required:
+      - consentCategories
+      properties:
+        consentCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategoryDTO'
+    ConsentCategory_Cmp_Data:
+      type: object
+      required:
+      - cmpVendor
+      - oneTrustCookieGroupDomain
+      - oneTrustCookieGroupId
+      - oneTrustCookieGroupGeo
+      properties:
+        cmpVendor:
+          $ref: '#/components/schemas/ConsentCategory_VendorTypeEnum'
+        oneTrustCookieGroupDescription:
+          type: string
+          description: The OneTrust provided description of the group
+        oneTrustCookieGroupDomain:
+          type: string
+          description: The domain reported by OneTrust for which the consent group applies
+          example: observepoint.com
+        oneTrustCookieGroupId:
+          type: string
+          description: The OneTrust ID for the group
+          example: C001
+        oneTrustCookieGroupGeo:
+          type: string
+          description: The geographic location for which the consent group applies
+          example: us, ut
+        sourceUrl:
+          type: string
+          description: The full URL of the page where the CMP import was run
+          example: https://example.com
+    UndeleteFailureCode:
+      type: string
+      enum:
+      - destination_gone
+      - already_restored
+      - error
+    AttachmentPatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
+    RunInfoDTO:
+      type: object
+      description: Run execution information
+      required:
+      - id
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Run ID
+        completedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the run completed
+        pageCount:
+          type: integer
+          format: int64
+          description: Number of pages processed in the run
+    ConsentCategoryDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+        type:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        id:
+          $ref: '#/components/schemas/ConsentCategoryId'
+        isDefaultCC:
+          type: boolean
+          description: If true, this is the default consent category
+        cmpData:
+          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
+        updatedType:
+          $ref: '#/components/schemas/ConsentCategory_updatedType'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last time this consent category was updated in UTC timezone
+    DomainInfoDTO:
+      type: object
+      description: Domain information
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+    AuditRun_ConfigurationInfoResponseDTO:
+      type: object
+      required:
+      - blockThirdPartyCookies
+      - browserName
+      - browserVersion
+      - customProxy
+      - filters
+      - gpcEnabled
+      - height
+      - loginActions
+      - locationId
+      - locationName
+      - onPageActions
+      - privacyConsentActions
+      - runDuration
+      - scanSpeed
+      - startingUrlCount
+      - urlsScanned
+      - userAgent
+      - vpnEnabled
+      - width
+      - technologyBlockingEnabled
+      - fileSubstitutionConfigured
+      - discoverSitemaps
+      - customHeadersApplied
+      properties:
+        blockThirdPartyCookies:
+          type: boolean
+          description: When true the browser blocks all third-party cookies
+        browserName:
+          type: string
+          description: Browser name
+        browserVersion:
+          type: string
+          description: Browser version
+        customProxy:
+          type: string
+          description: The custom proxy used for the audit
+        discoverSitemaps:
+          type: boolean
+          description: When true, the audit discovers sitemaps on any domains for starting URLs and uses those to find URLs to scan
+        sitemapData:
+          $ref: '#/components/schemas/AuditRun_SitemapData'
+        filters:
+          type: object
+          description: Filters used for the audit to include and exclude urls to be scanned
+          required:
+          - includeFilters
+          - excludeFilters
+          properties:
+            includeFilters:
+              type: array
+              items:
+                type: string
+                format: regex
+                example: ^https?://([^/:\?]*\.)?google.com
+              description: List of include filters
+            excludeFilters:
+              type: array
+              items:
+                type: string
+                format: regex
+                example: /careers
+              description: List of exclude filters
+        gpcEnabled:
+          type: boolean
+          description: GPC enabled or not
+        height:
+          type: integer
+          description: Browser height in pixels
+        loginActions:
+          type: boolean
+          description: Pre-Audit Actions present in configuration or not
+        locationId:
+          type: integer
+          description: Location (Proxy) ID, this maps to a location in the location table
+        locationName:
+          type: string
+          description: Location  human readable name. This field maps to the db location.label
+          example: England, London
+        onPageActions:
+          type: boolean
+          description: On Page Actions present in configuration or not
+        privacyConsentActions:
+          type: boolean
+          description: Privacy Consent Actions present in configuration or not
+        runDuration:
+          type: integer
+          description: Run duration in seconds
+        scanSpeed:
+          type: integer
+          description: 'Scan speed is the number of engines the customer requests to run the audit with
+
+            Currently a value between 1-50 is supported, but not guaranteed.
+
+            '
+        startingUrlCount:
+          type: number
+        urlsScanned:
+          type: integer
+          description: Number of URLs scanned
+        userAgent:
+          type: string
+          description: User agent
+        vpnEnabled:
+          type: boolean
+          description: 'VPN enabled or not for the run configuration '
+        width:
+          type: integer
+          description: Browser width in pixels
+        technologyBlockingEnabled:
+          type: boolean
+          description: Tag ID/Tag Category ID blocking enabled or not
+        fileSubstitutionConfigured:
+          type: boolean
+          description: File Substitution configured or not
+        customHeadersApplied:
+          type: boolean
+          description: Custom HTTP headers applied or not
+        auditStoppedByUserId:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: ID of the user who stopped the audit run early, if applicable
+    GhAppNameEnum:
+      type: string
+      description: Allowed GitHub App names for installation
+      enum:
+      - observepoint-integration
+      - observepoint-test-app
+    ConsentCategory_VendorTypeEnum:
+      type: string
+      enum:
+      - ONE_TRUST
+    UndeleteStatus:
+      type: string
+      enum:
+      - restored
+      - failed
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ConsentCategoryId:
+      type: integer
+      example: 3301
+      description: ID of consent category
+    AuditRun_SitemapDataItem:
+      type: object
+      required:
+      - sitemapUrl
+      - urlsFound
+      properties:
+        sitemapUrl:
+          type: string
+        urlsFound:
+          type: integer
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    ConsentCategorySnapshotId:
+      type: integer
+      format: int64
+      example: 33010
+      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
+    ConsentCategory_updatedType:
+      type: string
+      enum:
+      - ONETRUST_IMPORT
+      - FILE_IMPORT
+      - APP_CREATE
+    AuditNotesDTO:
+      type: object
+      description: Audit notes information
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the audit notes
+        notes:
+          type: string
+          description: Notes content for the audit
+    UndeleteWebAuditRequest:
+      type: object
+      required:
+      - id
+      - folderId
+      - subFolderId
+      properties:
+        id:
+          type: integer
+          format: int32
+        folderId:
+          type: integer
+          format: int32
+        subFolderId:
+          type: integer
+          format: int32
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

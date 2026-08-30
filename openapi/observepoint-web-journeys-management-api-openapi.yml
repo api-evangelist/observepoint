@@ -1,0 +1,2539 @@
+openapi: 3.2.0
+info:
+  title: V3 Web Journeys Management API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: web-journeys-management
+  x-displayName: Web Journeys Management
+  description: APIs for managing Web Journeys
+paths:
+  /v3/web-journeys:
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journeys
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys</div>
+
+
+        Retrieve all web journeys with optional filtering'
+      operationId: getWebJourneys
+      parameters:
+      - in: query
+        name: domainId
+        description: Filter by domain ID
+        required: false
+        schema:
+          type: integer
+          example: 123
+      - in: query
+        name: monitored
+        description: Filter by monitored status
+        required: false
+        schema:
+          type: boolean
+          example: true
+      - in: query
+        name: accountId
+        description: Filter by account ID
+        required: false
+        schema:
+          type: integer
+          example: 456
+      responses:
+        '200':
+          description: List of web journeys retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebJourneyDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+    post:
+      tags:
+      - web-journeys-management
+      summary: Create web journey
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-journeys</div>
+
+
+        Create a new web journey'
+      operationId: createWebJourney
+      requestBody:
+        description: Web journey data for creation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebJourneyUpdateDTO'
+      responses:
+        '200':
+          description: Web journey created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+    delete:
+      tags:
+      - web-journeys-management
+      summary: Delete web journeys by domain or folder
+      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/web-journeys</div>
+
+
+        Delete web journeys by domain ID or folder ID'
+      operationId: deleteWebJourneys
+      parameters:
+      - in: query
+        name: domainId
+        description: Delete all web journeys in the specified domain
+        required: false
+        schema:
+          type: integer
+          example: 123
+      - in: query
+        name: folderId
+        description: Delete all web journeys in the specified folder
+        required: false
+        schema:
+          type: integer
+          example: 456
+      responses:
+        '200':
+          description: Web journeys deleted successfully
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journey by ID
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span></div>
+
+
+        Retrieve a specific web journey by its ID'
+      operationId: getWebJourney
+      responses:
+        '200':
+          description: Web journey retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - web-journeys-management
+      summary: Update web journey
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span></div>
+
+
+        Update an existing web journey'
+      operationId: updateWebJourney
+      requestBody:
+        description: Updated web journey data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebJourneyUpdateDTO'
+      responses:
+        '200':
+          description: Web journey updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    delete:
+      tags:
+      - web-journeys-management
+      summary: Delete web journey
+      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span></div>
+
+
+        Delete a specific web journey by its ID'
+      operationId: deleteWebJourney
+      responses:
+        '200':
+          description: Web journey deleted successfully
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/undelete:
+    patch:
+      tags:
+      - web-journeys-management
+      summary: Undelete a web journey
+      description: '<div class="op-path-box"><span class="op-http-method-patch">PATCH</span> /v3/web-journeys/undelete</div>
+
+
+        Restore a single archived web journey into a chosen destination Folder and Sub-folder. The original parents are not reinstated. Historical run data is not restored. Per-item outcomes (including destination_gone and already_restored) are returned in the 200 response body; only authentication and authorization failures use 401/403.'
+      operationId: undeleteWebJourney
+      requestBody:
+        description: Web journey id and restore destination
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UndeleteWebJourneyRequest'
+      responses:
+        '200':
+          description: Restore outcome for the requested web journey
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UndeleteWebJourneyResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/status:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journey status
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/status</div>
+
+
+        Retrieve the current status of a web journey'
+      operationId: getWebJourneyStatus
+      responses:
+        '200':
+          description: Web journey status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyStatusDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/actions:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journey actions
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/actions</div>
+
+
+        Retrieve all actions for a web journey'
+      operationId: getWebJourneyActions
+      responses:
+        '200':
+          description: Web journey actions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActionSetActionDto'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - web-journeys-management
+      summary: Update web journey actions
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/actions</div>
+
+
+        Update all actions for a web journey'
+      operationId: updateWebJourneyActions
+      requestBody:
+        description: List of actions to update
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActionSetActionDto'
+      responses:
+        '200':
+          description: Web journey actions updated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActionSetActionDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/actions/{actionId}:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - in: path
+      name: actionId
+      description: The ID of the action
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 1001
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journey action by ID
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/actions/<span class="op-path-parameter">{actionId}</span></div>
+
+
+        Retrieve a specific action by its ID within a web journey'
+      operationId: getWebJourneyAction
+      responses:
+        '200':
+          description: Web journey action retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSetActionDto'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - web-journeys-management
+      summary: Update web journey action
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/actions/<span class="op-path-parameter">{actionId}</span></div>
+
+
+        Update a specific action within a web journey'
+      operationId: updateWebJourneyAction
+      requestBody:
+        description: Action data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionSetActionDto'
+      responses:
+        '200':
+          description: Web journey action updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSetActionDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/runs/{runId}/status:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - in: path
+      name: runId
+      description: The ID of the web journey run
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journey run status
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/status</div>
+
+
+        Retrieve the status of a specific web journey run'
+      operationId: getWebJourneyRunStatus
+      responses:
+        '200':
+          description: Web journey run status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyRunStatusObject'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/runs/{runId}:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - in: path
+      name: runId
+      description: The ID of the web journey run
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+    delete:
+      tags:
+      - web-journeys-management
+      summary: Delete web journey run
+      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span></div>
+
+
+        Stop/discard a specific web journey run'
+      operationId: deleteWebJourneyRun
+      responses:
+        '204':
+          description: Web journey run deleted successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/runs/current:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    delete:
+      tags:
+      - web-journeys-management
+      summary: Delete current web journey run
+      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/current</div>
+
+
+        Stop/discard the current web journey run'
+      operationId: deleteCurrentWebJourneyRun
+      responses:
+        '204':
+          description: Current web journey run deleted successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/notificationconfig:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journey notification configuration
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/notificationconfig</div>
+
+
+        Retrieve notification settings for a web journey'
+      operationId: getWebJourneyNotificationConfig
+      responses:
+        '200':
+          description: Notification configuration retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyNotificationConfig'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - web-journeys-management
+      summary: Update web journey notification configuration
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/notificationconfig</div>
+
+
+        Update or create notification settings for a web journey'
+      operationId: updateWebJourneyNotificationConfig
+      requestBody:
+        description: Notification configuration to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebJourneyNotificationConfig'
+      responses:
+        '200':
+          description: Notification configuration updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyNotificationConfig'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/rules:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journey rules
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/rules</div>
+
+
+        Retrieve all rules associated with a web journey'
+      operationId: getWebJourneyRules
+      responses:
+        '200':
+          description: Web journey rules retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyAndActionRules'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - web-journeys-management
+      summary: Update web journey rules
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/rules</div>
+
+
+        Bind rules to a web journey and its actions'
+      operationId: updateWebJourneyRules
+      requestBody:
+        description: Rules configuration to bind
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebJourneyAndActionRulesRequest'
+      responses:
+        '200':
+          description: Web journey rules updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyAndActionRules'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/actions/{actionId}/rules:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - in: path
+      name: actionId
+      description: The ID of the action
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 1001
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journey action rules
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/actions/<span class="op-path-parameter">{actionId}</span>/rules</div>
+
+
+        Retrieve rules for a specific action within a web journey'
+      operationId: getWebJourneyActionRules
+      responses:
+        '200':
+          description: Action rules retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - web-journeys-management
+      summary: Update web journey action rules
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/actions/<span class="op-path-parameter">{actionId}</span>/rules</div>
+
+
+        Bind rules to a specific action within a web journey'
+      operationId: updateWebJourneyActionRules
+      requestBody:
+        description: Set of rule IDs to bind to the action
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+              example:
+              - 101
+              - 102
+              - 103
+      responses:
+        '200':
+          description: Action rules updated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/remotefilemappings:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get web journey remote file mappings
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/remotefilemappings</div>
+
+
+        Retrieve all remote file mappings associated with a web journey'
+      operationId: getWebJourneyRemoteFileMappings
+      responses:
+        '200':
+          description: Remote file mappings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RemoteFileMapping'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - web-journeys-management
+      summary: Update web journey remote file mappings
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/remotefilemappings</div>
+
+
+        Bind remote file mappings to a web journey'
+      operationId: updateWebJourneyRemoteFileMappings
+      requestBody:
+        description: Set of remote file mapping IDs to bind
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+                format: int64
+              example:
+              - 201
+              - 202
+              - 203
+      responses:
+        '200':
+          description: Remote file mappings updated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                  format: int64
+                example:
+                - 201
+                - 202
+                - 203
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/runs/{runId}/actions/{actionSequenceId}/requests:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - in: path
+      name: runId
+      description: The ID of the web journey run
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+    - in: path
+      name: actionSequenceId
+      description: The sequence ID of the action
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 1
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get action requests
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/actions/<span class="op-path-parameter">{actionSequenceId}</span>/requests</div>
+
+
+        Retrieve all network requests made during an action execution'
+      operationId: getWebJourneyActionRequests
+      responses:
+        '200':
+          description: Action requests retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebJourneyActionRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/runs/{runId}/actions/{actionSequenceId}/logs:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - in: path
+      name: runId
+      description: The ID of the web journey run
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+    - in: path
+      name: actionSequenceId
+      description: The sequence ID of the action
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 1
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get action logs
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/actions/<span class="op-path-parameter">{actionSequenceId}</span>/logs</div>
+
+
+        Retrieve console logs generated during an action execution'
+      operationId: getWebJourneyActionLogs
+      responses:
+        '200':
+          description: Action logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsoleLogDto'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-journeys/{webJourneyId}/labels:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get all labels attached to specified web journey
+      operationId: getWebJourneyAssignedLabels
+      responses:
+        '200':
+          description: Successfully returned a list of web journey assigned labels.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/labels</div>
+    patch:
+      tags:
+      - web-journeys-management
+      summary: Patch labels attached to specified web journey
+      operationId: patchWebJourneyAssignedLabels
+      requestBody:
+        description: Patch Document
+        required: true
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/AttachmentPatchDocument_RequestDTO'
+      responses:
+        '200':
+          description: Successfully patched web journey assigned labels.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-patch">PATCH</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/labels</div>
+  /v3/web-journeys/{webJourneyId}/runs/{runId}/info:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - web-journeys-management
+      summary: Get journey configuration info for specified journey run
+      operationId: getWebJourneyRunInfo
+      responses:
+        '200':
+          description: Web Journey run configuration info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyRun_ConfigurationInfoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/info</div>
+  /v3/web-journeys/{webJourneyId}/runs:
+    post:
+      tags:
+      - web-journeys-management
+      summary: Run web journey
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs</div>
+
+
+        Creates a new run for the specified web journey.
+
+        The journey must exist, have actions configured, and not already be running.
+
+        '
+      operationId: runWebJourney
+      parameters:
+      - $ref: '#/components/parameters/WebJourneyId'
+      responses:
+        '200':
+          description: Run created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyRun_CreatedResponseDTO'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyRun_ErrorResponseDTO'
+        '401':
+          $ref: '#/components/responses/WebJourneyRun_UnAuthorized'
+        '403':
+          description: Usage limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyRun_ErrorResponseDTO'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyRun_ErrorResponseDTO'
+        '409':
+          description: Journey is already running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyRun_RunExistsResponseDTO'
+              example:
+                currentRunId: 5765431
+                code: 33
+      security:
+      - API_Key: []
+components:
+  schemas:
+    Schedule:
+      type: object
+      required:
+      - dtStart
+      - tzId
+      - recurrenceRule
+      - isPaused
+      - description
+      - presetType
+      allOf:
+      - $ref: '#/components/schemas/BaseScheduleForCreation'
+      - type: object
+        properties:
+          description:
+            type: string
+            description: A description of the schedule.
+          presetType:
+            type: string
+            description: The preset type of the schedule.
+            enum:
+            - 12_HOUR
+            - BIWEEKLY
+            - SEMI_ANNUALLY
+            - YEARLY
+            - RUN_ONCE
+            - 15_MIN
+            - HOURLY
+            - 6_HOUR
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+            - QUARTERLY
+            - CUSTOM
+            - UNSCHEDULED
+    SelectorTypeEnum:
+      type: string
+      enum:
+      - Empty
+      - String
+      - UrlParameter
+      - DataLayer
+      - Tag
+    MatchTypeEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - IsPresent
+      - Equals
+      - DoesNotEqual
+      - Contains
+      - DoesNotContain
+      - IsSet
+      - IsNotSet
+      - Regex
+      - GreaterThanOrEqualTo
+      - LessThanOrEqualTo
+    WebJourneyUpdateDTO:
+      type: object
+      description: Web journey data for creation or update
+      required:
+      - domainId
+      properties:
+        name:
+          type: string
+          description: Name of the web journey
+          example: E-commerce Checkout Flow
+          maxLength: 255
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Optional notes or description
+          example: Tests the complete checkout process
+        domainId:
+          type: integer
+          description: ID of the associated domain
+          example: 123
+        userId:
+          type: integer
+          description: ID of the user who created this web journey
+          example: 456
+        folderId:
+          type:
+          - integer
+          - 'null'
+          description: ID of the folder containing this web journey
+          example: 789
+        browserWidth:
+          type:
+          - integer
+          - 'null'
+          description: Browser viewport width in pixels
+          example: 1920
+          minimum: 250
+          maximum: 10000
+        browserHeight:
+          type:
+          - integer
+          - 'null'
+          description: Browser viewport height in pixels
+          example: 1080
+          minimum: 250
+          maximum: 10000
+        loadVideos:
+          type:
+          - boolean
+          - 'null'
+          description: Whether to load video content
+          example: true
+        vpnEnabled:
+          type:
+          - boolean
+          - 'null'
+          description: Whether VPN is enabled for this journey
+          example: false
+        gpcEnabled:
+          type:
+          - boolean
+          - 'null'
+          description: Whether Global Privacy Control is enabled
+          example: true
+        blockThirdPartyCookies:
+          type:
+          - boolean
+          - 'null'
+          description: Whether to block third-party cookies
+          example: false
+        frequency:
+          $ref: '#/components/schemas/WebJourneyFrequencyEnum'
+        location:
+          type:
+          - string
+          - 'null'
+          description: Geographic location for the web journey execution
+          example: US-West
+        userAgent:
+          type:
+          - string
+          - 'null'
+          description: User agent string to use
+          example: Chrome/91.0.4472.124
+        userAgentDescription:
+          type:
+          - string
+          - 'null'
+          description: Human-readable description of the user agent
+          example: Chrome Browser
+        customProxy:
+          type:
+          - string
+          - 'null'
+          description: Custom proxy server configuration
+          example: proxy.example.com:8080
+        monitoredByScriptServices:
+          type:
+          - boolean
+          - 'null'
+          description: Whether this journey is monitored by script services
+          example: true
+        nextCheck:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the next execution is scheduled
+          example: '2023-06-02T10:30:00Z'
+        schedule:
+          $ref: '#/components/schemas/BaseScheduleForCreation'
+    WebJourneyActionRulesRequest:
+      type: object
+      properties:
+        actionId:
+          type: integer
+          format: int64
+          description: The ID of the action
+        rules:
+          type: array
+          items:
+            type: integer
+          uniqueItems: true
+          description: Set of rule IDs for this action
+    RemoteFileMappingFailure:
+      type: object
+      required:
+      - failureType
+      properties:
+        failureType:
+          $ref: '#/components/schemas/RemoteFileMappingFailureType'
+        failureMessage:
+          type: string
+    RequestBlocking:
+      type: object
+      description: (Optional) Present if run configuration had TMS blocking enabled and request for this entry was blocked.
+      required:
+      - blockReason
+      - urlSignature
+      properties:
+        blockReason:
+          description: The configuration chosen by user. Phase 2 will include url_signature
+          type: string
+          enum:
+          - tag_id
+          - tag_category
+          - url_signature
+        urlSignature:
+          type: string
+          description: The singature used to identify requests.  Tag Signatures shall not be exposed to customers (blockReason is `tag_id` or `tag_category`).
+        tagId:
+          description: (Optional - Present when reason is `tag_id`) Allows FE to get Vendor, Category and other info as they do in tag initiators
+          type: integer
+        tagCategoryId:
+          description: (Optional) Present when reason is `tag_category`)
+          type: integer
+        failureMessage:
+          description: (Optional) Present if the request was meant to be blocked but it was not.
+          type: string
+    CookieBase:
+      type: object
+      required:
+      - name
+      - value
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        domain:
+          type: string
+        path:
+          type: string
+        expires:
+          type: string
+        httpOnly:
+          type: boolean
+        secure:
+          type: boolean
+        partyType:
+          $ref: '#/components/schemas/CookiePartyType'
+        sameSite:
+          $ref: '#/components/schemas/CookieSameSite'
+        partitionKey:
+          description: 'The partition key used for 3rd party cookies using CHIPS
+
+            See https://developer.mozilla.org/en-US/docs/Web/Privacy/Partitioned_cookies
+
+            '
+          type: string
+        partitionKeyOpaque:
+          description: 'True if a partition key is used, but for security reasons the partition key is not exposed
+
+            If this value is true, a cookie will be considered partitioned.
+
+            '
+          type: boolean
+    SequencedAction:
+      type: object
+      properties:
+        sequence:
+          type: integer
+          description: Sequence number of the action
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+          description: ID of the action
+        description:
+          type: string
+          description: 'Description of the action. Present for all actionTypes except: actionSet'
+        actionType:
+          type: string
+          enum:
+          - click
+          - input
+          - maskedinput
+          - select
+          - check
+          - uncheck
+          - enteriframe
+          - navto
+          - watch
+          - clearcookies
+          - execute
+          - exitiframe
+          - privacyoptin
+          - privacyoptout
+          - actionset
+          description: Type of the user action
+        waitDuration:
+          type: integer
+          description: 'Duration to wait in milliseconds. Present for actionTypes: navTo, click, input, select, check, uncheck, execute, watch, maskedInput, enterIFrame, exitIFrame, clearCookies, privacyOptIn, privacyOptOut'
+        selectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebActionSelector'
+          description: 'List of selectors for element-based actions. Present for actionTypes: click, input, select, check, uncheck, maskedInput, enterIFrame'
+        preventNavigation:
+          type: boolean
+          description: 'Whether to prevent navigation after action execution. Present for actionTypes: click, input, select, check, uncheck, execute, watch, maskedInput'
+        value:
+          type: string
+          description: 'Value field with different meanings per actionType. For input/select: input value. For navTo: URL. For privacyOptIn/privacyOptOut: URL. For execute: JavaScript code. Present for actionTypes: input, select, navTo, privacyOptIn, privacyOptOut, execute'
+        maskedValue:
+          type: string
+          description: 'Masked value for secure input actions. Present for actionType: maskedInput'
+        js:
+          type: string
+          description: 'JavaScript code to execute. Present for actionType: execute'
+        url:
+          type: string
+          description: 'URL for navigation and privacy actions. Present for actionTypes: navTo, privacyOptIn, privacyOptOut'
+        seconds:
+          type: integer
+          description: 'Number of seconds to watch/wait. Present for actionType: watch'
+        isRequired:
+          type: boolean
+          description: 'Whether privacy action is required. Present for actionTypes: privacyOptIn, privacyOptOut'
+      required:
+      - sequence
+      - actionType
+    AttachmentPatchDocument_ItemDTO:
+      description: A JSONPatch document for modifying consent preference attachments
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+          - add
+          - remove
+        path:
+          type: string
+        value:
+          type: integer
+          description: id of the item to assign
+      example:
+      - op: add
+        path: /-
+        value: 1
+      - op: remove
+        path: /
+        value: 2
+    HarCacheEntry:
+      type:
+      - object
+      - 'null'
+      properties:
+        expires:
+          $ref: '#/components/schemas/nullableDatetime'
+        lastAccess:
+          $ref: '#/components/schemas/datetime'
+        eTag:
+          type: string
+        hitCount:
+          type: integer
+          minimum: 0
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    RemoteFileMappingFailureType:
+      type: integer
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      x-enum-varnames:
+      - UNKNOWN
+      - FILE_SIZE_LIMIT_EXCEEDED
+      - FILE_NOT_FOUND
+      - CANNOT_GET_FILE
+    Substitution:
+      type: object
+      required:
+      - substituteUrl
+      properties:
+        substituteUrl:
+          type: string
+        failure:
+          $ref: '#/components/schemas/RemoteFileMappingFailure'
+        tagId:
+          type: integer
+        tagName:
+          type: string
+    WebJourneyDTO:
+      type: object
+      description: Web journey configuration and metadata
+      required:
+      - id
+      - name
+      - domainId
+      - userId
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the web journey
+          example: 12345
+        name:
+          type: string
+          description: Name of the web journey
+          example: E-commerce Checkout Flow
+          maxLength: 255
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Optional notes or description
+          example: Tests the complete checkout process
+        domainId:
+          type: integer
+          description: ID of the associated domain
+          example: 123
+        userId:
+          type: integer
+          description: ID of the user who created this web journey
+          example: 456
+        folderId:
+          type:
+          - integer
+          - 'null'
+          description: ID of the folder containing this web journey
+          example: 789
+        browserWidth:
+          type:
+          - integer
+          - 'null'
+          description: Browser viewport width in pixels
+          example: 1920
+          minimum: 250
+          maximum: 10000
+        browserHeight:
+          type:
+          - integer
+          - 'null'
+          description: Browser viewport height in pixels
+          example: 1080
+          minimum: 250
+          maximum: 10000
+        loadVideos:
+          type:
+          - boolean
+          - 'null'
+          description: Whether to load video content
+          example: true
+        vpnEnabled:
+          type:
+          - boolean
+          - 'null'
+          description: Whether VPN is enabled for this journey
+          example: false
+        gpcEnabled:
+          type:
+          - boolean
+          - 'null'
+          description: Whether Global Privacy Control is enabled
+          example: true
+        blockThirdPartyCookies:
+          type:
+          - boolean
+          - 'null'
+          description: Whether to block third-party cookies
+          example: false
+        frequency:
+          $ref: '#/components/schemas/WebJourneyFrequencyEnum'
+        location:
+          type:
+          - string
+          - 'null'
+          description: Geographic location for the web journey execution
+          example: US-West
+        userAgent:
+          type:
+          - string
+          - 'null'
+          description: User agent string to use
+          example: Chrome/91.0.4472.124
+        userAgentDescription:
+          type:
+          - string
+          - 'null'
+          description: Human-readable description of the user agent
+          example: Chrome Browser
+        customProxy:
+          type:
+          - string
+          - 'null'
+          description: Custom proxy server configuration
+          example: proxy.example.com:8080
+        monitoredByScriptServices:
+          type:
+          - boolean
+          - 'null'
+          description: Whether this journey is monitored by script services
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: When the web journey was created
+          example: '2023-06-01T10:30:00Z'
+        nextCheck:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the next execution is scheduled
+          example: '2023-06-02T10:30:00Z'
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+    WebJourneyAndActionRulesRequest:
+      type: object
+      properties:
+        webJourneyRules:
+          type: array
+          items:
+            type: integer
+          uniqueItems: true
+          description: Set of web journey rule IDs
+        actionRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebJourneyActionRulesRequest'
+          description: List of action rule requests
+    HarResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          minimum: 100
+          maximum: 600
+        statusText:
+          type: string
+        httpVersion:
+          type: string
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarCookie'
+        headers:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarHeaderOrQueryString'
+        content:
+          $ref: '#/components/schemas/HarResponseContent'
+        redirectURL:
+          type:
+          - string
+          - 'null'
+        headersSize:
+          type: integer
+          minimum: -1
+          description: Number of bytes in response headers (including ending \r\n\r\n). -1 if unavailable
+        bodySize:
+          type: integer
+          minimum: -1
+          description: Number of bytes in response body. -1 if unavailable
+        _transferSize:
+          type: integer
+          format: int64
+          minimum: 0
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    WebJourneyAndActionRules:
+      type: object
+      properties:
+        webJourneyRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+          description: List of rules for the web journey
+        actionRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebJourneyActionRules'
+          description: List of action-specific rules
+    WebJourneyRunStatusEnum:
+      type: string
+      description: Status of a web journey run
+      enum:
+      - NotChecked
+      - Ok
+      - Failure
+      - PageFailure
+      - ActionFailure
+      - RulesFailure
+      - ExecutingActions
+      - ProcessingRules
+      - DataCollectionFailure
+      example: Ok
+    PageFilterTypeEnum:
+      type:
+      - integer
+      - 'null'
+      description: Type of the page filter.
+      enum:
+      - 1
+      - 2
+      x-enum-varnames:
+      - URL
+      - STATUSCODE
+      x-enum-descriptions:
+      - URL filter type
+      - StatusCode filter type
+    CookiePartyType:
+      type: string
+      description: 'Indicates if cookie domain is different from domain of a page it was set on.
+
+        `owned_3rd_party` is deprecated
+
+        '
+      enum:
+      - 1st_party
+      - owned_3rd_party
+      - 3rd_party
+    Rule:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        accountId:
+          type: integer
+          format: int32
+        createdBy:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        recipients:
+          type: array
+          items:
+            type: string
+        checkTimes:
+          type: integer
+          format: int32
+        matchAllFilters:
+          type: boolean
+        pageFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageFilter'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleTag'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+        fromTemplate:
+          type: boolean
+    datetime:
+      type: string
+      format: date-time
+      description: The full date and time, according to ISO-8601 (e. g. 2020-08-25T21:15:43Z)
+    HarComment:
+      type:
+      - string
+      - 'null'
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    ActionSetActionDto:
+      allOf:
+      - $ref: '#/components/schemas/SequencedAction'
+      - type: object
+        properties:
+          actionSetId:
+            type: integer
+            format: int64
+            description: ID of the action set this action belongs to. For actionType 'actionSet', this contains the referenced action set ID
+          pageFilter:
+            type: string
+            description: Page filter pattern for the action
+    WebJourneyRun_ErrorResponseDTO:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          $ref: '#/components/schemas/WebJourneyRun_ErrorCode'
+      required:
+      - message
+      - code
+      example:
+        message: An error occurred
+        code: 10
+    WebJourneyRun_CreatedResponseDTO:
+      type: object
+      description: Response when a run is successfully created
+      properties:
+        newRunId:
+          type: integer
+          format: int64
+          description: The ID of the newly created run
+      required:
+      - newRunId
+      example:
+        newRunId: 5765432
+    UndeleteFailureCode:
+      type: string
+      enum:
+      - destination_gone
+      - already_restored
+      - error
+    BaseScheduleForCreation:
+      required:
+      - dtStart
+      - tzId
+      - recurrenceRule
+      - isPaused
+      properties:
+        dtStart:
+          type: string
+          description: Date of first desired start (if in range of recurrence rule).
+        tzId:
+          type: string
+          description: Timezone identifier compliant with tz database (ex. America/New_York). https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        recurrenceRule:
+          type: string
+          description: An RFC-5545 (https://www.rfc-editor.org/rfc/rfc5545#appendix-A) compliant recurrence rule string.
+        isPaused:
+          type: boolean
+          description: Whether the schedule is paused or not.
+    WebJourneyRun_RunExistsResponseDTO:
+      type: object
+      description: Response when a journey is already running
+      properties:
+        currentRunId:
+          type: integer
+          format: int64
+          description: The ID of the currently running run
+        code:
+          $ref: '#/components/schemas/WebJourneyRun_ErrorCode'
+      required:
+      - currentRunId
+      - code
+      example:
+        currentRunId: 5765431
+        code: 33
+    LocationData:
+      type: object
+      required:
+      - country
+      properties:
+        country:
+          type: string
+    RuleTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        tagId:
+          type: integer
+          format: int32
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+        account:
+          type: string
+        validationDescription:
+          type: string
+        clause:
+          $ref: '#/components/schemas/ClauseEnum'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleTagVariable'
+    HarRequest:
+      type: object
+      properties:
+        method:
+          type: string
+        url:
+          type: string
+        httpVersion:
+          type: string
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarCookie'
+        headers:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarHeaderOrQueryString'
+        queryString:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarHeaderOrQueryString'
+        postData:
+          $ref: '#/components/schemas/HarPostData'
+        headersSize:
+          type: integer
+          minimum: -1
+          description: Number of bytes in request headers (including ending \r\n\r\n). -1 if unavailable
+        bodySize:
+          type: integer
+          minimum: -1
+          description: Number of bytes in POST data payload. -1 if unavailable
+        comment:
+          $ref: '#/components/schemas/HarComment'
+        substitution:
+          $ref: '#/components/schemas/Substitution'
+        requestBlocking:
+          $ref: '#/components/schemas/RequestBlocking'
+    AttachmentPatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
+    HarCache:
+      type:
+      - object
+      - 'null'
+      properties:
+        beforeRequest:
+          $ref: '#/components/schemas/HarCacheEntry'
+        afterRequest:
+          $ref: '#/components/schemas/HarCacheEntry'
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    WebJourneyStatusDTO:
+      type: object
+      description: Current status of a web journey
+      required:
+      - status
+      - webJourneyRunning
+      - queued
+      properties:
+        status:
+          $ref: '#/components/schemas/WebJourneyRunStatusEnum'
+        webJourneyRunning:
+          type: boolean
+          description: Whether the web journey is currently running
+          example: false
+        lastCheck:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the web journey was last executed
+          example: '2023-06-01T16:45:00Z'
+        queued:
+          type: boolean
+          description: Whether the web journey is queued for execution
+          example: false
+        failureType:
+          $ref: '#/components/schemas/WebJourneyFailureTypeEnum'
+          description: The failure type of the last run, present only when status indicates failure
+    ConsoleLogDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The console message
+        count:
+          type: integer
+          minimum: 1
+          description: The number of times this exact console message was encountered in the given context
+        level:
+          type: string
+          enum:
+          - SEVERE
+          - WARNING
+          - INFO
+          - FINE
+          description: The console log level
+        timestamp:
+          type: integer
+          format: int64
+          description: Timestamp when the log occurred
+        source:
+          type: string
+          description: The file that triggered the console log, if it can be determined
+    CookieSameSite:
+      type:
+      - string
+      - 'null'
+      enum:
+      - None
+      - Lax
+      - Strict
+    RemoteFileMapping:
+      type: object
+      description: Remote file mapping configuration
+      required:
+      - id
+      - name
+      - matchType
+      - matchValue
+      - accountId
+      - createdBy
+      - createdAt
+      - updatedBy
+      - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Simple surrogate key in the database for this RFM config
+          example: 123
+        name:
+          type: string
+          maxLength: 255
+          description: A user-supplied name to identify this RFM config
+          example: Google Analytics Replacement
+        fileId:
+          type:
+          - string
+          - 'null'
+          description: A string GUID used as the uploaded replacement file's "name" in S3
+          example: 8c59d02b-6ebc-4893-9391-9be26c6d34cc
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          maxLength: 5000
+          description: The replacement URL, or else the name of the replacement file before it was uploaded
+          example: https://example.com/replacement-script.js
+        matchType:
+          type: string
+          enum:
+          - equals
+          - regex
+          description: Either "regex" or "equals"
+          example: equals
+        matchValue:
+          type: string
+          description: The request URL to be replaced (or the regex that matches URLs to replace)
+          example: https://www.google-analytics.com/analytics.js
+        accountId:
+          type: integer
+          description: Foreign key reference to accounts table. The owner of this RemoteFileMapping
+          example: 343
+        createdBy:
+          type: integer
+          description: Foreign key reference to the users table. Who created this RFM?
+          example: 1362
+        createdAt:
+          type: string
+          format: date-time
+          description: When this RFM was created
+          example: '2024-01-01T10:15:00.000Z'
+        updatedBy:
+          type: integer
+          description: Foreign key reference to the users table. Who updated this RFM most recently?
+          example: 1362
+        updatedAt:
+          type: string
+          format: date-time
+          description: When this RFM was last updated
+          example: '2024-01-02T10:15:00.000Z'
+    nullableDatetime:
+      type:
+      - string
+      - 'null'
+      format: date-time
+      description: The full date and time, according to ISO-8601 (e. g. 2020-08-25T21:15:43Z)
+    WebJourneyId:
+      type: integer
+      format: int64
+      example: 107239
+    UndeleteStatus:
+      type: string
+      enum:
+      - restored
+      - failed
+    WebJourneyRun_ConfigurationInfoResponseDTO:
+      type: object
+      required:
+      - browserName
+      - browserVersion
+      - width
+      - height
+      - userAgent
+      - locationId
+      - privacyConsentActions
+      - vpnEnabled
+      - gpcEnabled
+      - technologyBlockingEnabled
+      - fileSubstitutionConfigured
+      - blockThirdPartyCookies
+      - customHeadersApplied
+      properties:
+        browserName:
+          type: string
+          description: Browser name
+        browserVersion:
+          type: string
+          description: Browser version
+        width:
+          type: integer
+          description: Browser width in pixels
+        height:
+          type: integer
+          description: Browser height in pixels
+        userAgent:
+          type: string
+          description: User agent
+        locationId:
+          type: integer
+          description: Location  ID, this maps to a location in the location table
+        customProxy:
+          type: string
+          description: Custom proxy used for the run, if supplied by the user.
+          example: http://90.90.90.90:8888
+        privacyConsentActions:
+          type: boolean
+          description: Privacy Consent Actions present in configuration or not
+        vpnEnabled:
+          type: boolean
+          description: VPN enabled or not for the run configuration
+        gpcEnabled:
+          type: boolean
+          description: GPC enabled or not
+        technologyBlockingEnabled:
+          type: boolean
+          description: Tag ID/Tag Category ID blocking enabled or not
+        fileSubstitutionConfigured:
+          type: boolean
+          description: File Substitution configured or not
+        blockThirdPartyCookies:
+          type: boolean
+          description: Block third party cookies or not
+        customHeadersApplied:
+          type: boolean
+          description: Custom HTTP headers applied or not
+    LabelResponseDTO:
+      description: DTO for get/patch labels
+      type: object
+      properties:
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    WebJourneyRunStatusObject:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The numeric status value of the web journey run
+    HarResponseContent:
+      type: object
+      properties:
+        size:
+          type: integer
+          minimum: 0
+        compression:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+        mimeType:
+          type: string
+          format: mimeType
+        text:
+          type:
+          - string
+          - 'null'
+        encoding:
+          type:
+          - string
+          - 'null'
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    WebActionSelectorType:
+      type: string
+      enum:
+      - id
+      - name
+      - css
+      - xpath
+      - htmlattributes
+    ClauseEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - If
+      - Then
+      - Else
+    HarHeaderOrQueryString:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type:
+          - string
+          - 'null'
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    HarPostData:
+      type:
+      - object
+      - 'null'
+      properties:
+        mimeType:
+          type: string
+          format: mimeType
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarPostParameter'
+        text:
+          type: string
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    WebJourneyActionRules:
+      type: object
+      properties:
+        actionId:
+          type: integer
+          format: int64
+          description: The ID of the action
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+          description: List of rules for this action
+    WebJourneyRun_ErrorCode:
+      type: integer
+      description: 'Error codes:
+
+        - 10: ValidationError
+
+        - 11: MalformedRequest
+
+        - 33: AlreadyRunning
+
+        - 34: UsageLimitExceeded
+
+        '
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    HarPostParameter:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type:
+          - string
+          - 'null'
+        fileName:
+          type:
+          - string
+          - 'null'
+          format: fileName
+        contentType:
+          type:
+          - string
+          - 'null'
+          format: mimeType
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    WebJourneyFrequencyEnum:
+      type: string
+      description: Frequency options for web journey execution
+      enum:
+      - paused
+      - once
+      - 15 minutes
+      - 1 hour
+      - 6 hours
+      - 12 hours
+      - daily
+      - weekly
+      - biweekly
+      - monthly
+      example: daily
+    TagProperties:
+      type: object
+      description: Tag information object containing category and tag details
+      properties:
+        tagCategoryId:
+          type: integer
+          description: Tag category ID
+        tagCategoryName:
+          type: string
+          description: Tag category name
+        tagId:
+          type: integer
+          description: Tag ID
+        tagName:
+          type: string
+          description: Tag name
+    WebActionSelector:
+      type: object
+      properties:
+        selectorType:
+          $ref: '#/components/schemas/WebActionSelectorType'
+        value:
+          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
+      required:
+      - selectorType
+      - value
+    HarCookie:
+      allOf:
+      - $ref: '#/components/schemas/CookieBase'
+      - type: object
+        properties:
+          comment:
+            $ref: '#/components/schemas/HarComment'
+    PageFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        value:
+          type: string
+        type:
+          $ref: '#/components/schemas/PageFilterTypeEnum'
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+    RuleTagVariable:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleTagId:
+          type: integer
+          format: int32
+        variable:
+          type: string
+        value:
+          type: string
+        validationDescription:
+          type: string
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+        valueTagId:
+          type: integer
+          format: int32
+        selectorType:
+          $ref: '#/components/schemas/SelectorTypeEnum'
+    WebJourneyNotificationConfig:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+          description: List of email addresses for notifications
+        alerts:
+          type: boolean
+          description: Whether alerts are enabled
+        webHookUrl:
+          type: string
+          description: Webhook URL for notifications
+    HarEntryTimings:
+      type: object
+      properties:
+        blocked:
+          type:
+          - number
+          - 'null'
+          minimum: -1
+        dns:
+          type:
+          - number
+          - 'null'
+          minimum: -1
+        connect:
+          type:
+          - number
+          - 'null'
+          minimum: -1
+        send:
+          type: number
+          minimum: -1
+        wait:
+          type: number
+          minimum: -1
+        receive:
+          type: number
+          minimum: -1
+        ssl:
+          type:
+          - number
+          - 'null'
+          minimum: -1
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    UndeleteWebJourneyRequest:
+      type: object
+      required:
+      - id
+      - folderId
+      - subFolderId
+      properties:
+        id:
+          type: integer
+          format: int64
+        folderId:
+          type: integer
+          format: int32
+        subFolderId:
+          type: integer
+          format: int32
+    UndeleteWebJourneyResponse:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/UndeleteStatus'
+        folderId:
+          type: integer
+          format: int32
+        subFolderId:
+          type: integer
+          format: int32
+        code:
+          $ref: '#/components/schemas/UndeleteFailureCode'
+        reason:
+          type: string
+    WebJourneyActionRequestResponse:
+      type: object
+      properties:
+        pageref:
+          type: string
+        startedDateTime:
+          type: string
+          format: date-time
+          description: The full date and time, according to ISO-8601 (e. g. 2020-08-25T21:15:43Z)
+        time:
+          type: integer
+          minimum: 0
+          description: Request's duration in milliseconds
+        request:
+          $ref: '#/components/schemas/HarRequest'
+        response:
+          $ref: '#/components/schemas/HarResponse'
+        cache:
+          $ref: '#/components/schemas/HarCache'
+        timings:
+          $ref: '#/components/schemas/HarEntryTimings'
+        serverIPAddress:
+          type: string
+        connection:
+          type: string
+        comment:
+          type: string
+        resourceType:
+          type: string
+          description: Resource type (script, xhr, image, document, font, ping, etc.)
+        locationData:
+          $ref: '#/components/schemas/LocationData'
+        tag:
+          $ref: '#/components/schemas/TagProperties'
+        tagId:
+          type: integer
+    WebJourneyFailureTypeEnum:
+      type: string
+      description: Type of failure for a web journey run
+      enum:
+      - JOURNEY_ACTION_FAIL
+      - JOURNEY_COOKIE_COLLECTION_ERROR
+      - JOURNEY_DATA_LAYER_COLLECTION_ERROR
+      - JOURNEY_HAR_COLLECTION_ERROR
+      - JOURNEY_SCREENSHOT_COLLECTION_ERROR
+      - JOURNEY_DATA_COLLECTION_ERROR
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    WebJourneyRun_UnAuthorized:
+      description: Authentication failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+          example:
+            message: Unauthorized
+  parameters:
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

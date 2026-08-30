@@ -1,0 +1,233 @@
+openapi: 3.2.0
+info:
+  title: V3 Email Inbox Message Alerts API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: email-inbox-message-alerts
+  x-displayName: Email Inbox Message Alerts
+  description: Email inbox message alerts
+paths:
+  /v3/email-inbox-message-alerts:
+    post:
+      tags:
+      - email-inbox-message-alerts
+      operationId: getEmailInboxMessageAlerts
+      summary: Get all alerts for selected for email inbox message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailInboxMessageAlertsRequestDTO'
+      responses:
+        '200':
+          description: All alerts for selected email inbox messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailInboxMessageAlertsResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/email-inbox-message-alerts</div>
+components:
+  schemas:
+    EmailInboxMessageAlertsResponse_MessageItem:
+      type: object
+      required:
+      - messageId
+      - audits
+      properties:
+        messageId:
+          $ref: '#/components/schemas/ReceivedEmailMessageId'
+        audits:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/EmailInboxMessageAlertsResponse_AuditItem'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    EmailInboxMessageAlertsResponseDTO:
+      type: object
+      required:
+      - messages
+      properties:
+        messages:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/EmailInboxMessageAlertsResponse_MessageItem'
+    EmailInboxMessageAlertsRequestDTO:
+      type: object
+      required:
+      - emailInboxId
+      - messageIds
+      properties:
+        emailInboxId:
+          type: integer
+        messageIds:
+          type: array
+          description: Message IDs list cannot be empty
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/ReceivedEmailMessageId'
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    EmailInboxMessageAlertsResponse_AuditItem:
+      type: object
+      description: '`assignedAlertCount` is the number of alerts computed for completed run,
+
+        number of alerts assigned to audit for not completed run.
+
+        If audit is not completed then `triggeredAlertCount` property will be absent.
+
+        '
+      required:
+      - auditId
+      - auditName
+      - isCompleted
+      - runId
+      - assignedAlertCount
+      properties:
+        auditId:
+          $ref: '#/components/schemas/AuditId'
+        auditName:
+          type: string
+        isCompleted:
+          type: boolean
+        runId:
+          $ref: '#/components/schemas/RunId'
+        assignedAlertCount:
+          type: integer
+        triggeredAlertCount:
+          type: integer
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ReceivedEmailMessageId:
+      type: integer
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

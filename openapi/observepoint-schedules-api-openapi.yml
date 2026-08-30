@@ -1,0 +1,433 @@
+openapi: 3.2.0
+info:
+  title: V3 Schedules API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: schedules
+  x-displayName: Schedules
+  description: APIs for item schedules and calendars
+paths:
+  /v3/schedules/presets:
+    get:
+      tags:
+      - schedules
+      summary: Get all schedule presets
+      operationId: getSchedulePresets
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SchedulePreset'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/schedules/presets</div>
+  /v3/schedules/rule-description:
+    post:
+      tags:
+      - schedules
+      summary: Generate a description of a schedule's recurrence
+      operationId: createRecurrenceRuleDescription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleRuleDescriptionRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleRuleDescriptionResponse'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/schedules/rule-description</div>
+  /v3/schedules/calendar:
+    get:
+      parameters:
+      - $ref: '#/components/parameters/LocalStartDateTime'
+      - $ref: '#/components/parameters/LocalEndDate'
+      tags:
+      - schedules
+      summary: Calculate future occurrences based on the new schedules and the old frequencies
+      operationId: calendarGet
+      responses:
+        '200':
+          description: Get all data sources scheduled and future occurrences for provided params.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduledItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/schedules/calendar</div>
+    put:
+      tags:
+      - schedules
+      summary: Update calendar items' schedules using this endpoint.
+      operationId: calendarPut
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarUpdateRequestBody'
+      responses:
+        '204':
+          description: Success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/schedules/calendar</div>
+components:
+  schemas:
+    CalendarUpdateRequestBody:
+      description: The body for calendar item updates using the bulk PUT endpoint.
+      type: object
+      required:
+      - updateItems
+      properties:
+        updateItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarUpdateItem'
+    ScheduleWithExceptionsAndDescription:
+      required:
+      - description
+      type: object
+      description: Schedule object with exception dates for the calendar endpoint.
+      allOf:
+      - $ref: '#/components/schemas/ScheduleWithExceptions'
+      - type: object
+        properties:
+          description:
+            type: string
+            description: A description of the schedule.
+    FolderId:
+      type: integer
+      format: int32
+      description: ID of a folder
+      example: 123
+    SchedulePreset:
+      type: object
+      required:
+      - freqId
+      - friendlyName
+      - rule
+      - groupId
+      properties:
+        freqId:
+          type: string
+          description: The preset's frequency ID
+          example: 15_MIN
+        friendlyName:
+          type: string
+          description: The preset's user-friendly name
+          example: Every 15 Minutes
+        rule:
+          type: string
+          description: The preset's recurrence rule
+          example: FREQ=MINUTELY;INTERVAL=15
+        groupId:
+          type: string
+          description: The membership ID for the group
+    ISO8601LocalDateTime:
+      type: string
+      description: 'ISO-8601 Formatted date time implicitly in the user''s local timezone (ex: YYYY-MM-DDTHH:MM:SS/2020-10-30T12:00:00)'
+    DataSourceItemTypeCap:
+      description: Type of data source item.
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    SubFolderId:
+      type: integer
+      description: 'The ID of the subfolder under which the WebJourney/Audit is within.
+
+        '
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    BaseScheduleForCreation:
+      required:
+      - dtStart
+      - tzId
+      - recurrenceRule
+      - isPaused
+      properties:
+        dtStart:
+          type: string
+          description: Date of first desired start (if in range of recurrence rule).
+        tzId:
+          type: string
+          description: Timezone identifier compliant with tz database (ex. America/New_York). https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        recurrenceRule:
+          type: string
+          description: An RFC-5545 (https://www.rfc-editor.org/rfc/rfc5545#appendix-A) compliant recurrence rule string.
+        isPaused:
+          type: boolean
+          description: Whether the schedule is paused or not.
+    ScheduleWithExceptions:
+      required:
+      - dtStart
+      - tzId
+      - recurrenceRule
+      - isPaused
+      - exceptions
+      type: object
+      description: Schedule object with exception dates for the calendar endpoint.
+      allOf:
+      - $ref: '#/components/schemas/BaseScheduleForCreation'
+      - type: object
+        properties:
+          exceptions:
+            description: List of dates to skip when scheduling.
+            type: array
+            items:
+              $ref: '#/components/schemas/ISO8601LocalDateTime'
+    ScheduleRuleDescriptionResponse:
+      type: object
+      required:
+      - description
+      properties:
+        description:
+          type: string
+          description: A description of the schedule.
+    CurrentlyRunningItem:
+      type: object
+      description: Run of data source item that is in progress.
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        startedAt:
+          $ref: '#/components/schemas/StartedAt'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
+    ScheduledItem:
+      type: object
+      description: Base scheduled item which includes data source specific information.
+      properties:
+        itemName:
+          description: Name of the scheduled item.
+          type: string
+        itemId:
+          description: Item id of scheduled item.
+          type: integer
+        itemType:
+          $ref: '#/components/schemas/DataSourceItemTypeCap'
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrentlyRunningItem'
+        futureOccurrences:
+          type: array
+          items:
+            $ref: '#/components/schemas/ISO8601LocalDateTime'
+        folderId:
+          $ref: '#/components/schemas/FolderId'
+        subFolderId:
+          $ref: '#/components/schemas/SubFolderId'
+        userId:
+          $ref: '#/components/schemas/UserId'
+        labels:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/LabelId'
+        isMonitoredByScriptServices:
+          type: boolean
+          description: Whether the journey is monitored by script services.
+        schedule:
+          $ref: '#/components/schemas/ScheduleWithExceptionsAndDescription'
+    StartedAt:
+      type: string
+      format: datetime
+      description: Date/time of when an item was started
+    ScheduleRuleDescriptionRequest:
+      type: object
+      required:
+      - recurrenceRule
+      properties:
+        recurrenceRule:
+          type: string
+          description: An RFC-5545 (https://www.rfc-editor.org/rfc/rfc5545#appendix-A) compliant recurrence rule string.
+    CalendarUpdateItem:
+      description: Item in a calendar update (PUT) request.
+      type: object
+      required:
+      - itemType
+      - itemId
+      - schedule
+      properties:
+        itemType:
+          $ref: '#/components/schemas/DataSourceItemTypeCap'
+        itemId:
+          description: Item id of scheduled item.
+          type: number
+        schedule:
+          $ref: '#/components/schemas/ScheduleWithExceptions'
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    LocalEndDate:
+      in: query
+      name: localEndDateTime
+      required: false
+      schema:
+        $ref: '#/components/schemas/ISO8601LocalDateTime'
+    LocalStartDateTime:
+      in: query
+      name: localStartDateTime
+      required: false
+      schema:
+        $ref: '#/components/schemas/ISO8601LocalDateTime'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

@@ -1,0 +1,410 @@
+openapi: 3.2.0
+info:
+  title: V3 Exports API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: exports
+  x-displayName: Exports Center
+  description: Access requested exports status/information
+paths:
+  /v3/exports:
+    parameters:
+    - $ref: '#/components/parameters/pageParam'
+    - name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 20
+        minimum: 20
+        maximum: 200
+    - name: sortBy
+      in: query
+      required: false
+      description: Controls sorting
+      schema:
+        $ref: '#/components/schemas/ExportCenter_ExportsSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    - name: exportedItemType
+      in: query
+      description: aggregate filter for different export types and item types
+      required: false
+      schema:
+        $ref: '#/components/schemas/ExportCenter_ExportedItemTypeEnum'
+    - name: search
+      in: query
+      required: false
+      description: Filter by item or export name in "contains" mode
+      schema:
+        type: string
+        example: my audit
+    - name: requestedByUserId
+      in: query
+      required: false
+      description: Filter by user ID of export requestor
+      schema:
+        $ref: '#/components/schemas/UserId'
+    - name: exportIds
+      style: form
+      explode: false
+      in: query
+      required: false
+      description: Filter by a list of one or more export IDs, comma separated (example exportIds=1,2 or exportIds=1)
+      schema:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/components/schemas/ExportId'
+    get:
+      tags:
+      - exports
+      operationId: getExportCenterExports
+      summary: Get export center exports
+      responses:
+        '200':
+          description: Export Center exports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportCenter_ExportsDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/exports</div>
+  /v3/exports/{exportUuid}:
+    parameters:
+    - name: exportUuid
+      in: path
+      required: true
+      description: UUID of the export file
+      schema:
+        $ref: '#/components/schemas/ExportUuid'
+    get:
+      tags:
+      - exports
+      operationId: getExportDownload
+      summary: Download export
+      responses:
+        '302':
+          description: Redirect to presigned export link
+          headers:
+            Location:
+              schema:
+                type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/exports/<span class="op-path-parameter">{exportUuid}</span></div>
+components:
+  schemas:
+    ExportCenter_ExportStatus:
+      type: string
+      enum:
+      - queued
+      - in_progress
+      - completed
+      - failed
+      - no_data
+    ExportCenter_ExportsSortColumn:
+      type: string
+      enum:
+      - date_exported
+      - item_name
+      - run_date
+      - export_name
+      - exported_item_type
+      - requested_by
+      - status
+      - is_scheduled
+      default: date_exported
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
+    ExportCenter_ExportsItem:
+      type: object
+      description: 'Not all exports are related to a particular audit/web-journey/manual-journey item or its run, e.g. consent category configs export. Such exports do not have `itemType`, `itemId`, `itemName`, `runId`, `runDate`
+
+        '
+      required:
+      - exportId
+      - dateExported
+      - exportType
+      - specificExportType
+      - exportName
+      - requestedByUserId
+      - exportStatus
+      - exportDownloadLink
+      properties:
+        exportId:
+          $ref: '#/components/schemas/ExportId'
+        dateExported:
+          $ref: '#/components/schemas/DateAndTime'
+        exportType:
+          $ref: '#/components/schemas/ExportTypeEnum'
+        itemType:
+          $ref: '#/components/schemas/ExportCenter_ExportedItemTypeEnum'
+        itemId:
+          $ref: '#/components/schemas/ItemId'
+        itemName:
+          type: string
+          description: Name of an item this export has been executed for, see ItemType
+          example: My Audit
+        runId:
+          $ref: '#/components/schemas/RunId'
+        runDate:
+          $ref: '#/components/schemas/DateAndTime'
+        specificExportType:
+          type: string
+          description: Specific export type, for example AuditRun_ExportTypeEnum for audits
+        exportName:
+          type: string
+        requestedByUserId:
+          $ref: '#/components/schemas/UserId'
+        exportStatus:
+          $ref: '#/components/schemas/ExportCenter_ExportStatus'
+        exportDownloadLink:
+          type: string
+          description: Export file download link
+          example: https://api.observepoint.com/v3/exports/550e8400-e29b-41d4-a716-446655440000
+        scheduleId:
+          $ref: '#/components/schemas/ScheduledExportId'
+        isScheduled:
+          type: boolean
+          description: Whether the export is scheduled or not
+          default: false
+    ItemId:
+      type: integer
+      format: int64
+      description: ID of a data collector, see ItemType
+      example: 107239
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ExportCenter_ExportedItemTypeEnum:
+      type: string
+      enum:
+      - audit
+      - web_journey
+      - live_connect
+      - consent_categories
+      - alert
+      - account_usage
+      - grid_data
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    ScheduledExportId:
+      type: integer
+      format: int64
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    ExportTypeEnum:
+      type: string
+      description: Enumeration of all high-level export types
+      enum:
+      - AUDIT_RUN_EXPORT
+      - WEB_JOURNEY_RUN_EXPORT
+      - MANUAL_JOURNEY_RUN_EXPORT
+      - CONSENT_CATEGORY_EXPORT
+      - ALERT_EXPORT
+      - ACCOUNT_USAGE_EXPORT
+      - GRID_DATA_EXPORT
+    ExportUuid:
+      type: string
+      format: uuid
+      description: Unique ID of an export link
+    ExportCenter_ExportsDTO:
+      type: object
+      required:
+      - metadata
+      - exports
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        exports:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportCenter_ExportsItem'
+  parameters:
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

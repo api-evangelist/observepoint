@@ -1,0 +1,816 @@
+openapi: 3.2.0
+info:
+  title: V3 File Changes Report API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: file-changes-report
+  x-displayName: File Changes Report
+  description: File changes report endpoints
+paths:
+  /v3/web-audits/{auditId}/runs/{runId}/reports/file-changes:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - file-changes-report
+      summary: Get File Changes summary for specified audit run
+      operationId: getAuditRunFileChangesSummary
+      requestBody:
+        description: Filters applicable to File Changes report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_FileChanges_RequestDTO'
+      responses:
+        '200':
+          description: File Changes summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_FileChanges_SummaryDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/file-changes</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/file-changes/files:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_FileChangesList_PageSizeParam'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_FileChanges_FilesSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - file-changes-report
+      summary: Get File Changes files for specified audit run
+      operationId: getAuditRunFileChangesFiles
+      requestBody:
+        description: Filters applicable to File Changes report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_FileChanges_RequestDTO'
+      responses:
+        '200':
+          description: File Changes summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_FileChanges_FilesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/file-changes/files</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/file-changes/pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_FileChanges_PagesSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - file-changes-report
+      summary: Get File Changes pages for specified audit run
+      operationId: getAuditRunFileChangesPages
+      requestBody:
+        description: Filters applicable to File Changes report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_FileChanges_RequestDTO'
+      responses:
+        '200':
+          description: File Changes pages data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_FileChanges_PagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/file-changes/pages</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/file-changes/file-pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_FileChanges_PagesSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - file-changes-report
+      summary: Get File Changes pages for specific file in specified audit run
+      operationId: getAuditRunFileChangesPagesForFile
+      requestBody:
+        description: Filters applicable to File Changes report
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_FileChanges_FilePagesRequestDTO'
+      responses:
+        '200':
+          description: File Changes pages data for specific file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_FileChanges_PagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/file-changes/file-pages</div>
+components:
+  schemas:
+    AuditRun_FileChanges_PageItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    AuditRun_FileChanges_FileItemTrait:
+      type: object
+      required:
+      - filename
+      - requestDomain
+      - partyType
+      - fileChangeType
+      properties:
+        filename:
+          $ref: '#/components/schemas/RequestFilename'
+        requestDomain:
+          $ref: '#/components/schemas/RequestDomain'
+        partyType:
+          $ref: '#/components/schemas/NetworkRequestPartyType'
+        fileChangeType:
+          $ref: '#/components/schemas/AuditRun_FileChanges_FileChangeType'
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
+    AuditRunPageTrait:
+      description: Common trait for audit page with mandatory page properties
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    AuditRun_FileChanges_SizeDifferenceBounds:
+      type: object
+      description: Filters absolute difference values, e.g. when min = 200 then -300 diff passes filter. Should have `min` and/or `max` properties defined. `min` is inclusive, `max` is exclusive.
+      properties:
+        min:
+          $ref: '#/components/schemas/AuditRun_FileChanges_SizeDifferenceBoundInBytes'
+        max:
+          $ref: '#/components/schemas/AuditRun_FileChanges_SizeDifferenceBoundInBytes'
+    TagId:
+      type: integer
+      description: Tag ID
+    AuditRun_FileChanges_FileChangeType:
+      type: string
+      enum:
+      - new_file
+      - not_changed
+      - changed_file
+      - deleted_file
+      - unknown
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    AuditRun_FileChanges_FilePagesRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        required:
+        - file
+        properties:
+          pageStatusCode:
+            $ref: '#/components/schemas/StatusCodeEnum'
+          dateDifference:
+            $ref: '#/components/schemas/AuditRun_FileChanges_DateDifferenceBounds'
+          sizeDifference:
+            $ref: '#/components/schemas/AuditRun_FileChanges_SizeDifferenceBounds'
+          file:
+            $ref: '#/components/schemas/AuditRun_FileChanges_PagesRequestFile'
+          changeType:
+            $ref: '#/components/schemas/AuditRun_FileChanges_FileChangeType'
+    AuditRun_FileChanges_PagesDTO:
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_FileChanges_PageItem'
+    AuditRun_FileChanges_PagesSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_load_time
+      - page_status_code
+      - final_page_status_code
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AuditRun_FileChanges_FileItem:
+      description: If only one of them is null then this property has "unknown" change
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_FileChanges_FileItemTrait'
+      - type: object
+        required:
+        - pageCount
+        properties:
+          tag:
+            $ref: '#/components/schemas/AuditRun_FileChanges_FileItemTag'
+          largestDateDifference:
+            $ref: '#/components/schemas/AuditRun_FileChanges_DateDifferenceInMinutes'
+          largestSizeDifference:
+            $ref: '#/components/schemas/AuditRun_FileChanges_SizeDifferenceInBytes'
+          pageCount:
+            type: integer
+    AuditRun_FileChanges_SummaryDTO:
+      type: object
+      required:
+      - totalPageCount
+      - filteredPageCount
+      - totalChangedFileCount
+      - filteredChangedFileCount
+      - totalNewFileCount
+      - filteredNewFileCount
+      - totalFileDateDifferenceCount
+      - filteredFileDateDifferenceCount
+      - totalFileSizeDifferenceCount
+      - filteredFileSizeDifferenceCount
+      properties:
+        totalPageCount:
+          type: integer
+          description: Total number of pages audited
+        filteredPageCount:
+          type: integer
+          description: Number of pages passing all applied filters
+        totalChangedFileCount:
+          type: integer
+          description: Total number of changed files discovered
+        filteredChangedFileCount:
+          type: integer
+          description: Number of changed files passing all applied filters
+        totalNewFileCount:
+          type: integer
+          description: Total number of new files discovered
+        filteredNewFileCount:
+          type: integer
+          description: Number of new files discovered that pass all applied filters
+        totalFileDateDifferenceCount:
+          type: integer
+          description: Total number of files with date change discovered
+        filteredFileDateDifferenceCount:
+          type: integer
+          description: Number of files with date change passing all applied filters
+        totalFileSizeDifferenceCount:
+          type: integer
+          description: Total number of files with size change discovered
+        filteredFileSizeDifferenceCount:
+          type: integer
+          description: Number of files with size change passing all applied filters
+    PageFiltersTrait:
+      type: object
+      description: Common trait for page filters
+      properties:
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
+    NetworkRequestPartyType:
+      type: string
+      description: Indicates the level of similarity of network request URL domain and its page URL domain
+      enum:
+      - 1st_party
+      - 3rd_party
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    AuditRun_FileChanges_SizeDifferenceBoundInBytes:
+      type: integer
+      description: File size change in number of bytes
+      minimum: 1
+    StatusCodeEnum:
+      description: good - 2xx, redirects - 3xx, broken - all others
+      deprecated: true
+      type: string
+      enum:
+      - good
+      - redirects
+      - broken
+    AuditRun_FileChanges_PagesRequestFile:
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_FileChanges_FileItemTrait'
+      - type: object
+        properties:
+          tagId:
+            $ref: '#/components/schemas/TagId'
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    RequestFilename:
+      type: string
+      description: Name of the file. Identified as the last non-empty part of URL path
+      example: main.js
+    AuditRun_FileChanges_FilesSortColumn:
+      type: string
+      enum:
+      - largest_size_diff
+      - page_count
+      - tag
+      - filename
+      - change_type
+      - domain
+      - party_type
+      - largest_date_diff
+    RequestDomain:
+      type: string
+      description: Network request URL domain
+      example: example.com
+    AuditRun_FileChanges_DateDifferenceBoundInMinutes:
+      type: integer
+      description: date difference in minutes
+      minimum: 1
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRun_FileChanges_SizeDifferenceInBytes:
+      type: integer
+      description: File size change in number of bytes between 2 file versions, can be negative
+    AuditRun_FileChanges_FileItemTag:
+      allOf:
+      - $ref: '#/components/schemas/TagInfoTrait'
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    TagName:
+      type: string
+      description: Tag name
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun_FileChanges_RequestDTO:
+      description: Request body with filters for File Changes report
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        properties:
+          pageStatusCode:
+            $ref: '#/components/schemas/StatusCodeEnum'
+          primaryTagsOnly:
+            type: boolean
+            description: if true then return only pages/tags with primary tags else return all pages/tags
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagCategoryId:
+            $ref: '#/components/schemas/TagCategoryId'
+          tagVendorId:
+            $ref: '#/components/schemas/TagVendorId'
+          dateDifference:
+            $ref: '#/components/schemas/AuditRun_FileChanges_DateDifferenceBounds'
+          sizeDifference:
+            $ref: '#/components/schemas/AuditRun_FileChanges_SizeDifferenceBounds'
+          filename:
+            $ref: '#/components/schemas/RequestFilename'
+          changeType:
+            $ref: '#/components/schemas/AuditRun_FileChanges_FileChangeType'
+          anyRelatedTag:
+            type: boolean
+            description: Show all files with any related tag
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    AuditRun_FileChanges_DateDifferenceInMinutes:
+      type: integer
+      description: Number of minutes for date difference between 2 file versions, can be negative
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
+      properties:
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
+    TagCategoryName:
+      type: string
+      description: Name of a category of a tag
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    TagInfoTrait:
+      type: object
+      description: Common tag info
+      required:
+      - tagId
+      - tagName
+      - tagCategoryId
+      - tagCategoryName
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagName:
+          $ref: '#/components/schemas/TagName'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        tagCategoryName:
+          $ref: '#/components/schemas/TagCategoryName'
+    AuditRun_FileChanges_DateDifferenceBounds:
+      type: object
+      description: Filters absolute difference values, e.g. when min = 200 then -300 diff passes filter. Should have `min` and/or `max` properties defined. `min` is inclusive, `max` is exclusive.
+      properties:
+        min:
+          $ref: '#/components/schemas/AuditRun_FileChanges_DateDifferenceBoundInMinutes'
+        max:
+          $ref: '#/components/schemas/AuditRun_FileChanges_DateDifferenceBoundInMinutes'
+    AuditRun_FileChanges_FilesDTO:
+      type: object
+      required:
+      - metadata
+      - files
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_FileChanges_FileItem'
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    AuditRun_FileChangesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 200
+        default: 50
+        minimum: 50
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

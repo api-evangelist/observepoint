@@ -1,0 +1,512 @@
+openapi: 3.2.0
+info:
+  title: V3 Web Journeys Internal API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: web-journeys-internal
+  x-displayName: web-journeys-internal
+paths:
+  /v3/internal/web-journeys/{webJourneyId}/runs/{runId}/snapshots:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - web-journeys-internal
+      summary: Create snapshot of journey run actions
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/internal/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/snapshots</div>
+
+
+        Reads the journey''s current actions from the database. If any are ActionSets, it expands them
+
+        into their individual actions. If any are MaskedInput, this decrypts them.
+
+
+        **Note:** This endpoint has no authorization and is used by internal services only.
+
+        '
+      operationId: snapshotRunActionsOnly
+      responses:
+        '200':
+          description: Successful operation - returns list of engine actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EngineActionDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security: []
+  /v3/internal/web-journeys/{webJourneyId}/runs/{runId}/full-snapshots:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - web-journeys-internal
+      summary: Create full snapshot of journey run configuration
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/internal/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/full-snapshots</div>
+
+
+        Reads the journey''s complete configuration including actions, options, RFM configs, and custom headers.
+
+        This provides a complete snapshot of all settings needed to execute the journey run.
+
+
+        **Note:** This endpoint has no authorization and is used by internal services only.
+
+        '
+      operationId: fullSnapshotRun
+      parameters:
+      - in: query
+        name: runStartReason
+        description: Reason for starting the run (1=SCHEDULE, 2=RUN_NOW)
+        required: false
+        schema:
+          $ref: '#/components/schemas/WebJourneyStartReason'
+      - in: query
+        name: runRequestedBy
+        description: User ID who requested the run
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful operation - returns complete journey run configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyRunRequestDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security: []
+components:
+  schemas:
+    CustomHeaderGroupSnapshot:
+      type: object
+      description: Custom header group for runtime snapshots - matches s3-schema CustomHeaderGroup structure
+      required:
+      - groupName
+      - headers
+      - requestUrlFilters
+      properties:
+        id:
+          type: integer
+          format: int64
+        groupName:
+          type: string
+        headers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomHeader'
+        requestUrlFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestUrlFilter'
+    EngineActionDTO:
+      type: object
+      description: Engine action DTO for internal services - represents an action to be executed by the chrome-engine
+      properties:
+        elementSelectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineActionSelectorDTO'
+          description: List of element selectors for the action
+          default: []
+        filter:
+          type: string
+          description: CSS selector filter
+        input:
+          type: string
+          description: Input value for the action
+        label:
+          type: string
+          description: Label/description of the action
+        secretInput:
+          type: string
+          description: Encrypted/secret input value
+        preventNavigation:
+          type: boolean
+          description: Whether to prevent navigation after the action
+        actionType:
+          type: integer
+          description: Type of action to perform
+        sequenceId:
+          type: integer
+          description: Sequence identifier
+        snapshotId:
+          type: integer
+          description: Snapshot identifier
+        value:
+          type: integer
+          description: Value associated with the action
+        waitDuration:
+          type: integer
+          description: Wait duration in milliseconds
+        id:
+          type: integer
+          format: int64
+          description: Action identifier
+        isRequired:
+          type: boolean
+          description: Whether the action is required
+    WebJourneyRunRequestDTO:
+      type: object
+      description: Complete configuration snapshot for a web journey run
+      properties:
+        runId:
+          type: integer
+          format: int64
+          description: Run identifier
+        id:
+          type: integer
+          format: int64
+          description: Web journey identifier
+        accountId:
+          type: integer
+          format: int64
+          description: Account identifier
+        propertyId:
+          type: integer
+          format: int64
+          description: Property/domain identifier
+        userAgentId:
+          type: integer
+          description: User agent identifier
+        awsRegion:
+          type: string
+          description: AWS region for execution
+        tagMask:
+          type: string
+          description: Tag mask configuration
+        proxy:
+          type: string
+          description: Proxy server configuration
+        options:
+          $ref: '#/components/schemas/WebJourneyOptionsDTO'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineActionDTO'
+          description: List of actions to execute
+        vpnEnabled:
+          type: boolean
+          description: Whether VPN is enabled
+        gpcEnabled:
+          type: boolean
+          description: Whether Global Privacy Control is enabled
+        blockThirdPartyCookies:
+          type: boolean
+          description: Whether to block third-party cookies
+        rfmConfigs:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/RemoteFileMappingConfigDTO'
+          description: Remote file mapping configurations keyed by mapping ID
+        customHeaderGroup:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomHeaderGroupSnapshot'
+          description: Custom header groups for the journey
+        browserName:
+          type: string
+          description: Browser name used for the journey run
+        browserVersion:
+          type: string
+          description: Browser version used for the journey run
+        userAgentString:
+          type: string
+          description: Full user agent string used for the journey run
+    RemoteFileMappingConfigDTO:
+      type: object
+      description: Configuration for remote file mapping
+      properties:
+        s3File:
+          $ref: '#/components/schemas/S3FileDTO'
+        fileUrl:
+          type: string
+          description: URL of the replacement file
+        matchType:
+          type: integer
+          description: Match type (1=equals, 2=regex, etc.)
+        matchValue:
+          type: string
+          description: Value to match against
+    EngineActionSimpleSelectorDTO:
+      type: object
+      description: Simple selector using a string value (e.g., CSS selector)
+      required:
+      - jsonType
+      - strategy
+      - value
+      properties:
+        jsonType:
+          type: string
+          enum:
+          - simple
+          description: Selector type discriminator - must be 'simple'
+        strategy:
+          type: integer
+          description: Selector strategy identifier
+        value:
+          type: string
+          description: Selector value (e.g., CSS selector like '#submit-button')
+    ElementAttribute:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Attribute name
+        value:
+          type: string
+          description: Attribute value
+      required:
+      - name
+      - value
+    AttributeSelectorValue:
+      type: object
+      properties:
+        tagName:
+          type: string
+          description: HTML tag name
+        innerHTML:
+          type: string
+          description: Inner HTML content
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementAttribute'
+          description: List of element attributes
+    EngineActionSelectorDTO:
+      description: Polymorphic selector for engine actions - can be simple (string) or attribute-based
+      discriminator:
+        propertyName: jsonType
+        mapping:
+          simple: '#/components/schemas/EngineActionSimpleSelectorDTO'
+          attribute: '#/components/schemas/EngineActionAttributeSelectorDTO'
+      oneOf:
+      - $ref: '#/components/schemas/EngineActionSimpleSelectorDTO'
+      - $ref: '#/components/schemas/EngineActionAttributeSelectorDTO'
+    WebJourneyId:
+      type: integer
+      format: int64
+      example: 107239
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    S3FileDTO:
+      type: object
+      description: S3 file reference
+      properties:
+        bucket:
+          type: string
+          description: S3 bucket name
+        key:
+          type: string
+          description: S3 object key (full path)
+    CustomHeader:
+      type: object
+      required:
+      - name
+      - value
+      - type
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        type:
+          type: string
+          enum:
+          - REQUEST
+          - RESPONSE
+    EngineActionAttributeSelectorDTO:
+      type: object
+      description: Attribute-based selector using element attributes
+      required:
+      - jsonType
+      - strategy
+      - value
+      properties:
+        jsonType:
+          type: string
+          enum:
+          - attribute
+          description: Selector type discriminator - must be 'attribute'
+        strategy:
+          type: integer
+          description: Selector strategy identifier
+        value:
+          $ref: '#/components/schemas/AttributeSelectorValue'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    WebJourneyStartReason:
+      type: integer
+      description: Reason for starting the web journey run
+      enum:
+      - 1
+      - 2
+      x-enum-varnames:
+      - SCHEDULE
+      - RUN_NOW
+    RequestUrlFilter:
+      type: object
+      required:
+      - requestUrlFilter
+      - allowSubdomains
+      properties:
+        requestUrlFilter:
+          type: string
+        allowSubdomains:
+          type: boolean
+    WebJourneyOptionsDTO:
+      type: object
+      description: Browser and execution options for web journey
+      properties:
+        loadVideos:
+          type: boolean
+          description: Whether to load videos
+        browserWidth:
+          type: integer
+          description: Browser viewport width in pixels
+        browserHeight:
+          type: integer
+          description: Browser viewport height in pixels
+        dataLayer:
+          type: string
+          description: Data layer name for analytics
+  parameters:
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

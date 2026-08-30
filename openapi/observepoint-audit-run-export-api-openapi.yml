@@ -1,0 +1,297 @@
+openapi: 3.2.0
+info:
+  title: V3 Audit Run Export API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: audit-run-export
+  x-displayName: Audit Run Export
+  description: Export audit run data
+paths:
+  /v3/web-audits/{auditId}/runs/{runId}/exports/{exportType}:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - name: exportType
+      in: path
+      required: true
+      description: Controls accepted values and their bytes for page `size`, `sortBy` and request body
+      schema:
+        $ref: '#/components/schemas/AuditRun_ExportTypeEnum'
+    - $ref: '#/components/parameters/pageParam'
+    - name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        description: Same constraints applied as on regular "get items list" endpoint, depends on `exportType`
+    - name: sortBy
+      in: query
+      required: false
+      description: Controls sorting
+      schema:
+        type: string
+        description: 'Must correspond to sort column enum appropriate for given export type, see mapping in `AuditRun_ExportTypeToSortColumnMapping`
+
+          '
+    - $ref: '#/components/parameters/SortDescendingParam'
+    - $ref: '#/components/parameters/Export_AllDataParam'
+    - $ref: '#/components/parameters/Export_NoLimitParam'
+    post:
+      tags:
+      - audit-run-export
+      operationId: requestAuditRunExport
+      summary: Create export for web audit run
+      requestBody:
+        description: Filters
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Exact type depends on `exportType` param, see mapping in `AuditRun_ExportTypeToFilterMapping`
+      responses:
+        '201':
+          description: Details of created export
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResultDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/exports/<span class="op-path-parameter">{exportType}</span></div>
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    ExportResultDTO:
+      type: object
+      required:
+      - exportId
+      properties:
+        exportId:
+          $ref: '#/components/schemas/ExportId'
+    AuditRun_ExportTypeEnum:
+      type: string
+      description: All supported audit run export types
+      enum:
+      - AUDIT_SUMMARY_DETECTED_TAGS
+      - RULE_SUMMARY_PAGE_RESULTS
+      - RULE_SUMMARY_PAGE_RULE_RESULTS
+      - PAGE_SUMMARY_PAGES
+      - PAGE_SUMMARY_BROKEN_SCANNED_LINKS
+      - TAG_INVENTORY_PAGES
+      - TAG_HEALTH_PAGES
+      - TAG_DUPLICATES_AND_MULTIPLES_PAGES
+      - VARIABLE_INVENTORY_TAG_ACCOUNT_PAGES
+      - VARIABLE_INVENTORY_TAG_ACCOUNT_VARIABLE_PAGES
+      - VARIABLE_INVENTORY_TAG_ACCOUNT_VARIABLE_NOT_SET_PAGES
+      - VARIABLE_INVENTORY_TAG_ACCOUNT_VARIABLE_VALUE_PAGES
+      - COOKIE_INVENTORY_PAGES
+      - COOKIE_INVENTORY_COOKIE_PAGES
+      - COOKIE_INVENTORY_COOKIES_AGGREGATED
+      - BROWSER_LOGS_PAGES
+      - TAG_PRIVACY_COMPLIANCE
+      - TAG_PRIVACY_PAGES
+      - TAG_PRIVACY_TAG_PAGES
+      - COOKIE_PRIVACY_COMPLIANCE
+      - COOKIE_PRIVACY_PAGES
+      - COOKIE_PRIVACY_COOKIE_PAGES
+      - REQUEST_PRIVACY_COMPLIANCE
+      - REQUEST_PRIVACY_PAGES
+      - REQUEST_PRIVACY_REQUEST_PAGES
+      - FILE_CHANGES_PAGES
+      - FILE_CHANGES_FILE_PAGES
+      - TAG_METADATA
+      - TAG_INVENTORY_PAGE_TAGS
+      - COOKIE_INVENTORY_COOKIES
+      - BROWSER_LOGS_PAGE_LOGS
+      - NETWORK_REQUEST_LOG_PAGE_REQUESTS
+      - RULE_SUMMARY_RULES
+      - VARIABLE_INVENTORY_TAG_VARIABLES
+      - ALERT_SUMMARY_ALERTS
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
+  parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    Export_AllDataParam:
+      in: query
+      name: allData
+      schema:
+        type: boolean
+        default: false
+      required: false
+      description: IF `false` THEN only one results page will be exported ELSE all data will be exported
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    Export_NoLimitParam:
+      in: query
+      name: noLimit
+      schema:
+        type: boolean
+        default: false
+      required: false
+      description: IF `false` or not specified THEN export will be limited to 1,000,000 rows ELSE all data will be exported
+  responses:
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

@@ -1,0 +1,946 @@
+openapi: 3.2.0
+info:
+  title: V3 Cookie Privacy Report API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: cookie-privacy-report
+  x-displayName: Cookie Privacy report endpoints
+  description: Cookie privacy report
+paths:
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-privacy:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - cookie-privacy-report
+      summary: Get Cookie Privacy summary for specified audit run
+      operationId: getAuditRunCookiePrivacySummary
+      requestBody:
+        description: Filters applicable to Cookie Privacy report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_CookiePrivacy_RequestDTO'
+      responses:
+        '200':
+          description: Cookie Privacy summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookiePrivacy_SummaryDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-privacy</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-privacy/trends:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - cookie-privacy-report
+      summary: Get Cookie Privacy trends relative to specified audit run
+      operationId: getAuditRunCookiePrivacyTrends
+      responses:
+        '200':
+          description: Cookie Privacy trends data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookiePrivacy_TrendsDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-privacy/trends</div>
+  /v3/web-audits/{auditId}/reports/cookie-privacy/trends/{trendName}:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - name: trendName
+      in: path
+      required: true
+      description: name of requested trend
+      schema:
+        $ref: '#/components/schemas/AuditRun_CookiePrivacy_TrendsEnum'
+    - $ref: '#/components/parameters/AuditRun_Trends_DaysParam'
+    get:
+      tags:
+      - cookie-privacy-report
+      summary: Get Cookie Privacy specific trend values relative to current day
+      operationId: getAuditRunCookiePrivacyTrend
+      responses:
+        '200':
+          description: Cookie Privacy specific trend values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemRun_SpecificTrendValuesDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/reports/cookie-privacy/trends/<span class="op-path-parameter">{trendName}</span></div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-privacy/compliance:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_CookieList_PageSizeParam'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_CookiePrivacy_CookiesSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - cookie-privacy-report
+      summary: Get Cookie Privacy compliance for specified audit run
+      operationId: getAuditRunCookiePrivacyCompliance
+      requestBody:
+        description: Filters applicable to Cookie Privacy report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_CookiePrivacy_RequestDTO'
+      responses:
+        '200':
+          description: Cookie Privacy compliance data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookiePrivacy_CookiesComplianceDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-privacy/compliance</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-privacy/pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_CookiePrivacy_PagesSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - cookie-privacy-report
+      summary: Get Cookie Privacy pages data for specified audit run
+      operationId: getAuditRunCookiePrivacyPages
+      requestBody:
+        description: Filters applicable to Cookie Privacy report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_CookiePrivacy_RequestDTO'
+      responses:
+        '200':
+          description: Cookie Privacy pages data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookiePrivacy_PagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-privacy/pages</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-privacy/cookie-pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_CookiePrivacy_PagesSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - cookie-privacy-report
+      summary: Get Cookie Privacy pages data for specific cookie name+domain in specified audit run
+      operationId: getAuditRunCookiePrivacyCookiePages
+      requestBody:
+        description: Filters applicable to Cookie Privacy report
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_CookiePrivacy_CookiePagesRequestDTO'
+      responses:
+        '200':
+          description: Cookie Privacy pages data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_CookiePrivacy_PagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-privacy/cookie-pages</div>
+components:
+  schemas:
+    AuditRun_CookiePrivacy_SummaryDTO:
+      description: Cookie Privacy report summary
+      type: object
+      required:
+      - totalPageCount
+      - filteredPageCount
+      - totalUniqueCookieCount
+      - filteredUniqueCookieCount
+      - totalApprovedCookieCount
+      - filteredApprovedCookieCount
+      - totalUnapprovedCookieCount
+      - filteredUnapprovedCookieCount
+      - filteredPageWithUnapprovedCookieCount
+      - runHasNoConsentCategoriesAssigned
+      properties:
+        totalPageCount:
+          type: integer
+          description: Total number of pages audited
+        filteredPageCount:
+          type: integer
+          description: Number of pages passing all applied filters
+        totalUniqueCookieCount:
+          type: integer
+          description: Total number of unique cookies discovered. Cookie uniqueness determined by cookie name and domain
+        filteredUniqueCookieCount:
+          type: integer
+          description: Number of unique cookies passing all applied filters
+        totalApprovedCookieCount:
+          type: integer
+          description: Total number of approved cookies discovered
+        filteredApprovedCookieCount:
+          type: integer
+          description: Number of approved cookies passing all applied filters
+        totalUnapprovedCookieCount:
+          type: integer
+          description: Total number of unapproved cookies discovered
+        filteredUnapprovedCookieCount:
+          type: integer
+          description: Number of unapproved cookies passing all applied filters
+        filteredPageWithUnapprovedCookieCount:
+          type: integer
+          description: Number of pages with unapproved cookies passing all applied filters
+        runHasNoConsentCategoriesAssigned:
+          $ref: '#/components/schemas/RunHasNoConsentCategoriesAssigned'
+    AuditRun_CookiePrivacy_PagesSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_load_time
+      - page_status_code
+      - final_page_status_code
+      - cookie_count
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
+    AuditRunPageTrait:
+      description: Common trait for audit page with mandatory page properties
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    CookieDomain:
+      type: string
+      description: Cookie domain; preceding dot removed
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    CookieOriginTypeEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - PRE_AUDIT_ACTION
+      - PAGE_LOAD
+      - ON_PAGE_ACTION
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    AuditRun_CookiePrivacy_CookiePagesRequestDTO:
+      description: '`cookieName` and `cookieDomain` are deprecated'
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - $ref: '#/components/schemas/CookieFiltersTrait'
+      - type: object
+        properties:
+          cookieName:
+            deprecated: true
+            type: string
+            description: Cookie name
+          cookieDomain:
+            deprecated: true
+            type: string
+            description: Cookie domain; preceding dot removed
+          cookie:
+            type: object
+            required:
+            - name
+            - domain
+            properties:
+              name:
+                $ref: '#/components/schemas/CookieName'
+              domain:
+                $ref: '#/components/schemas/CookieDomain'
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    CookieName:
+      type: string
+      description: Cookie name
+    AuditRun_CookiePrivacy_CookieItem:
+      allOf:
+      - $ref: '#/components/schemas/AggregatedCookieTrait'
+      - type: object
+        required:
+        - cookieName
+        - cookieDomain
+        - filteredPageCount
+        properties:
+          cookieName:
+            $ref: '#/components/schemas/CookieName'
+          cookieDomain:
+            $ref: '#/components/schemas/CookieDomain'
+          consentCategoryComplianceStatus:
+            $ref: '#/components/schemas/ConsentCategoryComplianceStatus'
+          consentCategoryName:
+            $ref: '#/components/schemas/ConsentCategoryName'
+          consentCategorySnapshotId:
+            $ref: '#/components/schemas/ConsentCategorySnapshotId'
+          consentCategories:
+            type: array
+            description: List of consent categories matching this cookie
+            minItems: 0
+            items:
+              $ref: '#/components/schemas/AuditRunPrivacy_ConsentCategoryItem'
+          filteredPageCount:
+            type: integer
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    AuditRun_CookiePrivacy_TrendItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - totalUniqueCookieCount
+        - totalApprovedCookieCount
+        - totalUnapprovedCookieCount
+        properties:
+          totalUniqueCookieCount:
+            type: integer
+            description: Total number of unique cookies discovered. Cookie uniqueness determined same as in Cookie Inventory
+          totalApprovedCookieCount:
+            type: integer
+            description: Total number of approved cookies found in audit run
+          totalUnapprovedCookieCount:
+            type: integer
+            description: Total number of unapproved cookies found in audit run
+    AuditRun_CookiePrivacy_CookiesSortColumn:
+      type: string
+      enum:
+      - compliance_status
+      - page_count
+      - cookie_name
+      - cookie_domain
+      - consent_category_name
+      - consent_categories
+      - cookie_changed_during
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    ConsentCategoryComplianceStatus:
+      type: string
+      enum:
+      - approved
+      - unapproved
+    ConsentCategoryName:
+      type: string
+      description: Name of consent category item (tag, cookie, domain, geo) belongs to
+    PageFiltersTrait:
+      type: object
+      description: Common trait for page filters
+      properties:
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    CookieOriginInclusionTypeEnum:
+      type: string
+      description: '- `exclude_pre_audit_action_only_cookies` - exclude cookies which were only changed during pre-audit actions
+
+        '
+      enum:
+      - exclude_pre_audit_action_only_cookies
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    AuditRun_CookiePrivacy_TrendsEnum:
+      type: string
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      enum:
+      - unique_cookies
+      - approved_cookies
+      - unapproved_cookies
+    StringInclusionFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          minLength: 1
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
+    AuditRun_CookiePrivacy_CookiesComplianceDTO:
+      description: Cookie Compliance data
+      type: object
+      required:
+      - metadata
+      - cookies
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_CookiePrivacy_CookieItem'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    RunHasNoConsentCategoriesAssigned:
+      type: boolean
+      description: 'When TRUE, run did not have any consent categories assigned.
+
+        When NOT specified or FALSE, it had at least one.
+
+        '
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    AuditRun_CookiePrivacy_PageItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - cookieCount
+        properties:
+          cookieCount:
+            type: integer
+            description: Number of distinct cookie name+domain pairs on a page
+    AuditRun_CookiePrivacy_RequestDTO:
+      description: Request body with filters for Cookie Privacy report. `consentCategorySnapshotId` is deprecated, need to use `consentCategoryId` instead
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - $ref: '#/components/schemas/CookieFiltersTrait'
+      - type: object
+        properties:
+          cookieName:
+            $ref: '#/components/schemas/StringInclusionFilter'
+          cookieDomain:
+            $ref: '#/components/schemas/StringInclusionFilter'
+          consentCategoryId:
+            $ref: '#/components/schemas/ConsentCategoryId'
+          consentCategorySnapshotId:
+            $ref: '#/components/schemas/ConsentCategorySnapshotId'
+          consentCategoryComplianceStatus:
+            $ref: '#/components/schemas/ConsentCategoryComplianceStatus'
+    ConsentCategoryId:
+      type: integer
+      example: 3301
+      description: ID of consent category
+    AggregatedCookieTrait:
+      type: object
+      description: Common trait for cookies from Cookie Inventory Cookies and Cookie Privacy Compliance
+      properties:
+        cookieChangedDuring:
+          type: array
+          description: List of phases during which this cookie was changed, aggregated across all pages
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CookieOriginTypeEnum'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    ConsentCategorySnapshotId:
+      type: integer
+      format: int64
+      example: 33010
+      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
+      properties:
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRunPrivacy_ConsentCategoryItem:
+      type: object
+      required:
+      - consentCategoryComplianceStatus
+      - consentCategoryName
+      - consentCategorySnapshotId
+      properties:
+        consentCategoryComplianceStatus:
+          $ref: '#/components/schemas/ConsentCategoryComplianceStatus'
+        consentCategoryName:
+          $ref: '#/components/schemas/ConsentCategoryName'
+        consentCategorySnapshotId:
+          $ref: '#/components/schemas/ConsentCategorySnapshotId'
+    AuditRun_CookiePrivacy_PagesDTO:
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_CookiePrivacy_PageItem'
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    AuditRun_CookiePrivacy_TrendsDTO:
+      description: Cookie Privacy report trends
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/AuditRun_CookiePrivacy_TrendItem'
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    CookieFiltersTrait:
+      type: object
+      description: Common trait for cookie filters
+      properties:
+        cookieOriginInclusion:
+          $ref: '#/components/schemas/CookieOriginInclusionTypeEnum'
+  parameters:
+    AuditRun_Trends_DaysParam:
+      name: days
+      in: query
+      required: true
+      schema:
+        type: integer
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    AuditRun_CookieList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    AuditRun_CookiePrivacy_PagesSortParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_CookiePrivacy_PagesSortColumn'
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

@@ -1,0 +1,218 @@
+openapi: 3.2.0
+info:
+  title: V3 Web Journey Custom Headers API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: web-journey-custom-headers
+  x-displayName: Web Journey Custom Headers
+  description: APIs for managing web journey custom headers
+paths:
+  /v3/web-journeys/{webJourneyId}/custom-headers:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    get:
+      tags:
+      - web-journey-custom-headers
+      summary: Get custom headers for a web journey
+      operationId: getWebJourneyCustomHeaders
+      responses:
+        '200':
+          description: Successfully returned a list of custom headers for the web journey
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyCustomHeaderDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/custom-headers</div>
+    put:
+      tags:
+      - web-journey-custom-headers
+      summary: Update custom headers for a web journey
+      operationId: updateWebJourneyCustomHeaders
+      requestBody:
+        description: The Web Journey Custom Headers to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebJourneyCustomHeaderDTO'
+      responses:
+        '200':
+          description: Successfully updated the custom headers for the web journey
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebJourneyCustomHeaderDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/custom-headers</div>
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    WebJourneyCustomHeaderDTO:
+      type: object
+      required:
+      - assignedCustomHttpHeaders
+      properties:
+        assignedCustomHttpHeaders:
+          type: array
+          items:
+            required:
+            - groupId
+            properties:
+              groupId:
+                type: integer
+                format: int64
+              isApplyToAll:
+                type: boolean
+                description: Indicates whether custom header should be applied to all requests. For GET request, indicates that the header is not just assigned to the request but also applied to all requests. For PUT request, it specifies that the header should be updated to apply to all requests, if set to true, header will not be applied to the request.
+    WebJourneyId:
+      type: integer
+      format: int64
+      example: 107239
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

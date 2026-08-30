@@ -1,0 +1,397 @@
+openapi: 3.2.0
+info:
+  description: Endpoints for managing folders including creation, organization, access control, and folder-based resource management
+  title: V2 Folders API
+  version: null
+servers:
+- url: https://api.observepoint.com/v2
+tags:
+- description: Endpoints for managing folders including creation, organization, access control, and folder-based resource management
+  name: Folders
+paths:
+  /folders:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/folders</div>
+      operationId: getFolders
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Folder'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+      - API_Key: []
+      summary: Get list of all folders
+      tags:
+      - Folders
+    post:
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/folders</div>
+      operationId: createFolder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewFolder'
+        description: Folder create information
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+      - API_Key: []
+      summary: Create new folder
+      tags:
+      - Folders
+  /folders/{folderId}:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/folders/<span class="op-path-parameter">{folderId}</span></div>
+      operationId: findFolder
+      parameters:
+      - name: folderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+      security:
+      - API_Key: []
+      summary: Get folder by given id
+      tags:
+      - Folders
+    put:
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/folders/<span class="op-path-parameter">{folderId}</span></div>
+      operationId: updateFolder
+      parameters:
+      - name: folderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFolder'
+        description: Folder update information
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+      security:
+      - API_Key: []
+      summary: Update folder with given id
+      tags:
+      - Folders
+    delete:
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/folders/<span class="op-path-parameter">{folderId}</span></div>
+      operationId: deleteFolder
+      parameters:
+      - name: folderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+        '423':
+          description: Following items are still running. Please stop & discard their active runs first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemsAreRunningApiError'
+      security:
+      - API_Key: []
+      summary: Delete folder with given id
+      tags:
+      - Folders
+  /folders/{folderId}/users:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/folders/<span class="op-path-parameter">{folderId}</span>/users</div>
+      operationId: GetUsersWithFolderId
+      parameters:
+      - name: folderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+      security:
+      - API_Key: []
+      summary: Get users of folder with given id
+      tags:
+      - Folders
+    post:
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/folders/<span class="op-path-parameter">{folderId}</span>/users</div>
+      operationId: addUsers
+      parameters:
+      - name: folderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: int32
+                type: integer
+              type: array
+        description: List of users ids
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+        '403':
+          description: Don't have permissions to access this folder
+        '404':
+          description: Folder by given id not found
+      security:
+      - API_Key: []
+      summary: Add users to folder with given id
+      tags:
+      - Folders
+components:
+  schemas:
+    ItemWithActiveRun:
+      type: object
+      required:
+      - itemId
+      - itemName
+      - itemType
+      - runId
+      properties:
+        itemId:
+          format: int64
+          type: integer
+        itemName:
+          type: string
+        itemType:
+          type: string
+        runId:
+          format: int64
+          type: integer
+    Folder:
+      type: object
+      required:
+      - accountId
+      - appFailures
+      - appRuleFailures
+      - appsCount
+      - appsInQueue
+      - appsRunning
+      - auditsCount
+      - auditsRunning
+      - createdAt
+      - createdByUserId
+      - createdByUserName
+      - domainsCount
+      - id
+      - journeysCount
+      - name
+      - simulationErrors
+      - simulationsRunning
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        appFailures:
+          format: int32
+          type: integer
+        appRuleFailures:
+          format: int32
+          type: integer
+        appsCount:
+          format: int32
+          type: integer
+        appsInQueue:
+          format: int32
+          type: integer
+        appsRunning:
+          format: int32
+          type: integer
+        auditsCount:
+          format: int32
+          type: integer
+        auditsRunning:
+          format: int32
+          type: integer
+        createdAt:
+          format: date-time
+          type: string
+        createdByUserId:
+          format: int32
+          type: integer
+        createdByUserName:
+          type: string
+        domainsCount:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        journeysCount:
+          format: int32
+          type: integer
+        name:
+          type: string
+        simulationErrors:
+          format: int32
+          type: integer
+        simulationsRunning:
+          format: int32
+          type: integer
+      description: Folder model
+    User:
+      type: object
+      required:
+      - accountId
+      - created
+      - email
+      - firstName
+      - fullUsageDashboardAccess
+      - id
+      - lastName
+      - maxPagesPerAudit
+      - timezone
+      - updated
+      - username
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        created:
+          format: date-time
+          type: string
+        deleted:
+          description: ISO 8601 date time string with offset when user was deleted, null if not deleted
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: boolean
+        id:
+          format: int32
+          type: integer
+        lastLogin:
+          format: date-time
+          type: string
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          format: int32
+          type: integer
+        permissions:
+          enum:
+          - guest
+          - user
+          - admin
+          type: string
+        timezone:
+          type: string
+        updated:
+          format: date-time
+          type: string
+        username:
+          type: string
+      description: User model
+    NewFolder:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+      description: Folder create information
+    ItemsAreRunningApiError:
+      type: object
+      required:
+      - errorCode
+      - items
+      - message
+      properties:
+        errorCode:
+          format: int32
+          type: integer
+        items:
+          items:
+            $ref: '#/components/schemas/ItemWithActiveRun'
+          type: array
+        message:
+          type: string
+    UpdateFolder:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+      description: Folder update information
+  securitySchemes:
+    API_Key:
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`'
+      in: header
+      name: Authorization
+      type: apiKey

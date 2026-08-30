@@ -1,0 +1,843 @@
+openapi: 3.2.0
+info:
+  title: V3 Browser Logs Report API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: browser-logs-report
+  x-displayName: Browser Logs Report
+  description: Browser Logs report endpoints
+paths:
+  /v3/web-audits/{auditId}/runs/{runId}/reports/browser-logs:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - browser-logs-report
+      summary: Get Browser Logs summary for specified audit run
+      operationId: getAuditRunBrowserLogsSummary
+      requestBody:
+        description: Filters applicable to Browser Logs report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_BrowserLogs_RequestDTO'
+      responses:
+        '200':
+          description: Browser Logs summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_BrowserLogs_SummaryDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/browser-logs</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/browser-logs/trends:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - browser-logs-report
+      summary: Get Browser Logs trends relative to specified audit run
+      operationId: getAuditRunBrowserLogsTrends
+      responses:
+        '200':
+          description: Browser Logs trends data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_BrowserLogs_TrendsDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/browser-logs/trends</div>
+  /v3/web-audits/{auditId}/reports/browser-logs/trends/{trendName}:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - name: trendName
+      in: path
+      required: true
+      description: name of requested trend
+      schema:
+        $ref: '#/components/schemas/AuditRun_BrowserLogs_TrendsEnum'
+    - $ref: '#/components/parameters/AuditRun_Trends_DaysParam'
+    get:
+      tags:
+      - browser-logs-report
+      summary: Get Browser Logs specific trend values relative to current time
+      operationId: getAuditRunBrowserLogsTrend
+      responses:
+        '200':
+          description: Browser Logs specific trend values data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemRun_SpecificTrendValuesDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/reports/browser-logs/trends/<span class="op-path-parameter">{trendName}</span></div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/browser-logs/messages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_BrowserLogs_MessagesSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - browser-logs-report
+      summary: Get Browser Logs most common messages list for specified audit run
+      operationId: getAuditRunBrowserLogsMessages
+      requestBody:
+        description: Filters applicable to Browser Logs report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_BrowserLogs_RequestDTO'
+      responses:
+        '200':
+          description: Browser Logs most common messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_BrowserLogs_MessagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/browser-logs/messages</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/browser-logs/pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_BrowserLogs_PagesSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - browser-logs-report
+      summary: Get Browser Logs page list for specified audit run
+      operationId: getAuditRunBrowserLogsPages
+      requestBody:
+        description: Filters applicable to Browser Logs report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_BrowserLogs_PagesRequestDTO'
+      responses:
+        '200':
+          description: Browser Logs pages data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_BrowserLogs_PagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/browser-logs/pages</div>
+components:
+  schemas:
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    AuditRun_BrowserLogs_SummaryDTO:
+      description: Log counts are actually filtered
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_BrowserLogs_MessageCountTrait'
+      - type: object
+        required:
+        - totalPageCount
+        - filteredPageCount
+        properties:
+          totalPageCount:
+            type: integer
+            description: Total number of pages audited
+          filteredPageCount:
+            type: integer
+            description: Number of pages passing all applied filters
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
+    AuditRunPageTrait:
+      description: Common trait for audit page with mandatory page properties
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    AuditRun_BrowserLogs_TrendsItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - $ref: '#/components/schemas/AuditRun_BrowserLogs_MessageCountTrait'
+    AuditRun_BrowserLogs_MessageCountTrait:
+      type: object
+      required:
+      - errorLogCount
+      - warnLogCount
+      - infoLogCount
+      - debugLogCount
+      - otherLogCount
+      properties:
+        errorLogCount:
+          type: integer
+          description: Number of error level messages
+        warnLogCount:
+          type: integer
+          description: Number of warn level messages
+        infoLogCount:
+          type: integer
+          description: Number of info level messages
+        debugLogCount:
+          type: integer
+          description: Number of debug level messages
+        otherLogCount:
+          type: integer
+          description: Number of other level messages
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    TagId:
+      type: integer
+      description: Tag ID
+    AuditRun_BrowserLogs_PagesDTO:
+      description: Browser Logs pages list data
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_BrowserLogs_PagesItem'
+    AuditRun_BrowserLogs_TrendsDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_BrowserLogs_TrendsItem'
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    BrowserLogMessageLevelEnum:
+      type: string
+      enum:
+      - error
+      - warn
+      - info
+      - debug
+      - other
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    AuditRun_BrowserLogs_Messages_TagItem:
+      allOf:
+      - $ref: '#/components/schemas/TagInfoTrait'
+    AuditRun_BrowserLogs_PagesItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - $ref: '#/components/schemas/AuditRun_BrowserLogs_MessageCountTrait'
+    AuditRun_BrowserLogs_PagesRequestDTO:
+      description: If `message` filter is present, `messageText` filter will be ignored
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_BrowserLogs_RequestDTO'
+      - type: object
+        properties:
+          message:
+            $ref: '#/components/schemas/AuditRun_BrowserLogs_SelectedMessage'
+    AuditRun_BrowserLogs_MessagesDTO:
+      type: object
+      required:
+      - messages
+      - metadata
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        messages:
+          type: array
+          description: Browser log messages discovered during audit run.
+          items:
+            $ref: '#/components/schemas/AuditRun_BrowserLogs_MessagesItem'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AuditRun_BrowserLogs_PagesSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_load_time
+      - page_status_code
+      - final_page_status_code
+      - error_log_count
+      - warn_log_count
+      - info_log_count
+      - debug_log_count
+      - other_log_count
+    PageFiltersTrait:
+      type: object
+      description: Common trait for page filters
+      properties:
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
+    AuditRun_BrowserLogs_SelectedMessage:
+      type: object
+      required:
+      - message
+      - level
+      properties:
+        message:
+          type: string
+          minLength: 1
+        level:
+          $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
+    AuditRun_BrowserLogs_MessagesItem:
+      type: object
+      required:
+      - level
+      - message
+      - logCount
+      - pageCount
+      properties:
+        level:
+          $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
+        message:
+          type: string
+        logCount:
+          type: integer
+        pageCount:
+          type: integer
+        relatedTag:
+          $ref: '#/components/schemas/AuditRun_BrowserLogs_Messages_TagItem'
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    StatusCodeEnum:
+      description: good - 2xx, redirects - 3xx, broken - all others
+      deprecated: true
+      type: string
+      enum:
+      - good
+      - redirects
+      - broken
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    StringInclusionFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          minLength: 1
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
+    AuditRun_BrowserLogs_RequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        properties:
+          pageStatusCode:
+            $ref: '#/components/schemas/StatusCodeEnum'
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagCategoryId:
+            $ref: '#/components/schemas/TagCategoryId'
+          tagVendorId:
+            $ref: '#/components/schemas/TagVendorId'
+          level:
+            $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
+          messageText:
+            $ref: '#/components/schemas/StringInclusionFilter'
+          anyRelatedTag:
+            type: boolean
+            description: Show all messages with any related tag
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    TagName:
+      type: string
+      description: Tag name
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun_BrowserLogs_MessagesSortColumn:
+      type: string
+      enum:
+      - level
+      - message
+      - instances_count
+      - pages_count
+      - related_tag
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    AuditRun_BrowserLogs_TrendsEnum:
+      type: string
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      enum:
+      - error_logs
+      - warn_logs
+      - info_logs
+      - debug_logs
+      - other_logs
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
+      properties:
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
+    TagCategoryName:
+      type: string
+      description: Name of a category of a tag
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    TagInfoTrait:
+      type: object
+      description: Common tag info
+      required:
+      - tagId
+      - tagName
+      - tagCategoryId
+      - tagCategoryName
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagName:
+          $ref: '#/components/schemas/TagName'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        tagCategoryName:
+          $ref: '#/components/schemas/TagCategoryName'
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+  parameters:
+    AuditRun_Trends_DaysParam:
+      name: days
+      in: query
+      required: true
+      schema:
+        type: integer
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    AuditRun_BrowserLogs_PagesSortParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_BrowserLogs_PagesSortColumn'
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

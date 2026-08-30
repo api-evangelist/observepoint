@@ -1,0 +1,209 @@
+openapi: 3.2.0
+info:
+  title: V3 Web Journey Blocking Config API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: web-journey-blocking-config
+  x-displayName: Web Journey Blocking Config
+  description: APIs for managing web journey request blocking configuration
+paths:
+  /v3/web-journeys/{webJourneyId}/blocking-configuration:
+    parameters:
+    - $ref: '#/components/parameters/WebJourneyId'
+    get:
+      tags:
+      - web-journey-blocking-config
+      summary: Get blocking configuration for a web journey
+      operationId: getWebJourneyBlockingConfig
+      responses:
+        '200':
+          description: The Web Journey request blocking configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockingConfig_DTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/blocking-configuration</div>
+    put:
+      tags:
+      - web-journey-blocking-config
+      summary: Create blocking configuration for a web journey
+      operationId: createWebJourneyBlockingConfig
+      requestBody:
+        description: The Web Journey Blocking configuration to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockingConfig_DTO'
+      responses:
+        '200':
+          description: Successfully returned the created Web journey Blocking Configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockingConfig_DTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/blocking-configuration</div>
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    BlockingConfig_DTO:
+      type: object
+      description: The blocking configuration to be applied to the Audit or Journey.
+      properties:
+        tagIds:
+          description: (Optional) Present when blockingType is `tag_id`, a list of tag ids to block
+          type: array
+          items:
+            type: integer
+        tagCategoryIds:
+          description: (Optional) Present when blockingType is `tag_category`, a list of tag category ids to block
+          type: array
+          items:
+            type: integer
+    WebJourneyId:
+      type: integer
+      format: int64
+      example: 107239
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

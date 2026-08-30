@@ -1,0 +1,227 @@
+openapi: 3.2.0
+info:
+  title: V3 Alert Export API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: alert-export
+  x-displayName: Alert Export
+  description: Export alert data
+paths:
+  /v3/alerts/exports/{exportType}:
+    parameters:
+    - name: exportType
+      in: path
+      required: true
+      description: Controls accepted values
+      schema:
+        $ref: '#/components/schemas/AlertExportTypeEnum'
+    - $ref: '#/components/parameters/pageParam'
+    - name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        description: Same constraints applied as on regular "get items list" endpoint, depends on `exportType`
+        default: 50
+    - name: sortBy
+      in: query
+      required: false
+      description: Controls sorting
+      schema:
+        type: string
+        description: 'Must correspond to sort column enum appropriate for given export type, see mapping in `AlertExportTypeToSortColumnMapping`
+
+          '
+    - $ref: '#/components/parameters/SortDescendingParam'
+    - $ref: '#/components/parameters/Export_AllDataParam'
+    post:
+      tags:
+      - alert-export
+      operationId: requestAlertExport
+      summary: Create export for alert
+      requestBody:
+        description: Filters
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Exact type depends on `exportType` param, see mapping in `AlertExportTypeToFilterMapping`
+      responses:
+        '201':
+          description: Details of created export
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResultDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/alerts/exports/<span class="op-path-parameter">{exportType}</span></div>
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    ExportResultDTO:
+      type: object
+      required:
+      - exportId
+      properties:
+        exportId:
+          $ref: '#/components/schemas/ExportId'
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
+    AlertExportTypeEnum:
+      type: string
+      description: All supported alert export types
+      enum:
+      - ACCOUNT_LEVEL_TRIGGERED_ALERTS_EXPORT
+  parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    Export_AllDataParam:
+      in: query
+      name: allData
+      schema:
+        type: boolean
+        default: false
+      required: false
+      description: IF `false` THEN only one results page will be exported ELSE all data will be exported
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+  responses:
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

@@ -1,0 +1,557 @@
+openapi: 3.2.0
+info:
+  title: V3 Data Sources API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: data-sources
+  x-displayName: Data Sources
+  description: APIs for managing Data Sources
+paths:
+  /v3/data-sources:
+    get:
+      tags:
+      - data-sources
+      summary: Get all data sources in the account
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/data-sources</div>
+
+
+        this endpoint is get all the data sources in the account with their labels'
+      operationId: getDataSources
+      parameters:
+      - $ref: '#/components/parameters/PageParam'
+      - $ref: '#/components/parameters/PageSize'
+      - in: query
+        name: sortBy
+        required: false
+        schema:
+          $ref: '#/components/schemas/DataSourceSortByEnum'
+      - $ref: '#/components/parameters/SortDescendingParam'
+      - in: query
+        name: itemName
+        required: false
+        schema:
+          type: string
+        description: filter the items by a given name
+      - in: query
+        name: labelIds
+        required: false
+        schema:
+          type: array
+          items:
+            type: integer
+        description: filter the items by label ids
+      - in: query
+        name: itemType
+        required: false
+        schema:
+          $ref: '#/components/schemas/DataSourceItemType'
+        description: filter the items by a given item type
+      - in: query
+        name: withRuns
+        required: false
+        schema:
+          type: boolean
+        description: if true - response will only include data sources that have at least one run, if false - only data sources that have no runs. All data sources if not set.
+      - in: query
+        name: withLabels
+        required: false
+        schema:
+          type: boolean
+          default: true
+        description: if true - response will include labels for each data source, if false - only the data source id. All data sources if not set. Disabling labels will improve performance.
+      - in: query
+        name: withConsentCategories
+        required: false
+        schema:
+          type: boolean
+          default: true
+        description: if true - response will include consent categories. Disabling this will improve performance.
+      responses:
+        '200':
+          description: Retrieve user events in the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataSourcesResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+  /v3/data-sources/search:
+    post:
+      tags:
+      - data-sources
+      summary: Search data sources with specific item IDs
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/data-sources/search</div>
+
+
+        This endpoint retrieves all the data sources in the account with their labels.'
+      operationId: getDataSourcesWithItemIds
+      parameters:
+      - $ref: '#/components/parameters/PageParam'
+      - $ref: '#/components/parameters/PageSize'
+      - in: query
+        name: sortBy
+        required: false
+        schema:
+          $ref: '#/components/schemas/DataSourceSortByEnum'
+      - $ref: '#/components/parameters/SortDescendingParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemName:
+                  type: string
+                  description: filter the items by a given name
+                labelIds:
+                  type: array
+                  items:
+                    type: integer
+                  description: filter the items by label ids
+                itemIds:
+                  type: array
+                  items:
+                    type: integer
+                  description: filter the items by IDs (itemName & labelIds are ignored)
+                itemType:
+                  $ref: '#/components/schemas/DataSourceItemType'
+                withRuns:
+                  type: boolean
+                  description: If true - response includes only data sources with at least one run. If false - only those without runs. All if not set.
+      responses:
+        '200':
+          description: Retrieve user events in the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataSourcesResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+  /v3/data-sources/target-items/{itemType}/search:
+    post:
+      tags:
+      - data-sources
+      summary: Search for target items (audits or web journeys) for data source assignment based on searched item type (ALERT, CUSTOM_HEADER, EMAIL_INBOX, RULE)
+      operationId: searchDataSourcesTargetItems
+      parameters:
+      - name: itemType
+        in: path
+        required: true
+        description: Type of items to search for (AUDIT or WEB_JOURNEY)
+        schema:
+          $ref: '#/components/schemas/DataSourceItemTypeCap'
+      - $ref: '#/components/parameters/DataSourceTargetItemSortByParam'
+      - $ref: '#/components/parameters/SortDescendingParam'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/PageParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataSourcesTargetItemsSearchRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataSourcesTargetItemsSearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/data-sources/target-items/<span class="op-path-parameter">{itemType}</span>/search</div>
+components:
+  schemas:
+    DataSourcesTargetItem:
+      type: object
+      properties:
+        isAssigned:
+          type: boolean
+        itemType:
+          type: string
+          enum:
+          - AUDIT
+          - WEB_JOURNEY
+        itemId:
+          type: integer
+          format: int64
+        itemName:
+          type: string
+        lastRunAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last run for this item
+        itemLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssignedLabel'
+    DataSourcesTargetItemsSearchRequest:
+      type: object
+      description: Filters supported by Unified Data Sources Target Items Search.
+      properties:
+        searchItemType:
+          type: string
+          enum:
+          - ALERT
+          - CUSTOM_HEADER
+          - EMAIL_INBOX
+          - RULE
+        searchedItemId:
+          type: integer
+          format: int64
+        assignedToSearchedItem:
+          type: boolean
+        itemName:
+          type: string
+          minLength: 1
+        itemLabels:
+          type: array
+          description: non-empty array of labels present on an item, works as "item has all specified labels" filter
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        folders:
+          $ref: '#/components/schemas/FolderDomainFilter'
+    FolderId:
+      type: integer
+      format: int32
+      description: ID of a folder
+      example: 123
+    AssignedLabel:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+    DataSourcesTargetItemsSearchResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/PaginationMetadata'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataSourcesTargetItem'
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    DataSource:
+      type: object
+      required:
+      - itemType
+      - itemId
+      - labels
+      properties:
+        itemType:
+          $ref: '#/components/schemas/DataSourceItemType'
+        itemId:
+          type: integer
+        itemName:
+          type: string
+        lastCompletedRun:
+          $ref: '#/components/schemas/AuditRun'
+        consentCategoryType:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+    ConsentCategory_TypeEnum:
+      type: string
+      enum:
+      - approved
+      - unapproved
+    AuditRun:
+      type: object
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          type: string
+          format: date-time
+    DataSourceItemTypeCap:
+      description: Type of data source item.
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    FolderDomainFilter:
+      type: object
+      description: non-empty array of folders with domains (subfolders), items from which will be included in response
+      required:
+      - folders
+      properties:
+        folders:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/FolderDomainFilterItem'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    FolderDomainFilterItem:
+      type: object
+      required:
+      - folderId
+      properties:
+        folderId:
+          $ref: '#/components/schemas/FolderId'
+        domains:
+          type: array
+          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
+          items:
+            $ref: '#/components/schemas/DomainId'
+    DataSourceSortByEnum:
+      type: string
+      default: lastRun
+      enum:
+      - itemName
+      - itemType
+      - lastRun
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    DataSourceTargetItemSortByEnum:
+      type: string
+      default: ITEM_NAME
+      enum:
+      - ITEM_NAME
+      - RUN_DATE
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    DataSourceItemType:
+      description: Type of data source item.
+      type: string
+      enum:
+      - audit
+      - web-journey
+    DomainId:
+      type: integer
+      format: int32
+      description: ID of a domain
+      example: 123
+    DataSourcesResult:
+      type: object
+      required:
+      - metadata
+      - dataSources
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        dataSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataSource'
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    PageSize:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    DataSourceTargetItemSortByParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/DataSourceTargetItemSortByEnum'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

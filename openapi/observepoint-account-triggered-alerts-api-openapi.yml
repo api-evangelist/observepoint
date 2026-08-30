@@ -1,0 +1,779 @@
+openapi: 3.2.0
+info:
+  title: V3 Account Triggered Alerts API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: account-triggered-alerts
+  x-displayName: Account's Triggered Alerts
+  description: Account-level triggered alerts
+paths:
+  /v3/account-triggered-alerts/summary:
+    post:
+      operationId: getAccountTriggeredAlertsSummary
+      tags:
+      - account-triggered-alerts
+      summary: Get summary for all triggered alerts for the account
+      requestBody:
+        description: Filters
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountTriggeredAlertsRequestDTO'
+      responses:
+        '200':
+          description: Returns account triggered alerts summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountTriggeredAlerts_SummaryDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/account-triggered-alerts/summary</div>
+  /v3/account-triggered-alerts/alerts:
+    parameters:
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/QueryParamAlertsSearchPageSize'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/GetAccountTriggeredAlertsSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      operationId: getAccountTriggeredAlerts
+      tags:
+      - account-triggered-alerts
+      summary: Get all triggered alerts for the account
+      requestBody:
+        description: Filters
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountTriggeredAlertsRequestDTO'
+      responses:
+        '200':
+          description: Returns account triggered alerts list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountTriggeredAlerts_AlertsDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/account-triggered-alerts/alerts</div>
+  /v3/account-triggered-alerts/alerts/{alertId}:
+    parameters:
+    - $ref: '#/components/parameters/PathParamAlertId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/QueryParamAlertsSearchPageSize'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/GetAccountTriggeredAlertSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      operationId: getAccountTriggeredSpecificAlert
+      tags:
+      - account-triggered-alerts
+      summary: Get information about specific alert from all triggered alerts for the account
+      requestBody:
+        description: Filters
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountTriggeredAlertsSpecificAlertRequestDTO'
+      responses:
+        '200':
+          description: Returns account triggered alerts specific alert details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountTriggeredAlerts_DataSourcesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/account-triggered-alerts/alerts/<span class="op-path-parameter">{alertId}</span></div>
+components:
+  schemas:
+    AccountTriggeredAlerts_AlertsDTO:
+      type: object
+      required:
+      - metadata
+      - alerts
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        alerts:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/AccountTriggeredAlerts_Alert'
+    AlertMetricValueComparator:
+      type: object
+      description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
+
+        '
+      required:
+      - operator
+      properties:
+        operator:
+          $ref: '#/components/schemas/AlertMetricValueComparisonOperatorEnum'
+      discriminator:
+        propertyName: operator
+        mapping:
+          GREATER: '#/components/schemas/AlertMetricSpecificValueComparator'
+          GREATER_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          NOT_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
+          BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
+          NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
+    FoldersFilter:
+      type: array
+      description: non-empty array of folders with domains (subfolders), items from which will be included in response
+      minItems: 1
+      items:
+        $ref: '#/components/schemas/FoldersFilterItem'
+    AlertMetricValueComparisonOperatorEnum:
+      type: string
+      enum:
+      - GREATER
+      - GREATER_OR_EQUAL
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_OR_EQUAL
+      - LESS
+      - BETWEEN
+      - NOT_BETWEEN
+    FolderId:
+      type: integer
+      format: int32
+      description: ID of a folder
+      example: 123
+    AlertRunDateRange:
+      type: object
+      description: Should have `from` and/or `to` dates defined. `from` is inclusive and `to` is exclusive. `to` date should be after `from` date.
+      properties:
+        from:
+          $ref: '#/components/schemas/DateAndTime'
+        to:
+          $ref: '#/components/schemas/DateAndTime'
+    AccountTriggeredAlertsSpecificAlertRequestDTO:
+      type: object
+      properties:
+        runDateRange:
+          $ref: '#/components/schemas/AlertRunDateRange'
+        itemName:
+          type: string
+          minLength: 1
+          description: optional "item name contains substring" filter
+        itemLabels:
+          type: array
+          description: non-empty array of labels present on an item, works as "item has all specified labels" filter
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        itemType:
+          $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+        folders:
+          $ref: '#/components/schemas/FoldersFilter'
+    GetAccountTriggeredAlertsSortColumn:
+      type: string
+      enum:
+      - RECENTLY_TRIGGERED_DATE
+      - ALERT_NAME
+      - REPORT_METRIC
+      - PAGES_WITH_TRIGGERED_ALERTS
+      - SUBSCRIBERS
+      - DATA_SOURCES
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    AlertId:
+      type: integer
+      format: int64
+    AccountTriggeredAlerts_Alert:
+      allOf:
+      - $ref: '#/components/schemas/AlertConfigTrait'
+      - $ref: '#/components/schemas/PagesWithTriggeredAlerts'
+      - type: object
+        required:
+        - id
+        - subscriberCount
+        - isUserSubscribed
+        - recentTriggeredDate
+        - dataSourceCount
+        - alertConfigExists
+        properties:
+          id:
+            $ref: '#/components/schemas/AlertId'
+          subscriberCount:
+            type: integer
+          isUserSubscribed:
+            type: boolean
+          recentTriggeredDate:
+            $ref: '#/components/schemas/DateAndTime'
+          dataSourceCount:
+            type: integer
+          alertConfigExists:
+            $ref: '#/components/schemas/AlertConfigExistsFlag'
+    FoldersFilterItem:
+      type: object
+      required:
+      - folderId
+      properties:
+        folderId:
+          $ref: '#/components/schemas/FolderId'
+        domains:
+          type: array
+          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
+          items:
+            $ref: '#/components/schemas/DomainId'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AlertResultDetails:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          $ref: '#/components/schemas/AlertResultStatusEnum'
+        actualValue:
+          description: Value of the computed metric or its change.
+          type: number
+          format: double
+        currentRunValue:
+          description: Value of computed metric for current run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+        previousRunValue:
+          description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+    GetAccountTriggeredAlertSortColumn:
+      type: string
+      enum:
+      - RUN_DATE
+      - DATA_SOURCE_NAME
+      - PAGES_WITH_TRIGGERED_ALERTS
+    PagesWithTriggeredAlerts:
+      type: object
+      required:
+      - appliedAlertPageCount
+      - triggeredAlertAffectedPageCount
+      properties:
+        appliedAlertPageCount:
+          type: integer
+        triggeredAlertAffectedPageCount:
+          type: integer
+    AlertAssignmentItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    AlertName:
+      type: string
+      minLength: 1
+      description: User-defined name of the alert
+    AccountTriggeredAlertsRequestDTO:
+      description: Request body with filters for Account Triggered Alerts
+      type: object
+      properties:
+        runDateRange:
+          $ref: '#/components/schemas/AlertRunDateRange'
+        metricTypes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AlertMetricTypeEnum'
+        alertName:
+          type: string
+          description: when populated works as "alert `name` contains given substring" filter
+        alertLabels:
+          type: array
+          description: non-empty array of labels present on an alert
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        itemName:
+          type: string
+          minLength: 1
+          description: optional "item name contains substring" filter
+        itemLabels:
+          type: array
+          description: non-empty array of labels present on an item, works as "item has all specified labels" filter
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        itemType:
+          $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+        folders:
+          $ref: '#/components/schemas/FoldersFilter'
+        subscribedOnly:
+          type: boolean
+          description: when `false` or `null` then all alerts are returned, otherwise only alerts user is subscribed to are returned
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AlertConfigExistsFlag:
+      type: boolean
+      description: when `true` then alert config exists and can be edited, otherwise it is deleted
+    AccountTriggeredAlerts_DataSourcesDTO:
+      type: object
+      required:
+      - metadata
+      - dataSources
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        dataSources:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/AccountTriggeredAlerts_DataSource'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AlertMetricTypeEnum:
+      type: string
+      description: "Deprecated metric types:\n  - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT\n  - PAGE_SUMMARY_FAILED_RULE_COUNT\n"
+      enum:
+      - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT
+      - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT
+      - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT
+      - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT
+      - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT
+      - ACCOUNT_USAGE_V2_THIS_MONTH_AUDIT_PAGE_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_CURRENT_TERM_PAGE_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_CURRENT_TERM_WJ_RUN_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_THIS_MONTH_WJ_RUN_USAGE_PERCENTAGE
+      - ACCOUNT_USAGE_V2_LAST_30_DAYS_LOGIN_USER_COUNT
+      - SCORE_TOTAL
+      - SCORE_TAG_PRESENCE
+      - SCORE_TAG_PERFORMANCE
+      - SCORE_RULES
+      - SCORE_PAGE_PERFORMANCE
+      - SCORE_COOKIE
+      - PAGE_SUMMARY_PAGE_COUNT
+      - PAGE_SUMMARY_AVG_PAGE_LOAD_TIME
+      - PAGE_SUMMARY_BROKEN_INITIAL_PAGE_COUNT
+      - PAGE_SUMMARY_BROKEN_FINAL_PAGE_COUNT
+      - PAGE_SUMMARY_PAGE_WITH_BROKEN_LINKS_COUNT
+      - PAGE_SUMMARY_FAILED_RULE_COUNT
+      - PAGE_SUMMARY_WEB_VITALS_P75_LARGEST_CONTENTFUL_PAINT
+      - PAGE_SUMMARY_WEB_VITALS_P75_FIRST_CONTENTFUL_PAINT
+      - PAGE_SUMMARY_WEB_VITALS_P75_TIME_TO_FIRST_BYTE
+      - PAGE_SUMMARY_WEB_VITALS_P75_CUMULATIVE_LAYOUT_SHIFT
+      - TAG_INVENTORY_PAGE_COUNT
+      - TAG_INVENTORY_UNIQUE_TAG_COUNT
+      - TAG_INVENTORY_BROKEN_TAG_COUNT
+      - TAG_INVENTORY_BROKEN_PAGE_COUNT
+      - TAG_HEALTH_PAGE_COUNT
+      - TAG_HEALTH_AVG_TAG_LOAD_TIME
+      - TAG_HEALTH_AVG_TAG_REQUEST_SIZE
+      - TAG_HEALTH_SLOW_TAG_PERCENTAGE
+      - TAG_HEALTH_BROKEN_TAG_PERCENTAGE
+      - TAG_HEALTH_TAG_REQUEST_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_PAGE_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_UNIQUE_TAG_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_TAG_REQUEST_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_TAG_DUPLICATE_COUNT
+      - TAG_DUPLICATES_AND_MULTIPLES_TAG_MULTIPLE_COUNT
+      - VARIABLE_INVENTORY_PAGE_COUNT
+      - VARIABLE_INVENTORY_UNIQUE_TAG_COUNT
+      - VARIABLE_INVENTORY_TAG_REQUEST_COUNT
+      - VARIABLE_INVENTORY_UNIQUE_VARIABLE_COUNT
+      - VARIABLE_INVENTORY_UNIQUE_VARIABLE_VALUE_COUNT
+      - BROWSER_LOGS_PAGE_COUNT
+      - BROWSER_LOGS_ERROR_LOG_COUNT
+      - BROWSER_LOGS_WARN_LOG_COUNT
+      - BROWSER_LOGS_INFO_LOG_COUNT
+      - BROWSER_LOGS_DEBUG_LOG_COUNT
+      - BROWSER_LOGS_OTHER_LOG_COUNT
+      - COOKIE_INVENTORY_PAGE_COUNT
+      - COOKIE_INVENTORY_UNIQUE_COOKIE_COUNT
+      - COOKIE_INVENTORY_FIRST_PARTY_COOKIE_COUNT
+      - COOKIE_INVENTORY_THIRD_PARTY_COOKIE_COUNT
+      - COOKIE_INVENTORY_NON_SECURE_COOKIE_COUNT
+      - COOKIE_INVENTORY_SAME_SITE_EMPTY_COOKIE_COUNT
+      - PRIVACY_COOKIES_PAGE_COUNT
+      - PRIVACY_COOKIES_PAGE_WITH_UNAPPROVED_COOKIES_COUNT
+      - PRIVACY_COOKIES_UNIQUE_COOKIE_COUNT
+      - PRIVACY_COOKIES_APPROVED_COOKIE_COUNT
+      - PRIVACY_COOKIES_UNAPPROVED_COOKIE_COUNT
+      - PRIVACY_TAGS_PAGE_COUNT
+      - PRIVACY_TAGS_PAGE_WITH_UNAPPROVED_TAGS_COUNT
+      - PRIVACY_TAGS_UNIQUE_TAG_COUNT
+      - PRIVACY_TAGS_APPROVED_TAG_COUNT
+      - PRIVACY_TAGS_UNAPPROVED_TAG_COUNT
+      - PRIVACY_REQUESTS_PAGE_COUNT
+      - PRIVACY_REQUESTS_PAGE_WITH_UNAPPROVED_REQUESTS_COUNT
+      - PRIVACY_REQUESTS_REQUEST_COUNT
+      - PRIVACY_REQUESTS_UNIQUE_DOMAIN_COUNT
+      - PRIVACY_REQUESTS_UNIQUE_LOCATION_COUNT
+      - PRIVACY_REQUESTS_APPROVED_REQUEST_COUNT
+      - PRIVACY_REQUESTS_UNAPPROVED_REQUEST_COUNT
+      - FILE_CHANGES_PAGE_COUNT
+      - FILE_CHANGES_CHANGED_FILE_COUNT
+      - FILE_CHANGES_NEW_FILE_COUNT
+      - FILE_CHANGES_FILE_DATE_CHANGE_COUNT
+      - FILE_CHANGES_FILE_SIZE_CHANGE_COUNT
+      - RULE_RESULTS_PAGE_COUNT
+      - RULE_RESULTS_RULE_COUNT
+      - RULE_RESULTS_RULE_FAILURE_COUNT
+      - RULE_RESULTS_FAILED_RULE_COUNT
+      - RULE_RESULTS_PASSED_RULE_COUNT
+      - RULE_RESULTS_NOT_APPLIED_RULE_COUNT
+      - RULE_RESULTS_FAILED_RULE_PAGE_COUNT
+      - RULE_RESULTS_PASSED_RULE_PAGE_COUNT
+      - RULE_RESULTS_NOT_APPLIED_RULE_PAGE_COUNT
+    AlertMetricChangeTypeEnum:
+      type: string
+      description: 'Behaviour per type:
+
+        - VALUE_CHANGE: current - previous
+
+        - VALUE_CHANGE_ABS: ABS(current - previous)
+
+        - RELATIVE_VALUE_CHANGE: 100% * (current - previous) / previous
+
+        - RELATIVE_VALUE_CHANGE: ABS(100% * (current - previous) / previous)
+
+
+        Composite metric change operators shown on ObservePoint UI should be defined as described below:
+
+        - `Changes by (∆)` = VALUE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+)` = VALUE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-)` = VALUE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        - `Any change` = VALUE_CHANGE_ABS (or VALUE_CHANGE) + NOT_EQUAL(0)
+
+        - `Changes by (∆ %)` = RELATIVE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+%)` = RELATIVE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-%)` = RELATIVE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        '
+      enum:
+      - VALUE_CHANGE
+      - VALUE_CHANGE_ABS
+      - RELATIVE_VALUE_CHANGE
+      - RELATIVE_VALUE_CHANGE_ABS
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    AlertResultStatusEnum:
+      type: string
+      description: 'All statuses except `TRIGGERED` and `NOT_TRIGGERED` mean that alert/metric could not be computed. Statuses:
+
+        - UNKNOWN_ERROR: data retrieval or alert computation failed
+
+        - RUN_NOT_FOUND: requested run not found
+
+        - NO_VALUE: no data found for requested run (e.g. rules or consent categories were not applied)
+
+        - PREVIOUS_RUN_NOT_FOUND: previous run not found for run-over-run metric change alert
+
+        - PREVIOUS_RUN_NO_VALUE: no data found for previous run for run-over-run metric change alert
+
+        '
+      enum:
+      - TRIGGERED
+      - NOT_TRIGGERED
+      - UNKNOWN_ERROR
+      - RUN_NOT_FOUND
+      - NO_VALUE
+      - PREVIOUS_RUN_NOT_FOUND
+      - PREVIOUS_RUN_NO_VALUE
+    AlertConfigTrait:
+      description: Core parts of alert definition
+      type: object
+      required:
+      - name
+      - metricType
+      - targetValueComparator
+      - filtersV0
+      properties:
+        name:
+          $ref: '#/components/schemas/AlertName'
+        metricType:
+          $ref: '#/components/schemas/AlertMetricTypeEnum'
+        metricChangeType:
+          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
+        targetValueComparator:
+          $ref: '#/components/schemas/AlertMetricValueComparator'
+        filtersV0:
+          type: object
+          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
+
+            '
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    AccountTriggeredAlerts_DataSource:
+      allOf:
+      - $ref: '#/components/schemas/AlertResultDetails'
+      - $ref: '#/components/schemas/PagesWithTriggeredAlerts'
+      - type: object
+        required:
+        - runDate
+        - itemName
+        - itemType
+        - runId
+        - itemId
+        properties:
+          runDate:
+            $ref: '#/components/schemas/DateAndTime'
+          itemName:
+            type: string
+          itemType:
+            $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+          runId:
+            $ref: '#/components/schemas/RunId'
+          itemId:
+            $ref: '#/components/schemas/AlertAssignmentItemId'
+    DomainId:
+      type: integer
+      format: int32
+      description: ID of a domain
+      example: 123
+    AlertAssignmentItemId:
+      type: integer
+      format: int64
+      description: ID of the item that can have assigned Alert(s) onto it. See also `AlertAssignmentTypeEnum`
+    AccountTriggeredAlerts_SummaryDTO:
+      type: object
+      required:
+      - triggeredAlertAffectedPageCount
+      - triggeredAlertsInMostRecentRunCount
+      - auditsWithTriggeredAlertCount
+      - triggeredUsageAlertCount
+      properties:
+        triggeredAlertAffectedPageCount:
+          type: integer
+        triggeredAlertsInMostRecentRunCount:
+          type: integer
+        auditsWithTriggeredAlertCount:
+          type: integer
+        triggeredUsageAlertCount:
+          type: integer
+  parameters:
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    PathParamAlertId:
+      name: alertId
+      in: path
+      required: true
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AlertId'
+    QueryParamAlertsSearchPageSize:
+      in: query
+      name: size
+      required: false
+      allowEmptyValue: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

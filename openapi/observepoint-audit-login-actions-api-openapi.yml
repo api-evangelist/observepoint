@@ -1,0 +1,307 @@
+openapi: 3.2.0
+info:
+  title: V3 Audit Login Actions API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: audit-login-actions
+  x-displayName: Audit Login Actions
+  description: APIs for managing audit login actions
+paths:
+  /v3/web-audits/{auditId}/login-actions:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    get:
+      tags:
+      - audit-login-actions
+      summary: Get login actions for an audit
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/login-actions</div>
+
+
+        Retrieve all login actions configured for the specified audit'
+      operationId: getAuditLoginActions
+      responses:
+        '200':
+          description: List of audit login actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLoginSequencedAction'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - audit-login-actions
+      summary: Update login actions for an audit
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/login-actions</div>
+
+
+        Update the login actions configured for the specified audit'
+      operationId: updateAuditLoginActions
+      requestBody:
+        description: List of audit login actions to update
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AuditLoginSequencedAction'
+      responses:
+        '200':
+          description: Successfully updated audit login actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLoginSequencedAction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    WebActionSelector:
+      type: object
+      properties:
+        selectorType:
+          $ref: '#/components/schemas/WebActionSelectorType'
+        value:
+          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
+      required:
+      - selectorType
+      - value
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    SequencedAction:
+      type: object
+      properties:
+        sequence:
+          type: integer
+          description: Sequence number of the action
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+          description: ID of the action
+        description:
+          type: string
+          description: 'Description of the action. Present for all actionTypes except: actionSet'
+        actionType:
+          type: string
+          enum:
+          - click
+          - input
+          - maskedinput
+          - select
+          - check
+          - uncheck
+          - enteriframe
+          - navto
+          - watch
+          - clearcookies
+          - execute
+          - exitiframe
+          - privacyoptin
+          - privacyoptout
+          - actionset
+          description: Type of the user action
+        waitDuration:
+          type: integer
+          description: 'Duration to wait in milliseconds. Present for actionTypes: navTo, click, input, select, check, uncheck, execute, watch, maskedInput, enterIFrame, exitIFrame, clearCookies, privacyOptIn, privacyOptOut'
+        selectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebActionSelector'
+          description: 'List of selectors for element-based actions. Present for actionTypes: click, input, select, check, uncheck, maskedInput, enterIFrame'
+        preventNavigation:
+          type: boolean
+          description: 'Whether to prevent navigation after action execution. Present for actionTypes: click, input, select, check, uncheck, execute, watch, maskedInput'
+        value:
+          type: string
+          description: 'Value field with different meanings per actionType. For input/select: input value. For navTo: URL. For privacyOptIn/privacyOptOut: URL. For execute: JavaScript code. Present for actionTypes: input, select, navTo, privacyOptIn, privacyOptOut, execute'
+        maskedValue:
+          type: string
+          description: 'Masked value for secure input actions. Present for actionType: maskedInput'
+        js:
+          type: string
+          description: 'JavaScript code to execute. Present for actionType: execute'
+        url:
+          type: string
+          description: 'URL for navigation and privacy actions. Present for actionTypes: navTo, privacyOptIn, privacyOptOut'
+        seconds:
+          type: integer
+          description: 'Number of seconds to watch/wait. Present for actionType: watch'
+        isRequired:
+          type: boolean
+          description: 'Whether privacy action is required. Present for actionTypes: privacyOptIn, privacyOptOut'
+      required:
+      - sequence
+      - actionType
+    AuditLoginSequencedAction:
+      allOf:
+      - $ref: '#/components/schemas/SequencedAction'
+      - type: object
+        properties:
+          actionSetId:
+            type: integer
+            format: int64
+            description: 'ID of the action set to reference. Present for actionType: actionset'
+    WebActionSelectorType:
+      type: string
+      enum:
+      - id
+      - name
+      - css
+      - xpath
+      - htmlattributes
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

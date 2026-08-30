@@ -1,0 +1,518 @@
+openapi: 3.2.0
+info:
+  title: V3 Email Inbox Configuration API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: email-inbox-configuration
+  x-displayName: Email Inbox Configuration
+  description: APIs for managing email inbox configurations and setting
+paths:
+  /v3/email-inboxes:
+    post:
+      tags:
+      - email-inbox-configuration
+      summary: Add a new Email Inbox
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/email-inboxes</div>
+
+
+        Add a new Email Inbox'
+      operationId: addEmailInbox
+      requestBody:
+        description: Create a new Email Inbox
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailInboxRequestDTO'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailInboxResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+  /v3/email-inboxes/{emailInboxId}:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    put:
+      tags:
+      - email-inbox-configuration
+      summary: Update an existing Email Inbox
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span></div>
+
+
+        Update an existing Email Inbox by Id'
+      operationId: updateEmailInbox
+      requestBody:
+        description: Update an existent Email Inbox
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailInboxRequestDTO'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailInboxResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    delete:
+      tags:
+      - email-inbox-configuration
+      summary: Delete an Email Inbox
+      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span></div>
+
+
+        Delete an Email Inbox by Id'
+      operationId: deleteEmailInbox
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/email-inboxes/{emailInboxId}/audit-configurations:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    put:
+      tags:
+      - email-inbox-configuration
+      summary: Associate audit configurations with an existing Email Inbox
+      operationId: addEmailInboxConfigurations
+      requestBody:
+        description: Update configurations of an existent Email Inbox
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              uniqueItems: true
+              items:
+                $ref: '#/components/schemas/AuditId'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/audit-configurations</div>
+  /v3/email-inboxes/{emailInboxId}/audit-configurations/{auditId}:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    - $ref: '#/components/parameters/AuditId'
+    put:
+      tags:
+      - email-inbox-configuration
+      summary: Associate an audit configuration with an existing Email Inbox
+      operationId: addEmailInboxConfiguration
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/audit-configurations/<span class="op-path-parameter">{auditId}</span></div>
+    delete:
+      tags:
+      - email-inbox-configuration
+      summary: Delete an audit configuration from an Email Inbox
+      operationId: deleteEmailInboxConfiguration
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/audit-configurations/<span class="op-path-parameter">{auditId}</span></div>
+  /v3/email-inboxes/{emailInboxId}/labels:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    put:
+      tags:
+      - email-inbox-configuration
+      summary: Upsert labels for an existing Email Inbox
+      operationId: upsertInboxLabels
+      requestBody:
+        description: Update an existent Email Inbox labels
+        content:
+          application/json:
+            schema:
+              type: array
+              uniqueItems: true
+              items:
+                $ref: '#/components/schemas/LabelId'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Label'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/labels</div>
+  /v3/email-inboxes/{emailInboxId}/notes:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    put:
+      tags:
+      - email-inbox-configuration
+      summary: Upsert notes for the given Email Inbox
+      operationId: updateEmailInboxNotes
+      requestBody:
+        description: Update notes for a given Email Inbox
+        content:
+          text/plain:
+            schema:
+              type: string
+        required: false
+      responses:
+        '204':
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: My notes for this inbox. This inbox will audit marketing emails.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/notes</div>
+  /v3/email-inboxes/{emailInboxId}/messages/{receivedEmailMessageId}/runs:
+    parameters:
+    - $ref: '#/components/parameters/EmailInboxId'
+    - $ref: '#/components/parameters/ReceivedEmailMessageId'
+    delete:
+      tags:
+      - email-inbox-configuration
+      summary: Cancel all audit runs associated with a given Email Message
+      operationId: cancelEmailInboxMessageRuns
+      responses:
+        '202':
+          description: Successful operation
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/messages/<span class="op-path-parameter">{receivedEmailMessageId}</span>/runs</div>
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    EmailInboxSubscribersDTO:
+      type: object
+      properties:
+        onReceived:
+          type: array
+          items:
+            type: string
+            description: Email address subscribers to be alerted on email message received.
+        onProcessed:
+          type: array
+          items:
+            type: string
+            description: Email address subscribers to be alerted on email message processed.
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    EmailInboxId:
+      type: integer
+    EmailInboxLinkExclusionFilters:
+      description: A regex to be used to exclude links in email scans.
+      type: string
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    EmailInboxRequestDTO:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          example: Adove Campaign Holidays, Marketing Department
+        notes:
+          type: string
+        labelIds:
+          description: The ids of the labels to be associated to the Email Inbox
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/LabelId'
+        subscribers:
+          $ref: '#/components/schemas/EmailInboxSubscribersDTO'
+        linkExclusionFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
+        omitSocialLinks:
+          type: boolean
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    EmailInboxResponseDTO:
+      type: object
+      required:
+      - id
+      - emailAddress
+      - labelIds
+      - name
+      - linkExclusionFilters
+      - omitSocialLinks
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        labelIds:
+          description: The ids of the labels associated to the Email Inbox
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+          example: Christmas Marketing Campaign
+        emailAddress:
+          description: The email address that has been assigned to the inbox
+          type: string
+          example: scanTest+<8^[a-z0-9]>@email.observepoint.com
+        notes:
+          type: string
+        subscribers:
+          $ref: '#/components/schemas/EmailInboxSubscribersDTO'
+        linkExclusionFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
+        omitSocialLinks:
+          type: boolean
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    ReceivedEmailMessageId:
+      name: receivedEmailMessageId
+      in: path
+      required: true
+      description: Unique identification number for received email message record
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        type: integer
+    EmailInboxId:
+      name: emailInboxId
+      in: path
+      required: true
+      description: Unique identification number for email inbox
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/EmailInboxId'
+  responses:
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

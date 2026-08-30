@@ -1,0 +1,719 @@
+openapi: 3.2.0
+info:
+  title: V3 Audit Summary Report API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: audit-summary-report
+  x-displayName: Audit Summary Report
+  description: Audit Summary report endpoints
+paths:
+  /v3/web-audits/{auditId}/runs/{runId}/reports/audit-summary:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - audit-summary-report
+      summary: Get Audit Summary data for specified audit run
+      operationId: getAuditRunAuditSummary
+      requestBody:
+        description: Filters applicable to Audit Summary report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_AuditSummary_RequestDTO'
+      responses:
+        '200':
+          description: Audit Summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_SummaryDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/audit-summary</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/audit-summary/trends:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - audit-summary-report
+      summary: Get Audit Summary trends relative to specified audit run
+      operationId: getAuditRunAuditSummaryTrends
+      responses:
+        '200':
+          description: Audit Summary trends data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_TrendsDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/audit-summary/trends</div>
+  /v3/web-audits/{auditId}/reports/audit-summary/trends/{trendName}:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - name: trendName
+      in: path
+      required: true
+      description: name of requested trend
+      schema:
+        $ref: '#/components/schemas/AuditRun_AuditSummary_TrendsEnum'
+    - $ref: '#/components/parameters/AuditRun_Trends_DaysParam'
+    get:
+      tags:
+      - audit-summary-report
+      summary: Get Audit Summary specific trend values relative to current day
+      operationId: getAuditSummaryTrend
+      responses:
+        '200':
+          description: Audit Summary specific trend values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemRun_SpecificTrendValuesDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/reports/audit-summary/trends/<span class="op-path-parameter">{trendName}</span></div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/audit-summary/primary-tags:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - audit-summary-report
+      summary: Get Audit Summary all primary tags data for specified audit run
+      operationId: getAuditRunAuditSummaryPrimaryTags
+      requestBody:
+        description: Filters applicable to Audit Summary report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_AuditSummary_RequestDTO'
+      responses:
+        '200':
+          description: Audit Summary all primary tags data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_PrimaryTagsDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/audit-summary/primary-tags</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/audit-summary/tags:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - audit-summary-report
+      summary: Get Audit Summary all detected tags data for specified audit run
+      operationId: getAuditRunAuditSummaryDetectedTags
+      requestBody:
+        description: Filters applicable to Audit Summary report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_AuditSummary_RequestDTO'
+      responses:
+        '200':
+          description: Audit Summary all detected tags data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_DetectedTagsDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/audit-summary/tags</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/audit-summary/scores:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - audit-summary-report
+      summary: Get Audit Summary scores for specified audit run
+      operationId: getAuditRunAuditSummaryScores
+      responses:
+        '200':
+          description: Audit Summary scores data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_ScoresDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/audit-summary/scores</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/audit-summary/scores/trends:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - audit-summary-report
+      summary: Get Audit Summary scores trends relative to specified audit run
+      operationId: getAuditRunAuditSummaryScoresTrends
+      responses:
+        '200':
+          description: Audit Summary all scores trends data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_AllScoresTrendValuesDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/audit-summary/scores/trends</div>
+  /v3/web-audits/{auditId}/reports/audit-summary/scores/trends/{trendName}:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - name: trendName
+      in: path
+      required: true
+      description: name of requested trend
+      schema:
+        $ref: '#/components/schemas/AuditRun_AuditSummary_ScoreTrendsEnum'
+    - $ref: '#/components/parameters/AuditRun_Trends_DaysParam'
+    get:
+      tags:
+      - audit-summary-report
+      summary: Get Audit Summary specific score trend values relative to current time
+      operationId: getAuditRunAuditScoreTrend
+      responses:
+        '200':
+          description: Audit Score specific trend values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_AuditSummary_ScoreTrendValuesDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/reports/audit-summary/scores/trends/<span class="op-path-parameter">{trendName}</span></div>
+components:
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    FailedDependency:
+      description: The method could not be performed on the resource because the requested action depended on another action and that action failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  schemas:
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    AuditRun_AuditSummary_ScoreTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - score
+        properties:
+          score:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+    AuditRun_AuditSummary_PrimaryTagItem:
+      allOf:
+      - $ref: '#/components/schemas/TagInfoTrait'
+      - type: object
+        required:
+        - pageCount
+        - tagAccountCount
+        - tagVersionCount
+        - tagLoadTimeAverage
+        - statusCodeDistribution
+        properties:
+          pageCount:
+            type: integer
+            description: Number of pages this tag has been discovered on
+            default: 0
+          tagAccountCount:
+            type: integer
+            description: Number of distinct accounts of the tag
+            default: 0
+          tagVersionCount:
+            type: integer
+            description: Number of distinct versions of the tag
+            default: 0
+          tagLoadTimeAverage:
+            $ref: '#/components/schemas/TagLoadTime'
+          statusCodeDistribution:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_TagStatusCodeDistribution'
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    AuditRun_AuditSummary_TrendItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - totalBrokenPageCount
+        - totalUniqueTagCount
+        - totalBrokenTagCount
+        properties:
+          totalBrokenPageCount:
+            type: integer
+            description: Total number of broken pages
+          totalUniqueTagCount:
+            type: integer
+            description: Total number of unique tag vendors
+          totalBrokenTagCount:
+            type: integer
+            description: Total number of broken tag requests (0, 400+ or 500+ HTTP status code)
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    TagId:
+      type: integer
+      description: Tag ID
+    AuditRun_AuditSummary_ScoreTrendsEnum:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      type: string
+      enum:
+      - total
+      - tag_presence
+      - tag_performance
+      - rules
+      - page_performance
+      - cookies
+    AuditRun_AuditSummary_TagStatusCodeDistribution:
+      description: See `StatusCodeEnum`
+      type: object
+      required:
+      - good
+      - redirect
+      - broken
+      properties:
+        good:
+          type: integer
+          description: Number of tag requests with "good" status code
+          default: 0
+        redirect:
+          type: integer
+          description: Number of tag requests with "redirect" status code
+          default: 0
+        broken:
+          type: integer
+          description: Number of tag requests with "broken" status code
+          default: 0
+    AuditRun_AuditSummary_AllScoresTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - scores
+        properties:
+          scores:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_ScoresDTO'
+    AuditRun_AuditSummary_TrendsDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_TrendItem'
+    AuditRun_AuditSummary_RequestDTO:
+      description: Request body with filters for Audit Summary report
+      type: object
+      properties:
+        primaryTagsOnly:
+          type: boolean
+          description: (This filter option no longer works due to the response body change on May 2021) if true then return only pages/tags with primary tags else return all pages/tags
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        tagVendorId:
+          $ref: '#/components/schemas/TagVendorId'
+    AuditRun_AuditSummary_DetectedTagItem:
+      allOf:
+      - $ref: '#/components/schemas/TagInfoTrait'
+      - type: object
+        required:
+        - pageCount
+        - pageNotPresentCount
+        - tagLoadTimeAverage
+        - tagAccountCount
+        - uniqueVariableCount
+        properties:
+          pageCount:
+            type: integer
+            description: Number of pages this tag has been discovered on
+          pageNotPresentCount:
+            type: integer
+            description: Number of pages this tag has not been discovered on
+          tagLoadTimeAverage:
+            $ref: '#/components/schemas/TagLoadTime'
+          tagAccountCount:
+            type: integer
+            description: Number of distinct accounts of the tag
+          uniqueVariableCount:
+            type: integer
+            description: Number of unique variables in the tag
+    AuditRun_AuditSummary_Score:
+      type: object
+      required:
+      - score
+      - max
+      properties:
+        score:
+          type: number
+          format: float
+          description: Amount of points obtained in given score category. Rounded to one digit after dot
+        max:
+          type: integer
+          description: Max points for given score category, inclusive
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRun_AuditSummary_DetectedTagsDTO:
+      type: object
+      required:
+      - tags
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_DetectedTagItem'
+    AuditRun_AuditSummary_PrimaryTagsDTO:
+      type: object
+      required:
+      - tags
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_PrimaryTagItem'
+    TagName:
+      type: string
+      description: Tag name
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun_AuditSummary_TrendsEnum:
+      type: string
+      enum:
+      - unique_tags
+      - broken_tags
+      - broken_pages
+    AuditRun_AuditSummary_ScoreTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_ScoreTrendValueItem'
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    AuditRun_AuditSummary_AllScoresTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_AllScoresTrendValueItem'
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    TagCategoryName:
+      type: string
+      description: Name of a category of a tag
+    TagInfoTrait:
+      type: object
+      description: Common tag info
+      required:
+      - tagId
+      - tagName
+      - tagCategoryId
+      - tagCategoryName
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagName:
+          $ref: '#/components/schemas/TagName'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        tagCategoryName:
+          $ref: '#/components/schemas/TagCategoryName'
+    AuditRun_AuditSummary_SummaryDTO:
+      description: 'Audit Summary data. This endpoint will only provide unique primary tags data. the rest should be retrieved from tag-inventory : getAuditRunTagInventorySummary'
+      type: object
+      required:
+      - totalUniquePrimaryTagCount
+      - filteredUniquePrimaryTagCount
+      properties:
+        totalUniquePrimaryTagCount:
+          type: integer
+          description: Total number of tag vendors selected as account primary tags discovered during an audit run
+        filteredUniquePrimaryTagCount:
+          type: integer
+          description: Number of tag vendors selected as account primary tags passing all applied filters
+    TagLoadTime:
+      type: integer
+      description: Tag load time, in milliseconds
+      default: 0
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    AuditRun_AuditSummary_ScoresDTO:
+      type: object
+      required:
+      - total
+      - tagPresence
+      - tagPerformance
+      - rules
+      - pagePerformance
+      - cookies
+      properties:
+        total:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        tagPresence:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        tagPerformance:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        rules:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        pagePerformance:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        cookies:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+  parameters:
+    AuditRun_Trends_DaysParam:
+      name: days
+      in: query
+      required: true
+      schema:
+        type: integer
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

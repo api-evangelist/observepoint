@@ -1,0 +1,184 @@
+openapi: 3.2.0
+info:
+  description: Endpoints for managing labels including creation, assignment, and retrieval for organizing audits, journeys, and other resources
+  title: V2 Labels API
+  version: null
+servers:
+- url: https://api.observepoint.com/v2
+tags:
+- description: Endpoints for managing labels including creation, assignment, and retrieval for organizing audits, journeys, and other resources
+  name: Labels
+paths:
+  /labels:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/labels</div>
+      operationId: getLabels
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LabelWithSignedItems'
+                type: array
+        '401':
+          description: Authentication credentials are missing or invalid
+      security:
+      - API_Key: []
+      summary: Get list of all labels
+      tags:
+      - Labels
+    post:
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/labels</div>
+      operationId: createNewLabel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewLabel'
+        description: New label info
+        required: true
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelWithSignedItems'
+        '403':
+          description: Duplicate name
+        '422':
+          description: Empty name
+      security:
+      - API_Key: []
+      summary: Create new label
+      tags:
+      - Labels
+  /labels/{labelId}:
+    put:
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/labels/<span class="op-path-parameter">{labelId}</span></div>
+      operationId: updateLabel
+      parameters:
+      - name: labelId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewLabel'
+        description: Updated label info
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelWithSignedItems'
+        '403':
+          description: Duplicate name
+        '404':
+          description: Label with such id doesn't exist in your account
+        '422':
+          description: Empty name
+      security:
+      - API_Key: []
+      summary: Update existing label name
+      tags:
+      - Labels
+    delete:
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/labels/<span class="op-path-parameter">{labelId}</span></div>
+      operationId: deleteALabel
+      parameters:
+      - name: labelId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Label deleted
+        '404':
+          description: There is no label with id labelid
+      security:
+      - API_Key: []
+      summary: Delete label with given id
+      tags:
+      - Labels
+components:
+  schemas:
+    LabelWithSignedItems:
+      type: object
+      required:
+      - alerts
+      - audits
+      - consentCategories
+      - emailInboxes
+      - id
+      - mobileJourney
+      - name
+      - rules
+      - savedReports
+      - webJourney
+      properties:
+        alerts:
+          items:
+            type: number
+          type: array
+        audits:
+          items:
+            type: number
+          type: array
+        consentCategories:
+          items:
+            type: number
+          type: array
+        emailInboxes:
+          items:
+            type: number
+          type: array
+        id:
+          format: int32
+          type: integer
+        mobileJourney:
+          items:
+            type: number
+          type: array
+        name:
+          type: string
+        rules:
+          items:
+            type: number
+          type: array
+        savedReports:
+          items:
+            type: number
+          type: array
+        webJourney:
+          items:
+            type: number
+          type: array
+      description: Label with all items to which it was assigned
+    NewLabel:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+      description: Label creation information
+  securitySchemes:
+    API_Key:
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`'
+      in: header
+      name: Authorization
+      type: apiKey

@@ -1,0 +1,389 @@
+openapi: 3.2.0
+info:
+  title: V3 Action Set Action Rules API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: action-set-action-rules
+  x-displayName: Action Set Action Rules
+  description: APIs for managing Action Set Action Rules
+paths:
+  /v3/action-sets/{actionSetId}/actions/{actionId}/rules:
+    get:
+      tags:
+      - action-set-action-rules
+      summary: Get action set action rules
+      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/action-sets/<span class="op-path-parameter">{actionSetId}</span>/actions/<span class="op-path-parameter">{actionId}</span>/rules</div>
+
+
+        Retrieve all rules for a specific action set and action'
+      operationId: getActionSetActionRules
+      parameters:
+      - name: actionSetId
+        in: path
+        description: Action set ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: actionId
+        in: path
+        description: Action ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successfully retrieved rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+    put:
+      tags:
+      - action-set-action-rules
+      summary: Update action set action rules
+      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/action-sets/<span class="op-path-parameter">{actionSetId}</span>/actions/<span class="op-path-parameter">{actionId}</span>/rules</div>
+
+
+        Update the rules for a specific action set and action with a new set of rule IDs'
+      operationId: updateActionSetActionRules
+      parameters:
+      - name: actionSetId
+        in: path
+        description: Action set ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: actionId
+        in: path
+        description: Action ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              uniqueItems: true
+              type: array
+              description: Set of rule IDs to associate with the action
+              items:
+                type: integer
+                format: int32
+        required: true
+      responses:
+        '200':
+          description: Successfully updated rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    MatchTypeEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - IsPresent
+      - Equals
+      - DoesNotEqual
+      - Contains
+      - DoesNotContain
+      - IsSet
+      - IsNotSet
+      - Regex
+      - GreaterThanOrEqualTo
+      - LessThanOrEqualTo
+    SelectorTypeEnum:
+      type: string
+      enum:
+      - Empty
+      - String
+      - UrlParameter
+      - DataLayer
+      - Tag
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    PageFilterTypeEnum:
+      type:
+      - integer
+      - 'null'
+      description: Type of the page filter.
+      enum:
+      - 1
+      - 2
+      x-enum-varnames:
+      - URL
+      - STATUSCODE
+      x-enum-descriptions:
+      - URL filter type
+      - StatusCode filter type
+    Rule:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        accountId:
+          type: integer
+          format: int32
+        createdBy:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        recipients:
+          type: array
+          items:
+            type: string
+        checkTimes:
+          type: integer
+          format: int32
+        matchAllFilters:
+          type: boolean
+        pageFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageFilter'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleTag'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+        fromTemplate:
+          type: boolean
+    PageFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        value:
+          type: string
+        type:
+          $ref: '#/components/schemas/PageFilterTypeEnum'
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+    RuleTagVariable:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleTagId:
+          type: integer
+          format: int32
+        variable:
+          type: string
+        value:
+          type: string
+        validationDescription:
+          type: string
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+        valueTagId:
+          type: integer
+          format: int32
+        selectorType:
+          $ref: '#/components/schemas/SelectorTypeEnum'
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    ClauseEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - If
+      - Then
+      - Else
+    RuleTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        tagId:
+          type: integer
+          format: int32
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+        account:
+          type: string
+        validationDescription:
+          type: string
+        clause:
+          $ref: '#/components/schemas/ClauseEnum'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleTagVariable'
+  responses:
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

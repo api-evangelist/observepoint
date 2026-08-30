@@ -1,0 +1,787 @@
+openapi: 3.2.0
+info:
+  title: V3 Account Usage V2 API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: account-usage-v2
+  x-displayName: Account Usage
+  description: Account usage data
+paths:
+  /v3/usage/overview:
+    get:
+      tags:
+      - account-usage-v2
+      operationId: getAccountUsageV2Overview
+      summary: Get brief usage overview for account
+      responses:
+        '200':
+          description: Usage overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountUsageV2_Overview_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/usage/overview</div>
+  /v3/usage/summary:
+    get:
+      tags:
+      - account-usage-v2
+      operationId: getAccountUsageV2NotFilterableSummary
+      summary: Get not filterable usage summary for account
+      responses:
+        '200':
+          description: Basic usage summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountUsageV2_Summary_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/usage/summary</div>
+  /v3/usage/{itemType}/summary:
+    parameters:
+    - $ref: '#/components/parameters/AccountUsageV2_ItemType'
+    post:
+      tags:
+      - account-usage-v2
+      operationId: getAccountUsageV2SpecificItemTypeSummary
+      summary: Get filterable specific item type usage summary for account. If web journeys are not included in contract, 404 status code will be returned
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUsageV2_RequestDTO'
+      responses:
+        '200':
+          description: Specific item type usage summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountUsageV2_SpecificItemTypeSummary_ResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/usage/<span class="op-path-parameter">{itemType}</span>/summary</div>
+  /v3/usage/{itemType}/trends:
+    parameters:
+    - $ref: '#/components/parameters/AccountUsageV2_ItemType'
+    post:
+      tags:
+      - account-usage-v2
+      operationId: getAccountUsageV2Trends
+      summary: Get usage trends for specified item type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUsageV2_RequestDTO'
+      responses:
+        '200':
+          description: Usage trends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountUsageV2_Trends_ResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/usage/<span class="op-path-parameter">{itemType}</span>/trends</div>
+  /v3/usage/{itemType}/daily-trends:
+    parameters:
+    - $ref: '#/components/parameters/AccountUsageV2_ItemType'
+    get:
+      tags:
+      - account-usage-v2
+      operationId: getAccountUsageV2DailyTrends
+      summary: Get usage trends for rolling week, for specified item type
+      responses:
+        '200':
+          description: Usage trends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountUsageV2_DailyTrends_ResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/usage/<span class="op-path-parameter">{itemType}</span>/daily-trends</div>
+components:
+  schemas:
+    AccountUsageV2_AllowOveragesFlag:
+      type: boolean
+      description: 'When TRUE, account is allowed to go over the limit and will be charged for overages.
+
+        When FALSE, account will be blocked from running audits and web journeys that will go over the limit.
+
+        '
+    AccountUsageV2_FilterableInteger:
+      type: object
+      description: '`filtered` property can be omitted if filters were not applied
+
+        '
+      required:
+      - total
+      properties:
+        total:
+          type: integer
+        filtered:
+          type: integer
+    AccountUsageV2_ContractTermFilter:
+      type: object
+      description: Select specific contract term. Current term will be shown if omitted
+      required:
+      - startDateInclusive
+      - endDateInclusive
+      properties:
+        startDateInclusive:
+          $ref: '#/components/schemas/DateUtc'
+        endDateInclusive:
+          $ref: '#/components/schemas/DateUtc'
+    AccountUsageV2_ItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    AccountUsageV2_Summary_UsersUsage:
+      type: object
+      required:
+      - totalUsers
+      - usersLoggedInLast30Days
+      properties:
+        totalUsers:
+          description: Number of users in account
+          type: integer
+        usersLoggedInLast30Days:
+          type: array
+          description: List of user IDs that logged in last 30 days
+          items:
+            $ref: '#/components/schemas/UserId'
+    AccountUsageV2_RequestDTO:
+      type: object
+      description: Filters for usage report
+      properties:
+        dataSources:
+          type: array
+          description: Non-empty array of data sources. Usage for selected data sources only will be shown
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ItemId'
+        dataSourceCreators:
+          type: array
+          description: Non-empty array of user IDs. Matches data sources that have been created by any of the specified users
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/UserId'
+        dataSourceFolders:
+          $ref: '#/components/schemas/FoldersFilter'
+        dataSourceLabels:
+          type: array
+          description: Non-empty array of labels present on an item. Matches data sources that have all specified labels
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        runFrequencies:
+          type: array
+          description: Non-empty array of frequency names. Matches data sources that have any of the specified frequencies
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AccountUsageV2_RunFrequency'
+        contractTerm:
+          $ref: '#/components/schemas/AccountUsageV2_ContractTermFilter'
+    AccountUsageV2_ContractTerm:
+      type: object
+      description: Contract start and end dates
+      required:
+      - startDateInclusive
+      - endDateInclusive
+      properties:
+        startDateInclusive:
+          $ref: '#/components/schemas/DateUtc'
+        endDateInclusive:
+          $ref: '#/components/schemas/DateUtc'
+    FoldersFilter:
+      type: array
+      description: non-empty array of folders with domains (subfolders), items from which will be included in response
+      minItems: 1
+      items:
+        $ref: '#/components/schemas/FoldersFilterItem'
+    AccountUsageV2_Trends_CurrentPeriod:
+      description: '`periodTotal` and `cumulativeTotal` calculated for completed runs in current period, `periodProjectedTotal` and `cumulativeProjectedTotal` estimated for future runs
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/AccountUsageV2_Trends_PastPeriod'
+      - $ref: '#/components/schemas/AccountUsageV2_Trends_FuturePeriod'
+    FolderId:
+      type: integer
+      format: int32
+      description: ID of a folder
+      example: 123
+    AccountUsageV2_CumulativePacing:
+      type: integer
+      description: Shows how many pages should be scanned to date to hit the limit by the end of the contract term
+    AccountUsageV2_Trends_BasePeriodTrait:
+      type: object
+      description: '`startDateInclusive` and `endDateExclusive` define period of time for which usage is shown
+
+        '
+      required:
+      - startDateInclusive
+      - endDateExclusive
+      properties:
+        startDateInclusive:
+          $ref: '#/components/schemas/DateUtc'
+        endDateExclusive:
+          $ref: '#/components/schemas/DateUtc'
+    AccountUsageV2_SpecificItemTypeSummary_BaseUsage:
+      type: object
+      description: 'Subtypes:
+
+        - AccountUsageV2_SpecificItemTypeSummary_AuditUsage
+
+        - AccountUsageV2_SpecificItemTypeSummary_WebJourneyUsage
+
+
+        `cumulativeTotal` - number of pages scanned (for audits) or runs completed (for web journeys) to date.
+
+        `termLimit`, `cumulativePacing` - can be omitted if there is no limit.
+
+        `overLimitPrice` is only visible to account admins.
+
+        '
+      required:
+      - itemType
+      - cumulativeTotal
+      properties:
+        itemType:
+          $ref: '#/components/schemas/AccountUsageV2_ItemTypeEnum'
+        cumulativeTotal:
+          $ref: '#/components/schemas/AccountUsageV2_FilterableInteger'
+        termLimit:
+          $ref: '#/components/schemas/AccountUsageV2_TermLimit'
+        limitNoteType:
+          $ref: '#/components/schemas/AccountUsageV2_LimitNoteTypeEnum'
+        cumulativePacing:
+          $ref: '#/components/schemas/AccountUsageV2_CumulativePacing'
+        overLimitPrice:
+          $ref: '#/components/schemas/AccountUsageV2_OverLimitPrice'
+      discriminator:
+        propertyName: itemType
+        mapping:
+          AUDIT: '#/components/schemas/AccountUsageV2_SpecificItemTypeSummary_AuditUsage'
+          WEB_JOURNEY: '#/components/schemas/AccountUsageV2_SpecificItemTypeSummary_WebJourneyUsage'
+    AccountUsageV2_SpecificItemTypeSummary_ResponseDTO:
+      type: object
+      required:
+      - currentContractTerm
+      - contractTerms
+      - usage
+      properties:
+        currentContractTerm:
+          $ref: '#/components/schemas/AccountUsageV2_ContractTerm'
+        contractTerms:
+          type: array
+          description: Dates of contracts
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/AccountUsageV2_ContractTerm'
+        usage:
+          $ref: '#/components/schemas/AccountUsageV2_SpecificItemTypeSummary_BaseUsage'
+    AccountUsageV2_OverLimitPrice:
+      description: Price of a page scan (for audits) or a run (for web journeys) over the limit
+      allOf:
+      - $ref: '#/components/schemas/MonetaryAmount'
+    AccountUsageV2_DailyTrends_ItemInfoWithRunDetails:
+      allOf:
+      - $ref: '#/components/schemas/AccountUsageV2_DailyTrends_ItemInfo'
+      - type: object
+        properties:
+          lastRunId:
+            $ref: '#/components/schemas/RunId'
+          lastRunCompletedAt:
+            $ref: '#/components/schemas/DateAndTime'
+          noOfRunsCompleted:
+            type: integer
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    AccountUsageV2_DailyTrends_ItemInfo:
+      type: object
+      required:
+      - frequency
+      - itemName
+      - itemId
+      properties:
+        frequency:
+          $ref: '#/components/schemas/AccountUsageV2_RunFrequency'
+        description:
+          description: Schedule description or value of frequency if no schedule is present
+          type: string
+        itemName:
+          description: Audit name or Web Journey name
+          type: string
+        itemId:
+          description: Audit ID or Web Journey ID
+          type: integer
+    AccountUsageV2_Overview_ResponseDTO:
+      type: object
+      description: '`webJourneyUsage` can be absent if web journeys are not included in contract.
+
+        '
+      required:
+      - auditUsage
+      - allowOverages
+      properties:
+        auditUsage:
+          $ref: '#/components/schemas/AccountUsageV2_Overview_SpecificItemTypeUsage'
+        webJourneyUsage:
+          $ref: '#/components/schemas/AccountUsageV2_Overview_SpecificItemTypeUsage'
+        allowOverages:
+          $ref: '#/components/schemas/AccountUsageV2_AllowOveragesFlag'
+    FoldersFilterItem:
+      type: object
+      required:
+      - folderId
+      properties:
+        folderId:
+          $ref: '#/components/schemas/FolderId'
+        domains:
+          type: array
+          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
+          items:
+            $ref: '#/components/schemas/DomainId'
+    AccountUsageV2_DailyTrends_ResponseDTO:
+      type: object
+      required:
+      - dailyUsageItems
+      properties:
+        dailyUsageItems:
+          type: array
+          description: Runs completed per day in the last 3 days, today and scheduled in the next 3 days
+          items:
+            $ref: '#/components/schemas/AccountUsageV2_DailyTrends_Usage'
+    AccountUsageV2_Trends_ResponseDTO:
+      type: object
+      description: '`termLimit`, `monthlyPacing` - can be omitted if there is no limit
+
+        '
+      required:
+      - pastPeriods
+      - futurePeriods
+      properties:
+        pastPeriods:
+          type: array
+          description: Represents all past months
+          items:
+            $ref: '#/components/schemas/AccountUsageV2_Trends_PastPeriod'
+        currentPeriod:
+          $ref: '#/components/schemas/AccountUsageV2_Trends_CurrentPeriod'
+        futurePeriods:
+          type: array
+          description: Represents future months, with projected values
+          items:
+            $ref: '#/components/schemas/AccountUsageV2_Trends_FuturePeriod'
+        termLimit:
+          $ref: '#/components/schemas/AccountUsageV2_TermLimit'
+        limitNoteType:
+          $ref: '#/components/schemas/AccountUsageV2_LimitNoteTypeEnum'
+        monthlyPacing:
+          $ref: '#/components/schemas/AccountUsageV2_MonthlyPacing'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    DateUtc:
+      type: string
+      format: date
+      description: Date in ISO 8601 format, in UTC timezone
+    AccountUsageV2_Overview_SpecificItemTypeUsage:
+      type: object
+      description: '`usagePercentage` and `usageLimit` can be omitted if there is no limit.
+
+        `overLimitPrice` is only visible to account admins.
+
+        '
+      required:
+      - currentContractTerm
+      - usageCount
+      properties:
+        usageCount:
+          type: integer
+          format: integer
+          description: Number of pages scanned (for audits) or runs completed (for web journeys) to date
+        usageLimit:
+          type: integer
+          format: integer
+          description: Limit of pages scanned (for audits) or runs completed (for web journeys) for the current contract term
+        limitNoteType:
+          $ref: '#/components/schemas/AccountUsageV2_LimitNoteTypeEnum'
+        usagePercentage:
+          type: number
+          format: float
+          description: Percentage of usage relative to contract term limit
+        overLimitPrice:
+          $ref: '#/components/schemas/AccountUsageV2_OverLimitPrice'
+        currentContractTerm:
+          $ref: '#/components/schemas/AccountUsageV2_ContractTerm'
+    AccountUsageV2_TermLimit:
+      type: integer
+      description: Limit of pages scanned (for audits) or runs completed (for web journeys) for the contract term
+    AccountUsageV2_DailyTrends_Usage:
+      type: object
+      description: Scheduled items are shown only for today and dates in the future
+      required:
+      - day
+      properties:
+        day:
+          $ref: '#/components/schemas/DateUtc'
+        noOfCompletedRuns:
+          type: integer
+        noOfScheduledRuns:
+          type: integer
+        completedItems:
+          type: array
+          description: 100 items per day in the account
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/AccountUsageV2_DailyTrends_ItemInfoWithRunDetails'
+        scheduledItems:
+          type: array
+          description: 100 items per day in the account
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/AccountUsageV2_DailyTrends_ScheduledItemInfoWithRunDetails'
+        noOfPagesScanned:
+          description: used for Audits only
+          type: integer
+        noOfPagesScheduledToScan:
+          description: used for Audits only
+          type: integer
+    AccountUsageV2_DailyTrends_ScheduledItemInfoWithRunDetails:
+      allOf:
+      - $ref: '#/components/schemas/AccountUsageV2_DailyTrends_ItemInfo'
+      - type: object
+        properties:
+          nextScheduledRunDateTime:
+            $ref: '#/components/schemas/DateAndTime'
+          noOfRunsScheduled:
+            type: integer
+          noOfPagesScheduledToScan:
+            type: integer
+    AccountUsageV2_Summary_SupportContactType:
+      type: string
+      description: '`AE` - Account Executive
+
+        `CSM` - Customer Success Manager
+
+        '
+      enum:
+      - AE
+      - CSM
+    AccountUsageV2_Trends_FuturePeriod:
+      allOf:
+      - $ref: '#/components/schemas/AccountUsageV2_Trends_BasePeriodTrait'
+      - type: object
+        description: '`periodProjectedTotal` and `cumulativeProjectedTotal` can represent either pages scanned (for audits) or runs completed (for web journeys)
+
+          '
+        required:
+        - periodProjectedTotal
+        - cumulativeProjectedTotal
+        properties:
+          periodProjectedTotal:
+            $ref: '#/components/schemas/AccountUsageV2_FilterableProjectedUsage'
+          cumulativeProjectedTotal:
+            $ref: '#/components/schemas/AccountUsageV2_FilterableProjectedUsage'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AccountUsageV2_Trends_PastPeriod:
+      allOf:
+      - $ref: '#/components/schemas/AccountUsageV2_Trends_BasePeriodTrait'
+      - type: object
+        description: '`periodTotal` and `cumulativeTotal` can represent either pages scanned (for audits) or runs completed (for web journeys)
+
+          '
+        required:
+        - periodTotal
+        - cumulativeTotal
+        properties:
+          periodTotal:
+            $ref: '#/components/schemas/AccountUsageV2_FilterableInteger'
+          cumulativeTotal:
+            $ref: '#/components/schemas/AccountUsageV2_FilterableInteger'
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
+    AccountUsageV2_Summary_SupportContact:
+      type: object
+      required:
+      - type
+      - name
+      - email
+      properties:
+        type:
+          $ref: '#/components/schemas/AccountUsageV2_Summary_SupportContactType'
+        name:
+          type: string
+          description: Name of the person to contact
+        email:
+          type: string
+    AccountUsageV2_FilterableProjectedUsage:
+      type: object
+      description: Duplicates `AccountUsageV2_ProjectedUsage`, but includes `total` and `filtered` values for each estimate
+      required:
+      - scheduledUsageEstimate
+      - historicalUsageEstimate
+      properties:
+        scheduledUsageEstimate:
+          $ref: '#/components/schemas/AccountUsageV2_FilterableInteger'
+        historicalUsageEstimate:
+          $ref: '#/components/schemas/AccountUsageV2_FilterableInteger'
+    AccountUsageV2_MonthlyPacing:
+      type: integer
+      description: Shows how many pages should be scanned per month to hit the limit by the end of the contract term
+    AccountUsageV2_RunFrequency:
+      type: string
+      description: combination of journey and audit frequency
+      enum:
+      - paused
+      - once
+      - 15 minutes
+      - 1 hour
+      - 6 hours
+      - 12 hours
+      - daily
+      - weekly
+      - biweekly
+      - monthly
+      - quarterly
+      - semiannually
+      - yearly
+      - custom
+      - unscheduled
+    DomainId:
+      type: integer
+      format: int32
+      description: ID of a domain
+      example: 123
+    AccountUsageV2_Summary_ResponseDTO:
+      type: object
+      required:
+      - usersUsage
+      - contacts
+      - allowOverages
+      properties:
+        usersUsage:
+          $ref: '#/components/schemas/AccountUsageV2_Summary_UsersUsage'
+        contacts:
+          type: array
+          description: List of people to contact for support
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/AccountUsageV2_Summary_SupportContact'
+        allowOverages:
+          $ref: '#/components/schemas/AccountUsageV2_AllowOveragesFlag'
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    MonetaryAmount:
+      type: object
+      description: A monetary amount
+      required:
+      - amount
+      - currency
+      properties:
+        amount:
+          type: number
+          example: 0.01
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+    CurrencyCode:
+      type: string
+      description: A currency represented by its ISO 4217 alpha code
+      pattern: ^[A-Z]{3}$
+      example: USD
+    ItemId:
+      type: integer
+      format: int64
+      description: ID of a data collector, see ItemType
+      example: 107239
+    AccountUsageV2_LimitNoteTypeEnum:
+      type: string
+      enum:
+      - UNLIMITED
+      - LIMIT_UNDETERMINED
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    AccountUsageV2_ItemType:
+      name: itemType
+      in: path
+      required: true
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AccountUsageV2_ItemTypeEnum'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

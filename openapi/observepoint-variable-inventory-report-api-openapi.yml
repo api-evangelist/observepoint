@@ -1,0 +1,1144 @@
+openapi: 3.2.0
+info:
+  title: V3 Variable Inventory Report API
+  description: This section documents the V3 API endpoints that provide access to comprehensive audit and journey data from ObservePoint. Use these endpoints to retrieve detailed reports, export data, manage alerts, configure scans and privacy settings, and analyze web performance metrics from your ObservePoint scans.
+  version: null
+  contact:
+    name: Observepoint
+    url: https://www.observepoint.com/contact-us
+servers:
+- url: https://api.observepoint.com
+  description: ObservePoint Production API
+tags:
+- name: variable-inventory-report
+  x-displayName: Variable Inventory Report
+  description: Variable Inventory report endpoints
+paths:
+  /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - variable-inventory-report
+      summary: Get Variable Inventory summary for specified audit run
+      operationId: getAuditRunVariableInventorySummary
+      requestBody:
+        description: Filters applicable to Variable Inventory report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_RequestDTO'
+      responses:
+        '200':
+          description: Variable Inventory summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_VariableInventory_SummaryDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/variable-inventory</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory/trends:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    get:
+      tags:
+      - variable-inventory-report
+      summary: Get Variable Inventory trends relative to specified audit run
+      operationId: getAuditRunVariableInventoryTrends
+      responses:
+        '200':
+          description: Variable Inventory summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_VariableInventory_TrendsDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/variable-inventory/trends</div>
+  /v3/web-audits/{auditId}/reports/variable-inventory/trends/{trendName}:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - name: trendName
+      in: path
+      required: true
+      description: name of requested trend
+      schema:
+        $ref: '#/components/schemas/AuditRun_VariableInventory_TrendsEnum'
+    - $ref: '#/components/parameters/AuditRun_Trends_DaysParam'
+    get:
+      tags:
+      - variable-inventory-report
+      summary: Get Variable Inventory specific trend values relative to current day
+      operationId: getAuditRunVariableInventoryTrend
+      responses:
+        '200':
+          description: Variable Inventory specific trend values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemRun_SpecificTrendValuesDTO'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/reports/variable-inventory/trends/<span class="op-path-parameter">{trendName}</span></div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory/tags:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_TagAccountList_PageSizeParam'
+    post:
+      tags:
+      - variable-inventory-report
+      summary: Get Variable Inventory tag accounts list for specified audit run
+      operationId: getAuditRunVariableInventoryTagAccounts
+      requestBody:
+        description: Filters applicable to Variable Inventory report
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_RequestDTO'
+      responses:
+        '200':
+          description: Variable Inventory tag accounts list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_VariableInventory_TagsDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/variable-inventory/tags</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory/tag-account-variables:
+    description: This endpoint will return top 500 variables with highest variableSetPageCount (Desc).
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    post:
+      tags:
+      - variable-inventory-report
+      operationId: getAuditRunVariableInventoryTagAccountVariables
+      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/variable-inventory/tag-account-variables</div>
+
+
+        This endpoint will only return top 500 variables which are sort by variableSetPageCount (Desc).'
+      summary: Get top 500 variables sorted by variableSetPageCount
+      requestBody:
+        description: Filters applicable to Variable Inventory report
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountRequestDTO'
+      responses:
+        '200':
+          description: Variable Inventory tag account variables list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountVariablesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+  /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory/tag-account-pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_VariableInventory_PagesSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - variable-inventory-report
+      summary: Get Variable Inventory page list for specific tag account in specified audit run
+      operationId: getAuditRunVariableInventoryTagAccountPages
+      requestBody:
+        description: Filters applicable to Variable Inventory report
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountRequestDTO'
+      responses:
+        '200':
+          description: Variable Inventory - page list for specified tag account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_VariableInventory_PagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/variable-inventory/tag-account-pages</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory/tag-account-variable-pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_VariableInventory_PagesSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - variable-inventory-report
+      summary: Get Variable Inventory page list for specific tag account variable in specified audit run
+      operationId: getAuditRunVariableInventoryTagAccountVariablePages
+      requestBody:
+        description: Filters applicable to Variable Inventory report
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountVariableRequestDTO'
+      responses:
+        '200':
+          description: Variable Inventory - page list for specified tag account variable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_VariableInventory_PagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/variable-inventory/tag-account-variable-pages</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory/tag-account-variable-not-set-pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_VariableInventory_PagesSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - variable-inventory-report
+      summary: Get Variable Inventory page list where variable is not set for specific tag account variable in specified audit run. This endpoint does not support sorting by `variable_count` because we retrieve pages that do NOT have that specific variable
+      operationId: getAuditRunVariableInventoryTagAccountVariableNotSetPages
+      requestBody:
+        description: Filters applicable to Variable Inventory report
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountVariableRequestDTO'
+      responses:
+        '200':
+          description: Variable Inventory tag account variable not set pages list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_VariableInventory_VariableNotSetPagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/variable-inventory/tag-account-variable-not-set-pages</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory/tag-account-variable-values:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_TagAccountVariableValueList_PageSizeParam'
+    - name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_VariableInventory_VariableValuesSortColumn'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - variable-inventory-report
+      summary: Get Variable Inventory unique values list for specific tag account variable in specified audit run
+      operationId: getAuditRunVariableInventoryTagAccountVariableUniqueValues
+      requestBody:
+        description: Filters applicable to Variable Inventory report
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountVariableRequestDTO'
+      responses:
+        '200':
+          description: Variable Inventory tag account variable unique values list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_VariableInventory_UniqueVariableValuesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/variable-inventory/tag-account-variable-values</div>
+  /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory/tag-account-variable-value-pages:
+    parameters:
+    - $ref: '#/components/parameters/AuditId'
+    - $ref: '#/components/parameters/RunId'
+    - $ref: '#/components/parameters/pageParam'
+    - $ref: '#/components/parameters/AuditRun_PagesList_PageSizeParam'
+    - $ref: '#/components/parameters/AuditRun_VariableInventory_PagesSortParam'
+    - $ref: '#/components/parameters/SortDescendingParam'
+    post:
+      tags:
+      - variable-inventory-report
+      summary: Get Variable Inventory page list for specific tag account variable value in specified audit run
+      operationId: getAuditRunVariableInventoryTagAccountVariableValuePages
+      requestBody:
+        description: Filters applicable to Variable Inventory report
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountVariableValueRequestDTO'
+      responses:
+        '200':
+          description: Variable Inventory tag account variable pages list with unique variable values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRun_VariableInventory_VariableValuePagesDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - API_Key: []
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/variable-inventory/tag-account-variable-value-pages</div>
+components:
+  schemas:
+    VariableValue:
+      type: string
+      description: Variable value
+    AuditRun_VariableInventory_TagAccountVariableRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountRequestDTO'
+      - type: object
+        required:
+        - variableName
+        properties:
+          variableName:
+            $ref: '#/components/schemas/VariableName'
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    AuditRun_VariableInventory_VariableItem:
+      type: object
+      required:
+      - variableName
+      - uniqueValueCount
+      - variableNotSetPageCount
+      - variableSetPageCount
+      properties:
+        variableName:
+          $ref: '#/components/schemas/VariableName'
+        friendlyName:
+          type: string
+          description: Human-readable variable name
+        uniqueValueCount:
+          type: integer
+          description: Number of unique values of the variable
+        variableNotSetPageCount:
+          type: integer
+          description: Number of pages where variable is not set
+        variableSetPageCount:
+          type: integer
+          description: Number of pages where variable is set
+    AuditRun_VariableInventory_TagAccountVariablesDTO:
+      description: Variable Inventory report tag account variables list. This list will include the top 500 variables with the highest variableSetPageCount.
+      type: object
+      required:
+      - variables
+      properties:
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_VariableItem'
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
+    AuditRunPageTrait:
+      description: Common trait for audit page with mandatory page properties
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+    AuditRun_VariableInventory_TagAccountItem:
+      type: object
+      properties:
+        tagAccount:
+          $ref: '#/components/schemas/TagAccount'
+        totalPageCount:
+          type: integer
+          description: Total number of pages
+        totalVariableCount:
+          type: integer
+          description: Total number of variables in tag account
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    AuditRun_VariableInventory_PagesDTO:
+      description: Tag Inventory pages list data
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_PagesItem'
+    TagId:
+      type: integer
+      description: Tag ID
+    AuditRun_VariableInventory_RequestDTO:
+      description: Request body with filters for Variable Inventory report
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        properties:
+          primaryTagsOnly:
+            type: boolean
+            description: if true then return only pages/tags with primary tags else return all pages/tags
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagCategoryId:
+            $ref: '#/components/schemas/TagCategoryId'
+          tagVendorId:
+            $ref: '#/components/schemas/TagVendorId'
+          tagAccount:
+            $ref: '#/components/schemas/TagAccount'
+    AuditRun_VariableInventory_PagesItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - variableCount
+        properties:
+          variableCount:
+            type: integer
+            description: Number of unique tag (account) variables on a page
+    AuditRun_VariableInventory_TagsDTO:
+      description: Variable Inventory report tag accounts list
+      type: object
+      required:
+      - metadata
+      - tags
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_TagItem'
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    TagInfoTrait:
+      type: object
+      description: Common tag info
+      required:
+      - tagId
+      - tagName
+      - tagCategoryId
+      - tagCategoryName
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagName:
+          $ref: '#/components/schemas/TagName'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        tagCategoryName:
+          $ref: '#/components/schemas/TagCategoryName'
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRun_VariableInventory_VariableNotSetPagesDTO:
+      description: Tag Inventory pages list data
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_VariableNotSetPagesItem'
+    AuditRun_VariableInventory_TagItem:
+      allOf:
+      - $ref: '#/components/schemas/TagInfoTrait'
+      - type: object
+        properties:
+          tagAccounts:
+            type: array
+            items:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountItem'
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    AuditRun_VariableInventory_TrendsEnum:
+      type: string
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      enum:
+      - unique_tags
+      - tag_requests
+      - unique_variables
+      - unique_values
+    AuditRun_VariableInventory_UniqueVariableValuesItem:
+      type: object
+      properties:
+        variableValue:
+          $ref: '#/components/schemas/VariableValue'
+        pageCount:
+          type: integer
+          description: Number of pages containing specific variable value and passing all filters
+        tagWithVariableValueCount:
+          type: integer
+          description: Number of tag requests containing this specific variable value and passing all filters
+    AuditRun_VariableInventory_SummaryDTO:
+      description: Variable Inventory report summary
+      type: object
+      required:
+      - totalPageCount
+      - filteredPageCount
+      - filteredUniqueTagCount
+      - totalTagInstanceCount
+      - filteredTagInstanceCount
+      - totalUniqueVariableNameCount
+      - filteredUniqueVariableNameCount
+      - totalUniqueVariableValueCount
+      - filteredUniqueVariableValueCount
+      properties:
+        totalPageCount:
+          type: integer
+          description: Total number of pages audited
+        filteredPageCount:
+          type: integer
+          description: Number of pages passing all applied filters
+        filteredUniqueTagCount:
+          type: integer
+          description: Number of unique tag vendors passing all applied filters
+        totalTagInstanceCount:
+          type: integer
+          description: Total number of tag requests discovered
+        filteredTagInstanceCount:
+          type: integer
+          description: Number of tag requests passing all applied filters
+        totalUniqueVariableNameCount:
+          type: integer
+          description: Total number of unique variable names across all tags
+        filteredUniqueVariableNameCount:
+          type: integer
+          description: Number of unique variable names across all tags passing all applied filters
+        totalUniqueVariableValueCount:
+          type: integer
+          description: Total number of unique variable names across all tags
+        filteredUniqueVariableValueCount:
+          type: integer
+          description: Number of unique variable names across all tags passing all applied filters
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    PageFiltersTrait:
+      type: object
+      description: Common trait for page filters
+      properties:
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
+    AuditRun_VariableInventory_PagesSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_load_time
+      - page_status_code
+      - final_page_status_code
+      - variable_count
+    AuditRun_VariableInventory_VariableValuePageItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - tagWithVariableValueCount
+        properties:
+          tagWithVariableValueCount:
+            type: integer
+            default: Number of tag requests with the variable value
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
+    AuditRun_VariableInventory_TagAccountVariableValueRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountVariableRequestDTO'
+      - type: object
+        required:
+        - variableValue
+        properties:
+          variableValue:
+            $ref: '#/components/schemas/VariableValue'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    AuditRun_VariableInventory_VariableValuePagesDTO:
+      description: Variable Inventory - variable values pages list data
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_VariableValuePageItem'
+    TagName:
+      type: string
+      description: Tag name
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    AuditRun_VariableInventory_TrendsItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - totalUniqueTagCount
+        - totalTagInstanceCount
+        - totalUniqueVariableNameCount
+        - totalUniqueVariableValueCount
+        properties:
+          totalUniqueTagCount:
+            type: integer
+            description: Total number of unique tag vendors discovered
+          totalTagInstanceCount:
+            type: integer
+            description: Total number of tag requests discovered
+          totalUniqueVariableNameCount:
+            type: integer
+            description: Total number of unique variable names across all tags
+          totalUniqueVariableValueCount:
+            type: integer
+            description: Total number of unique variable names across all tags
+    AuditRun_VariableInventory_VariableNotSetPagesItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    AuditRun_VariableInventory_VariableValuesSortColumn:
+      type: string
+      enum:
+      - variable_value
+      - page_count
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
+      properties:
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
+    VariableName:
+      type: string
+      description: Variable name (key)
+    TagCategoryName:
+      type: string
+      description: Name of a category of a tag
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    TagAccount:
+      type: string
+      description: Tag account
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    AuditRun_VariableInventory_TagAccountRequestDTO:
+      description: Request body for Variable Inventory report
+      required:
+      - tagId
+      - tagAccount
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        properties:
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagAccount:
+            $ref: '#/components/schemas/TagAccount'
+    AuditRun_VariableInventory_TrendsDTO:
+      description: Variable Inventory trends overview (a.k.a. trendlines a.k.a. sparklines)
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_TrendsItem'
+    AuditRun_VariableInventory_UniqueVariableValuesDTO:
+      description: Variable Inventory - unique variable values list data
+      type: object
+      required:
+      - metadata
+      - variableValues
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        variableValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_UniqueVariableValuesItem'
+  parameters:
+    AuditRun_Trends_DaysParam:
+      name: days
+      in: query
+      required: true
+      schema:
+        type: integer
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    AuditRun_TagAccountList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    AuditRun_TagAccountVariableValueList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    AuditRun_VariableInventory_PagesSortParam:
+      in: query
+      name: sortBy
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_VariableInventory_PagesSortColumn'
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  securitySchemes:
+    API_Key:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`
+
+        '
+x-tagGroups:
+- name: Audit Reports
+  tags:
+  - alert-summary-report
+  - audit-summary-report
+  - browser-logs-report
+  - cookie-inventory-report
+  - cookie-privacy-report
+  - file-changes-report
+  - page-details-report
+  - page-summary-report
+  - request-privacy-report
+  - rule-summary-report
+  - tag-duplicates-and-multiples-report
+  - tag-health-report
+  - tag-inventory-report
+  - tag-privacy-report
+  - variable-inventory-report
+  - web-audits
+- name: Web Journey Reports
+  tags:
+  - web-journey-cookie-report
+- name: Exports
+  tags:
+  - account-usage-export
+  - alert-export
+  - audit-run-export
+  - consent-category-export
+  - exports
+  - manual-journey-run-export
+  - scheduled-exports
+  - web-journey-run-export
+- name: Alerts
+  tags:
+  - account-triggered-alerts
+  - account-usage-alerts
+  - alerts
+  - email-inbox-message-alerts
+- name: Account Usage
+  tags:
+  - account-usage-v2
+- name: Email
+  tags:
+  - email-inbox-configuration
+  - email-inbox-messages
+  - email-inboxes
+- name: Configuration
+  tags:
+  - action-set-action-rules
+  - action-set-actions
+  - action-sets
+  - audit-actions
+  - audit-blocking-config
+  - audit-login-actions
+  - audits-consent-category
+  - audits-management
+  - consent-categories
+  - custom-headers
+  - data-sources
+  - geo-locations
+  - notification-center
+  - remote-file-mappings
+  - rules
+  - schedules
+  - site-censuses
+  - user-events
+  - web-journey-blocking-config
+  - web-journey-custom-headers
+  - web-journeys-management

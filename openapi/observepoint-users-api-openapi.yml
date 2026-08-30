@@ -1,0 +1,336 @@
+openapi: 3.2.0
+info:
+  description: Endpoints for managing users including creation, authentication, permissions, and user account management
+  title: V2 Users API
+  version: null
+servers:
+- url: https://api.observepoint.com/v2
+tags:
+- description: Endpoints for managing users including creation, authentication, permissions, and user account management
+  name: Users
+paths:
+  /users:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/users</div>
+      operationId: getUsers
+      parameters:
+      - name: withDeleted
+        in: query
+        description: Include deleted users
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+        '403':
+          description: Not Admin User
+      security:
+      - API_Key: []
+      summary: Return all users for current user account.
+      tags:
+      - Users
+  /users/{userId}:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/users/<span class="op-path-parameter">{userId}</span></div>
+      operationId: getUser
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Not Admin user or id parameter is not equal to current user id
+        '404':
+          description: Not found user by given id
+      security:
+      - API_Key: []
+      summary: Return user data by given id. Accessible only for admin users or if {userId} equal to current user id
+      tags:
+      - Users
+    put:
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/users/<span class="op-path-parameter">{userId}</span></div>
+      operationId: updateUser
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDocument'
+        description: Updated user data
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Not Admin user or id parameter is not equal to current user id
+        '404':
+          description: Not found user by given id
+      security:
+      - API_Key: []
+      summary: Update user data by given userId.Accessible only for admin users or if {userId} equal to current user id
+      tags:
+      - Users
+    delete:
+      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/users/<span class="op-path-parameter">{userId}</span></div>
+      operationId: deleteUser
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Item was successfully deleted
+        '403':
+          description: Not Admin user or id parameter is not equal to current user id
+        '404':
+          description: Not found user by given id
+      security:
+      - API_Key: []
+      summary: Delete user by given id. Accessible only for admin users
+      tags:
+      - Users
+  /users/{userId}/folders:
+    get:
+      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/users/<span class="op-path-parameter">{userId}</span>/folders</div>
+      operationId: getUserFolders
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserFolder'
+                type: array
+        '403':
+          description: Not Admin user or id parameter is not equal to current user id
+        '404':
+          description: Not found user by given id
+      security:
+      - API_Key: []
+      summary: Return folders list shared with user by given id. Accessible only for admin users or if {userId} equal to current user id
+      tags:
+      - Users
+    post:
+      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/users/<span class="op-path-parameter">{userId}</span>/folders</div>
+      operationId: addUserFolders
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/addUserFoldersBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserFolder'
+                type: array
+        '403':
+          description: Not Admin User
+        '404':
+          description: Not found user by given id
+        '422':
+          description: Some of provided folder id's is not found
+      security:
+      - API_Key: []
+      summary: Add given folders as shared for user with given userId.Accessible only for admin users
+      tags:
+      - Users
+    put:
+      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/users/<span class="op-path-parameter">{userId}</span>/folders</div>
+      operationId: setUserFolders
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        $ref: '#/components/requestBodies/addUserFoldersBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserFolder'
+                type: array
+        '403':
+          description: Not Admin User
+        '404':
+          description: Not found user by given id
+        '422':
+          description: Some of provided folder id's is not found
+      security:
+      - API_Key: []
+      summary: Set given folders as shared for user with given userId. Accessible only for admin users
+      tags:
+      - Users
+components:
+  schemas:
+    UserFolder:
+      type: object
+      required:
+      - accountId
+      - id
+      - name
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: User folder model
+    User:
+      type: object
+      required:
+      - accountId
+      - created
+      - email
+      - firstName
+      - fullUsageDashboardAccess
+      - id
+      - lastName
+      - maxPagesPerAudit
+      - timezone
+      - updated
+      - username
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        created:
+          format: date-time
+          type: string
+        deleted:
+          description: ISO 8601 date time string with offset when user was deleted, null if not deleted
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: boolean
+        id:
+          format: int32
+          type: integer
+        lastLogin:
+          format: date-time
+          type: string
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          format: int32
+          type: integer
+        permissions:
+          enum:
+          - guest
+          - user
+          - admin
+          type: string
+        timezone:
+          type: string
+        updated:
+          format: date-time
+          type: string
+        username:
+          type: string
+      description: User model
+    UserDocument:
+      type: object
+      required:
+      - email
+      - firstName
+      - lastName
+      - timezone
+      - username
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: number
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          type: number
+        permissions:
+          enum:
+          - guest
+          - user
+          - admin
+          type: string
+        timezone:
+          type: string
+        username:
+          type: string
+      description: User create/update model
+  requestBodies:
+    addUserFoldersBody:
+      content:
+        application/json:
+          schema:
+            items:
+              format: int32
+              type: integer
+            type: array
+      description: Folders id list
+  securitySchemes:
+    API_Key:
+      description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
+
+
+        Example: `Authorization: abc123...def456`'
+      in: header
+      name: Authorization
+      type: apiKey
