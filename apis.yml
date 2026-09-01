@@ -30,17 +30,17 @@ specificationVersion: '0.20'
 created: '2026-08-26'
 modified: '2026-08-26'
 tags:
-- company
+- Company
 - web-governance
-- tag-management
+- Tag Management
 - analytics-validation
-- privacy-compliance
-- consent-management
-- web-accessibility
-- data-quality
-- marketing-technology
+- Privacy Compliance
+- Consent Management
+- Web Accessibility
+- Data Quality
+- Marketing Technology
 - website-auditing
-- digital-analytics
+- Digital Analytics
 - Webhook
 tags_raw:
 - company
