@@ -42,7 +42,7 @@ x-type: company
 x-source: harvest:secondary-market
 specificationVersion: '0.20'
 created: '2026-08-26'
-modified: '2026-08-26'
+modified: '2026-09-06'
 tags:
 - Company
 - web-governance
@@ -1748,6 +1748,12 @@ common:
   url: skills/_index.yml
 - type: JSONSchema
   url: json-schema/observepoint-data-dictionary-schemas.json
+- name: MCP Server
+  url: https://mcp.observepoint.ai/v1
+  type: MCPServer
+- name: MCP Documentation
+  url: https://help.observepoint.com/en/collections/19738264-observepoint-mcp-server
+  type: MCPDocumentation
 x-enrichment:
   date: '2026-08-26'
   status: enriched
