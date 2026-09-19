@@ -468,6 +468,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Audit
+  tags_raw:
   - Audits
   properties:
   - type: OpenAPI
@@ -1234,7 +1236,7 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
-  - Schedules
+  - Schedule
   tags_raw:
   - schedules
   properties:
