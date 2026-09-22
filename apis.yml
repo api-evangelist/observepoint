@@ -53,7 +53,7 @@ tags:
 - Web Accessibility
 - Data Quality
 - Marketing Technology
-- website-auditing
+- Website Auditing
 - Digital Analytics
 - Webhook
 tags_raw:
@@ -1510,6 +1510,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Web Audits
+  tags_raw:
   - web-audits
   properties:
   - type: OpenAPI
