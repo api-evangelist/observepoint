@@ -10,7 +10,7 @@ servers:
 - url: https://api.observepoint.com
   description: ObservePoint Production API
 tags:
-- name: exports
+- name: Exports
   x-displayName: Exports Center
   description: Access requested exports status/information
 paths:
@@ -64,7 +64,7 @@ paths:
           $ref: '#/components/schemas/ExportId'
     get:
       tags:
-      - exports
+      - Exports
       operationId: getExportCenterExports
       summary: Get export center exports
       responses:
@@ -78,7 +78,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/exports</div>
+      description: GET /v3/exports
   /v3/exports/{exportUuid}:
     parameters:
     - name: exportUuid
@@ -89,7 +89,7 @@ paths:
         $ref: '#/components/schemas/ExportUuid'
     get:
       tags:
-      - exports
+      - Exports
       operationId: getExportDownload
       summary: Download export
       responses:
@@ -103,33 +103,21 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/exports/<span class="op-path-parameter">{exportUuid}</span></div>
+      description: GET /v3/exports/{exportUuid}
 components:
   schemas:
-    ExportCenter_ExportStatus:
-      type: string
-      enum:
-      - queued
-      - in_progress
-      - completed
-      - failed
-      - no_data
-    ExportCenter_ExportsSortColumn:
-      type: string
-      enum:
-      - date_exported
-      - item_name
-      - run_date
-      - export_name
-      - exported_item_type
-      - requested_by
-      - status
-      - is_scheduled
-      default: date_exported
-    ExportId:
-      type: integer
-      format: int64
-      description: Unique ID of an export
+    ExportCenter_ExportsDTO:
+      type: object
+      required:
+      - metadata
+      - exports
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        exports:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportCenter_ExportsItem'
     ExportCenter_ExportsItem:
       type: object
       description: 'Not all exports are related to a particular audit/web-journey/manual-journey item or its run, e.g. consent category configs export. Such exports do not have `itemType`, `itemId`, `itemName`, `runId`, `runDate`
@@ -182,11 +170,101 @@ components:
           type: boolean
           description: Whether the export is scheduled or not
           default: false
-    ItemId:
+    ExportUuid:
+      type: string
+      format: uuid
+      description: Unique ID of an export link
+    ExportCenter_ExportsSortColumn:
+      type: string
+      enum:
+      - date_exported
+      - item_name
+      - run_date
+      - export_name
+      - exported_item_type
+      - requested_by
+      - status
+      - is_scheduled
+      default: date_exported
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    RunId:
       type: integer
       format: int64
-      description: ID of a data collector, see ItemType
-      example: 107239
+      example: 33010
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    ExportTypeEnum:
+      type: string
+      description: Enumeration of all high-level export types
+      enum:
+      - AUDIT_RUN_EXPORT
+      - WEB_JOURNEY_RUN_EXPORT
+      - MANUAL_JOURNEY_RUN_EXPORT
+      - CONSENT_CATEGORY_EXPORT
+      - ALERT_EXPORT
+      - ACCOUNT_USAGE_EXPORT
+      - GRID_DATA_EXPORT
+    ExportCenter_ExportedItemTypeEnum:
+      type: string
+      enum:
+      - audit
+      - web_journey
+      - live_connect
+      - consent_categories
+      - alert
+      - account_usage
+      - grid_data
+    ExportCenter_ExportStatus:
+      type: string
+      enum:
+      - queued
+      - in_progress
+      - completed
+      - failed
+      - no_data
     PaginationMetadata:
       type: object
       required:
@@ -211,92 +289,14 @@ components:
         currentPageNumber:
           description: Current page number/ordinal
           type: integer
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ExportCenter_ExportedItemTypeEnum:
-      type: string
-      enum:
-      - audit
-      - web_journey
-      - live_connect
-      - consent_categories
-      - alert
-      - account_usage
-      - grid_data
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     ScheduledExportId:
       type: integer
       format: int64
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    UserId:
+    ItemId:
       type: integer
-      description: ID of a user
-      example: 123
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    ExportTypeEnum:
-      type: string
-      description: Enumeration of all high-level export types
-      enum:
-      - AUDIT_RUN_EXPORT
-      - WEB_JOURNEY_RUN_EXPORT
-      - MANUAL_JOURNEY_RUN_EXPORT
-      - CONSENT_CATEGORY_EXPORT
-      - ALERT_EXPORT
-      - ACCOUNT_USAGE_EXPORT
-      - GRID_DATA_EXPORT
-    ExportUuid:
-      type: string
-      format: uuid
-      description: Unique ID of an export link
-    ExportCenter_ExportsDTO:
-      type: object
-      required:
-      - metadata
-      - exports
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        exports:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExportCenter_ExportsItem'
+      format: int64
+      description: ID of a data collector, see ItemType
+      example: 107239
   parameters:
     pageParam:
       name: page

@@ -51,9 +51,77 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-journeys/<span class="op-path-parameter">{webJourneyId}</span>/runs/<span class="op-path-parameter">{runId}</span>/exports/<span class="op-path-parameter">{exportType}</span></div>
+      description: POST /v3/web-journeys/{webJourneyId}/runs/{runId}/exports/{exportType}
 components:
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
   schemas:
+    WebJourneyId:
+      type: integer
+      format: int64
+      example: 107239
+    ExportResultDTO:
+      type: object
+      required:
+      - exportId
+      properties:
+        exportId:
+          $ref: '#/components/schemas/ExportId'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
+    WebJourneyRun_ExportTypeEnum:
+      type: string
+      description: All supported web journey run export types
+      enum:
+      - ACTION_SUMMARY
+      - ACTION_TAGS
+      - ACTION_TAG_VARIABLES
+      - RULE_SUMMARY
+      - ACTION_COOKIES
+      - ACTION_NETWORK_REQUESTS
+      - ACTION_BROWSER_LOGS
     ErrorModel:
       type: object
       properties:
@@ -66,74 +134,6 @@ components:
           type: string
         validationReport:
           type: object
-    ExportResultDTO:
-      type: object
-      required:
-      - exportId
-      properties:
-        exportId:
-          $ref: '#/components/schemas/ExportId'
-    WebJourneyRun_ExportTypeEnum:
-      type: string
-      description: All supported web journey run export types
-      enum:
-      - ACTION_SUMMARY
-      - ACTION_TAGS
-      - ACTION_TAG_VARIABLES
-      - RULE_SUMMARY
-      - ACTION_COOKIES
-      - ACTION_NETWORK_REQUESTS
-      - ACTION_BROWSER_LOGS
-    WebJourneyId:
-      type: integer
-      format: int64
-      example: 107239
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ExportId:
-      type: integer
-      format: int64
-      description: Unique ID of an export
-  responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-  parameters:
-    RunId:
-      name: runId
-      in: path
-      required: true
-      description: Unique identification number for web audit or journey run
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/RunId'
-    WebJourneyId:
-      name: webJourneyId
-      in: path
-      required: true
-      description: Unique identification number for web journey item
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/WebJourneyId'
   securitySchemes:
     API_Key:
       type: apiKey

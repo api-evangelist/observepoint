@@ -10,7 +10,7 @@ servers:
 - url: https://api.observepoint.com
   description: ObservePoint Production API
 tags:
-- name: alert-export
+- name: Alert Export
   x-displayName: Alert Export
   description: Export alert data
 paths:
@@ -43,7 +43,7 @@ paths:
     - $ref: '#/components/parameters/Export_AllDataParam'
     post:
       tags:
-      - alert-export
+      - Alert Export
       operationId: requestAlertExport
       summary: Create export for alert
       requestBody:
@@ -69,9 +69,44 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/alerts/exports/<span class="op-path-parameter">{exportType}</span></div>
+      description: POST /v3/alerts/exports/{exportType}
 components:
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
+    ExportResultDTO:
+      type: object
+      required:
+      - exportId
+      properties:
+        exportId:
+          $ref: '#/components/schemas/ExportId'
+    AlertExportTypeEnum:
+      type: string
+      description: All supported alert export types
+      enum:
+      - ACCOUNT_LEVEL_TRIGGERED_ALERTS_EXPORT
     ErrorModel:
       type: object
       properties:
@@ -84,31 +119,7 @@ components:
           type: string
         validationReport:
           type: object
-    ExportResultDTO:
-      type: object
-      required:
-      - exportId
-      properties:
-        exportId:
-          $ref: '#/components/schemas/ExportId'
-    ExportId:
-      type: integer
-      format: int64
-      description: Unique ID of an export
-    AlertExportTypeEnum:
-      type: string
-      description: All supported alert export types
-      enum:
-      - ACCOUNT_LEVEL_TRIGGERED_ALERTS_EXPORT
   parameters:
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
     Export_AllDataParam:
       in: query
       name: allData
@@ -126,25 +137,14 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
-  responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
   securitySchemes:
     API_Key:
       type: apiKey

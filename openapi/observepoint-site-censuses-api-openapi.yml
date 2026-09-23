@@ -43,7 +43,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/site-censuses</div>
+      description: GET /v3/site-censuses
     post:
       tags:
       - site-censuses
@@ -71,7 +71,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/site-censuses</div>
+      description: POST /v3/site-censuses
   /v3/site-censuses/{censusId}:
     parameters:
     - $ref: '#/components/parameters/SiteCensusId'
@@ -97,7 +97,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span></div>
+      description: GET /v3/site-censuses/{censusId}
     put:
       tags:
       - site-censuses
@@ -127,7 +127,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span></div>
+      description: PUT /v3/site-censuses/{censusId}
     delete:
       tags:
       - site-censuses
@@ -146,7 +146,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span></div>
+      description: DELETE /v3/site-censuses/{censusId}
   /v3/site-censuses/{censusId}/current-results:
     get:
       tags:
@@ -190,13 +190,13 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span>/current-results</div>
+      description: GET /v3/site-censuses/{censusId}/current-results
   /v3/site-censuses/{censusId}/url-folders:
     get:
       tags:
       - site-censuses
-      summary: Browse a host's folder tree, list every host's root, or search folders and pages across the census -- each returned folder carrying a preview of its direct URLs
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span>/url-folders</div>
+      summary: Browse a host's folder tree, list every host's root, or search folders and…
+      description: 'GET /v3/site-censuses/{censusId}/url-folders
 
 
         In both modes every counted folder row nests a preview of its own DIRECT child URLs in `urls` (capped at urlsPerFolder, with the uncapped total in matchedUrlCount), so one request returns a fully renderable tree level -- folders and the pages inside them -- without a follow-up call to folders/urls. That endpoint remains the way to page through a folder whose preview was truncated; it lists in the same default (URL, id) order, so the preview''s URLs reappear there in the same relative order. It lists every direct URL of the folder without this endpoint''s view filtering, so its rows and totals can exceed the preview''s matchedUrlCount (e.g. on censuses with IGNORE patterns or in excluded views).
@@ -214,9 +214,7 @@ paths:
         Pagination counts matched folders only: totalCount is the number of matching folders, and one page is pageSize matched rows. Nested `urls` entries and ancestor context rows are additional and never counted. A matching URL appears exactly once across the whole pagination -- nested under its containing folder, on the page where that folder sorts.
 
 
-        Where the counts come from: the excluded view (returnExcludedOnly=true) is always computed live from URLs, and so is the included view whenever the census is running, has IGNORE patterns configured, or has not finished folder aggregation; otherwise the included view is served from the persisted folder rollup. A search result''s folder counts always describe the folder''s whole subtree on both paths -- they are never restricted to matching URLs -- so the same folder reports the same totalUrls whether it was reached by browsing or by searching. Persisted counts still bucket status codes slightly differently from live ones: live treats any status other than 0 as visited, while the persisted unknown-status bucket additionally absorbs missing, 1xx and 6xx+ codes and reports them under urlsToVisit. visitedUrls + urlsToVisit always equals totalUrls on both paths.
-
-        '
+        Where the counts come from: the excluded view (returnExcludedOnly=true) is always computed live from URLs, and so is the included view whenever the census is running, has IGNORE patterns configured, or has not finished folder aggregation; otherwise the included view is served from the persisted folder rollup. A search result''s folder counts always describe the folder''s whole subtree on both paths -- they are never restricted to matching URLs -- so the same folder reports the same totalUrls whether it was reached by browsing or by searching. Persisted counts still bucket status codes slightly differently from live ones: live treats any status other than 0 as visited, while the persisted unknown-status bucket additionally absorbs missing, 1xx and 6xx+ codes and reports them under urlsToVisit. visitedUrls + urlsToVisit always equals totalUrls on both paths.'
       operationId: getSiteCensusUrlFolders
       parameters:
       - $ref: '#/components/parameters/SiteCensusId'
@@ -304,12 +302,10 @@ paths:
       tags:
       - site-censuses
       summary: Returns the rolled-up counts for a single site-census folder
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span>/folders/summary</div>
+      description: 'GET /v3/site-censuses/{censusId}/folders/summary
 
 
-        Reads the precomputed rollup counts for one folder from site_census_url_folders (trustworthy only when finalized is true), plus live included/ignored URL counts computed over the folder''s subtree.
-
-        '
+        Reads the precomputed rollup counts for one folder from site_census_url_folders (trustworthy only when finalized is true), plus live included/ignored URL counts computed over the folder''s subtree.'
       operationId: getSiteCensusFolderSummary
       parameters:
       - $ref: '#/components/parameters/SiteCensusId'
@@ -351,15 +347,13 @@ paths:
       tags:
       - site-censuses
       summary: Returns the URLs sitting directly in a site-census folder
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span>/folders/urls</div>
+      description: 'GET /v3/site-censuses/{censusId}/folders/urls
 
 
         Lists the individual URLs whose containing folder is exactly folderPath (direct URLs only, not descendants), from site_census_urls, paginated.
 
 
-        Supply searchPattern to page through only the matching pages of one folder - the same pages the url-folders search nests in that folder''s `urls` preview, using the identical page-name predicate and the same default (URL, id) order, so paging past a truncated preview continues the exact sequence the preview started and cannot surface pages the search itself would not have matched.
-
-        '
+        Supply searchPattern to page through only the matching pages of one folder - the same pages the url-folders search nests in that folder''s `urls` preview, using the identical page-name predicate and the same default (URL, id) order, so paging past a truncated preview continues the exact sequence the preview started and cannot surface pages the search itself would not have matched.'
       operationId: getSiteCensusFolderUrls
       parameters:
       - $ref: '#/components/parameters/SiteCensusId'
@@ -416,7 +410,7 @@ paths:
     post:
       tags:
       - site-censuses
-      summary: Returns a preview of the current census results data given specific path patterns
+      summary: Returns a preview of the current census results data given specific path…
       operationId: getSiteCensusPatternUrlPreview
       parameters:
       - $ref: '#/components/parameters/SiteCensusId'
@@ -442,7 +436,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span>/current-results/url-preview</div>
+      description: POST /v3/site-censuses/{censusId}/current-results/url-preview
   /v3/site-censuses/{censusId}/start:
     post:
       tags:
@@ -466,7 +460,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span>/start</div>
+      description: POST /v3/site-censuses/{censusId}/start
   /v3/site-censuses/{censusId}/stop:
     post:
       tags:
@@ -490,14 +484,14 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/site-censuses/<span class="op-path-parameter">{censusId}</span>/stop</div>
+      description: POST /v3/site-censuses/{censusId}/stop
   /v3/site-censuses/finder:
     get:
       tags:
       - site-censuses
       operationId: findSiteCensuses
       summary: Find site censuses
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/site-censuses/finder</div>
+      description: 'GET /v3/site-censuses/finder
 
 
         Find site censuses. Available for ≥ OpAdmins only.'
@@ -526,77 +520,105 @@ paths:
       - API_Key: []
 components:
   schemas:
-    FoundSiteCensusDTO:
+    SiteCensusSummaryDTO:
+      allOf:
+      - $ref: '#/components/schemas/SiteCensusResultsSummaryDTO'
+      - type: object
+        required:
+        - censusConfig
+        properties:
+          censusConfig:
+            $ref: '#/components/schemas/SiteCensusCompleteDTO'
+    SiteCensusCompleteDTO:
+      allOf:
+      - $ref: '#/components/schemas/SiteCensusBehaviorDTO'
+      - type: object
+        required:
+        - id
+        - isArchived
+        properties:
+          id:
+            type: integer
+            format: int64
+            description: The unique identifier for the Site Census.
+          isArchived:
+            type: boolean
+            readOnly: true
+            description: Indicates whether the Site Census has been archived. True if and only if the census has an archived_at timestamp. Archived censuses cannot be edited or restarted, but they can be deleted. Server-set; ignored on requests.
+    SiteCensusFolderUrlsResultsDTO:
       type: object
-      description: 'Represents a site census retrieved from a search operation. Site censuses can be searched by the following properties:
-
-        - `id`
-
-        - `name`
-
-        '
       required:
-      - id
-      - name
-      - accountId
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        accountId:
-          type: integer
-          format: int64
-    SiteCensusPatternPreviewResponse:
-      type: object
-      required:
-      - censusId
-      - totalUrls
+      - metadata
       - urls
       properties:
-        censusId:
-          type: integer
-          format: int64
-          description: The unique identifier for the Site Census.
-        totalUrls:
-          type: integer
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
         urls:
           type: array
           minItems: 0
           items:
-            type: string
-    SiteCensusSortByEnum:
-      type: string
-      default: NAME
-      enum:
-      - NAME
-      - UNIQUE_URLS
-      - VISITED_URLS
-      - URLS_TO_VISIT
-      - IGNORED_URLS
-      - BROKEN_URLS
-      - SCAN_DATE
-    SiteCensusBehaviorDTO:
-      allOf:
-      - $ref: '#/components/schemas/SiteCensusBaseDTO'
-      - type: object
-        required:
-        - startingUrls
-        - filterPatterns
-        properties:
-          startingUrls:
-            type: array
-            minItems: 0
-            items:
-              type: string
-              format: uri
-            description: The list of starting URLs for the Site Census.
-          filterPatterns:
-            type: array
-            minItems: 0
-            items:
-              $ref: '#/components/schemas/SiteCensusFilterPattern'
+            $ref: '#/components/schemas/SiteCensusFolderUrlDTO'
+    SiteCensusFolderSummaryDTO:
+      type: object
+      required:
+      - censusId
+      - baseDomain
+      - host
+      - folderPath
+      - totalUrls
+      - directUrls
+      - childFolderCount
+      - visitedUrls
+      - urlsToVisit
+      - brokenUrls
+      - includedUrls
+      - ignoredUrls
+      - finalized
+      properties:
+        censusId:
+          type: integer
+          format: int64
+        baseDomain:
+          type: string
+        host:
+          type: string
+        folderPath:
+          type: string
+        totalUrls:
+          type: integer
+          minimum: 0
+          description: Self-inclusive total URLs in this folder and all descendants (descendant_page_count).
+        directUrls:
+          type: integer
+          minimum: 0
+          description: URLs sitting directly in this folder (not descendants).
+        childFolderCount:
+          type: integer
+          minimum: 0
+          description: Number of immediate child folders.
+        visitedUrls:
+          type: integer
+          minimum: 0
+          description: Visited URLs in the subtree (success + redirect + broken buckets).
+        urlsToVisit:
+          type: integer
+          minimum: 0
+          description: Not-yet-categorized URLs in the subtree (unknown-status bucket); ~0 for a finalized census.
+        brokenUrls:
+          type: integer
+          minimum: 0
+          description: URLs in the subtree with a 4xx/5xx status.
+        includedUrls:
+          type: integer
+          minimum: 0
+          description: Live count of subtree URLs NOT matching any IGNORE pattern.
+        ignoredUrls:
+          type: integer
+          minimum: 0
+          description: Live count of subtree URLs matching an IGNORE pattern.
+        finalized:
+          type: boolean
+          description: True when the folder's precomputed rollup counts have been finalized and are trustworthy.
     SiteCensusBaseDTO:
       type: object
       required:
@@ -704,258 +726,6 @@ components:
         renderedPathPattern:
           type: string
           description: The rendered path of the URL pattern with the dynamic segment character. Not meant for display.
-    SiteCensusUrlSegment:
-      type: object
-      required:
-      - segmentType
-      properties:
-        segmentType:
-          type: string
-          description: 'The type of segment in the path. A static segment is a string in the path that does not represent a variable.
-
-            A dynamic segment is one that represents a variable in the URL. For example, a dynamic segment could be a user ID.
-
-            '
-          enum:
-          - STATIC
-          - DYNAMIC
-        staticSegmentValue:
-          type: string
-          description: present when segment type is `static`. A static segment is a string in the path that does not represent a variable.
-        dynamicSegmentType:
-          type: string
-          description: present when segment type is `dynamic`. Use this type to make rendering decisions when displaying path segments.
-          enum:
-          - NUMBER
-          - DATETIME
-          - ALPHA
-          - ALPHA_NUMERIC
-    SiteCensusUrlPattern:
-      allOf:
-      - $ref: '#/components/schemas/SiteCensusBaseUrlPattern'
-      - type: object
-        description: The ObservePoint proprietary pattern used to classify URLs with similar paths based upon dynamic path segments.
-        required:
-        - urlSegments
-        properties:
-          urlSegments:
-            type: array
-            minItems: 0
-            description: The list of URL path segments.  Construct a full path pattern by appending the segment in order of array index separated by forward slashes.
-            items:
-              $ref: '#/components/schemas/SiteCensusUrlSegment'
-    SiteCensusUrlFolderSortByEnum:
-      type: string
-      default: FOLDER_NAME
-      enum:
-      - FOLDER_NAME
-      - TOTAL_URLS
-      - URLS_TO_VISIT
-      - VISITED_URLS
-      - BROKEN_URLS
-      - LAST_FOUND
-    SiteCensusUrlPatternResultsDTO:
-      type: object
-      required:
-      - urlPattern
-      - totalUrls
-      - urlsToVisit
-      - visitedUrls
-      - brokenUrls
-      properties:
-        urlPattern:
-          $ref: '#/components/schemas/SiteCensusUrlPattern'
-        totalUrls:
-          type: integer
-          minimum: 0
-          description: The total number of URLs within this pattern.
-        urlsToVisit:
-          type: integer
-          minimum: 0
-          description: The number of URLs in this pattern that can still be visited.
-        visitedUrls:
-          type: integer
-          minimum: 0
-          description: The number of URLs in this pattern that have been visited.
-        brokenUrls:
-          type: integer
-          minimum: 0
-          description: The number of URLs in this pattern that have been visited, but returned with 4xx or 5xx status codes.
-        latestFound:
-          type: string
-          format: date-time
-          description: The date and time of the last URL in this pattern that was found in ISO 8601 format
-    SiteCensusCustomHttpHeader:
-      type: object
-      required:
-      - groupId
-      properties:
-        groupId:
-          type: integer
-          format: int64
-          description: The ID of the custom HTTP header group.
-    SiteCensusFolderUrlSortByEnum:
-      type: string
-      default: URL
-      enum:
-      - URL
-      - STATUS_CODE
-      - LAST_FOUND
-    SiteCensusFolderUrlDTO:
-      type: object
-      required:
-      - urlId
-      - url
-      properties:
-        urlId:
-          type: integer
-          format: int64
-          description: The site_census_urls row id for this URL.
-        url:
-          type: string
-          description: The full page URL (scheme://host/path?query).
-        mostRecentStatusCode:
-          type:
-          - integer
-          - 'null'
-          description: Most recent HTTP status observed; null/0 when not yet visited.
-        urlFoundAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: When the URL was first found, ISO 8601.
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    SiteCensusUrlFolderResultsDTO:
-      type: object
-      required:
-      - metadata
-      - folders
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        folders:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/SiteCensusUrlFolderResultDTO'
-    SiteCensusFolderSummaryDTO:
-      type: object
-      required:
-      - censusId
-      - baseDomain
-      - host
-      - folderPath
-      - totalUrls
-      - directUrls
-      - childFolderCount
-      - visitedUrls
-      - urlsToVisit
-      - brokenUrls
-      - includedUrls
-      - ignoredUrls
-      - finalized
-      properties:
-        censusId:
-          type: integer
-          format: int64
-        baseDomain:
-          type: string
-        host:
-          type: string
-        folderPath:
-          type: string
-        totalUrls:
-          type: integer
-          minimum: 0
-          description: Self-inclusive total URLs in this folder and all descendants (descendant_page_count).
-        directUrls:
-          type: integer
-          minimum: 0
-          description: URLs sitting directly in this folder (not descendants).
-        childFolderCount:
-          type: integer
-          minimum: 0
-          description: Number of immediate child folders.
-        visitedUrls:
-          type: integer
-          minimum: 0
-          description: Visited URLs in the subtree (success + redirect + broken buckets).
-        urlsToVisit:
-          type: integer
-          minimum: 0
-          description: Not-yet-categorized URLs in the subtree (unknown-status bucket); ~0 for a finalized census.
-        brokenUrls:
-          type: integer
-          minimum: 0
-          description: URLs in the subtree with a 4xx/5xx status.
-        includedUrls:
-          type: integer
-          minimum: 0
-          description: Live count of subtree URLs NOT matching any IGNORE pattern.
-        ignoredUrls:
-          type: integer
-          minimum: 0
-          description: Live count of subtree URLs matching an IGNORE pattern.
-        finalized:
-          type: boolean
-          description: True when the folder's precomputed rollup counts have been finalized and are trustworthy.
-    SiteCensusResultsSortByEnum:
-      type: string
-      default: TOTAL_URLS
-      enum:
-      - TOTAL_URLS
-      - URL_PATTERN
-      - URLS_TO_VISIT
-      - VISITED_URLS
-      - BROKEN_URLS
-      - LAST_FOUND
-    SiteCensusSearchParam:
-      type: string
-      minLength: 1
-      description: Parameter to search for site censuses
-    SiteCensusCompleteDTO:
-      allOf:
-      - $ref: '#/components/schemas/SiteCensusBehaviorDTO'
-      - type: object
-        required:
-        - id
-        - isArchived
-        properties:
-          id:
-            type: integer
-            format: int64
-            description: The unique identifier for the Site Census.
-          isArchived:
-            type: boolean
-            readOnly: true
-            description: Indicates whether the Site Census has been archived. True if and only if the census has an archived_at timestamp. Archived censuses cannot be edited or restarted, but they can be deleted. Server-set; ignored on requests.
-    CensusId:
-      type: integer
-      format: int64
     SiteCensusUrlFolderResultDTO:
       type: object
       required:
@@ -1021,18 +791,122 @@ components:
             '
           items:
             $ref: '#/components/schemas/SiteCensusUrlFolderPageDTO'
-    FoundSiteCensusesListResponseDTO:
+    SiteCensusSortByEnum:
+      type: string
+      default: NAME
+      enum:
+      - NAME
+      - UNIQUE_URLS
+      - VISITED_URLS
+      - URLS_TO_VISIT
+      - IGNORED_URLS
+      - BROKEN_URLS
+      - SCAN_DATE
+    SiteCensusCustomHttpHeader:
+      type: object
+      required:
+      - groupId
+      properties:
+        groupId:
+          type: integer
+          format: int64
+          description: The ID of the custom HTTP header group.
+    SiteCensusResultsSortByEnum:
+      type: string
+      default: TOTAL_URLS
+      enum:
+      - TOTAL_URLS
+      - URL_PATTERN
+      - URLS_TO_VISIT
+      - VISITED_URLS
+      - BROKEN_URLS
+      - LAST_FOUND
+    SiteCensusFolderUrlSortByEnum:
+      type: string
+      default: URL
+      enum:
+      - URL
+      - STATUS_CODE
+      - LAST_FOUND
+    SiteCensusPatternPreviewResponse:
+      type: object
+      required:
+      - censusId
+      - totalUrls
+      - urls
+      properties:
+        censusId:
+          type: integer
+          format: int64
+          description: The unique identifier for the Site Census.
+        totalUrls:
+          type: integer
+        urls:
+          type: array
+          minItems: 0
+          items:
+            type: string
+    SiteCensusUrlSegment:
+      type: object
+      required:
+      - segmentType
+      properties:
+        segmentType:
+          type: string
+          description: 'The type of segment in the path. A static segment is a string in the path that does not represent a variable.
+
+            A dynamic segment is one that represents a variable in the URL. For example, a dynamic segment could be a user ID.
+
+            '
+          enum:
+          - STATIC
+          - DYNAMIC
+        staticSegmentValue:
+          type: string
+          description: present when segment type is `static`. A static segment is a string in the path that does not represent a variable.
+        dynamicSegmentType:
+          type: string
+          description: present when segment type is `dynamic`. Use this type to make rendering decisions when displaying path segments.
+          enum:
+          - NUMBER
+          - DATETIME
+          - ALPHA
+          - ALPHA_NUMERIC
+    SiteCensusUrlFolderResultsDTO:
       type: object
       required:
       - metadata
-      - items
+      - folders
       properties:
         metadata:
           $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        items:
+        folders:
           type: array
+          minItems: 0
           items:
-            $ref: '#/components/schemas/FoundSiteCensusDTO'
+            $ref: '#/components/schemas/SiteCensusUrlFolderResultDTO'
+    FoundSiteCensusDTO:
+      type: object
+      description: 'Represents a site census retrieved from a search operation. Site censuses can be searched by the following properties:
+
+        - `id`
+
+        - `name`
+
+        '
+      required:
+      - id
+      - name
+      - accountId
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        accountId:
+          type: integer
+          format: int64
     ErrorModel:
       type: object
       properties:
@@ -1045,6 +919,75 @@ components:
           type: string
         validationReport:
           type: object
+    SiteCensusFolderUrlDTO:
+      type: object
+      required:
+      - urlId
+      - url
+      properties:
+        urlId:
+          type: integer
+          format: int64
+          description: The site_census_urls row id for this URL.
+        url:
+          type: string
+          description: The full page URL (scheme://host/path?query).
+        mostRecentStatusCode:
+          type:
+          - integer
+          - 'null'
+          description: Most recent HTTP status observed; null/0 when not yet visited.
+        urlFoundAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the URL was first found, ISO 8601.
+    SiteCensusFilterPattern:
+      type: object
+      required:
+      - pathPattern
+      - fqdn
+      - type
+      properties:
+        pathPattern:
+          type: string
+          description: The GLOB pattern to match the path of the URL.
+        fqdn:
+          type: string
+          description: The fully qualified domain name (FQDN) to match against the URL.
+        type:
+          type: string
+          enum:
+          - PRIORITY
+          - IGNORE
+          description: Indicates whether matches should be prioritized or ignored.
+    SiteCensusSearchParam:
+      type: string
+      minLength: 1
+      description: Parameter to search for site censuses
+    SiteCensusUrlPattern:
+      allOf:
+      - $ref: '#/components/schemas/SiteCensusBaseUrlPattern'
+      - type: object
+        description: The ObservePoint proprietary pattern used to classify URLs with similar paths based upon dynamic path segments.
+        required:
+        - urlSegments
+        properties:
+          urlSegments:
+            type: array
+            minItems: 0
+            description: The list of URL path segments.  Construct a full path pattern by appending the segment in order of array index separated by forward slashes.
+            items:
+              $ref: '#/components/schemas/SiteCensusUrlSegment'
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
     SiteCensusUrlFolderPageDTO:
       type: object
       description: 'One direct-child URL of the folder row it is nested under. In search mode its own page name matched searchPattern; in browse mode every in-view direct URL qualifies. Carries no folder identity of its own - the enclosing folder row is the identity.
@@ -1076,27 +1019,36 @@ components:
           - 'null'
           format: date-time
           description: When the URL was first found, ISO 8601.
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    SiteCensusFolderUrlsResultsDTO:
-      type: object
-      required:
-      - metadata
-      - urls
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        urls:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/SiteCensusFolderUrlDTO'
+    SiteCensusUrlFolderSortByEnum:
+      type: string
+      default: FOLDER_NAME
+      enum:
+      - FOLDER_NAME
+      - TOTAL_URLS
+      - URLS_TO_VISIT
+      - VISITED_URLS
+      - BROKEN_URLS
+      - LAST_FOUND
+    SiteCensusBehaviorDTO:
+      allOf:
+      - $ref: '#/components/schemas/SiteCensusBaseDTO'
+      - type: object
+        required:
+        - startingUrls
+        - filterPatterns
+        properties:
+          startingUrls:
+            type: array
+            minItems: 0
+            items:
+              type: string
+              format: uri
+            description: The list of starting URLs for the Site Census.
+          filterPatterns:
+            type: array
+            minItems: 0
+            items:
+              $ref: '#/components/schemas/SiteCensusFilterPattern'
     SiteCensusCurrentResultsDTO:
       type: object
       required:
@@ -1113,6 +1065,76 @@ components:
             $ref: '#/components/schemas/SiteCensusUrlPatternResultsDTO'
         resultsSummary:
           $ref: '#/components/schemas/SiteCensusResultsSummaryDTO'
+    SiteCensusUrlPatternResultsDTO:
+      type: object
+      required:
+      - urlPattern
+      - totalUrls
+      - urlsToVisit
+      - visitedUrls
+      - brokenUrls
+      properties:
+        urlPattern:
+          $ref: '#/components/schemas/SiteCensusUrlPattern'
+        totalUrls:
+          type: integer
+          minimum: 0
+          description: The total number of URLs within this pattern.
+        urlsToVisit:
+          type: integer
+          minimum: 0
+          description: The number of URLs in this pattern that can still be visited.
+        visitedUrls:
+          type: integer
+          minimum: 0
+          description: The number of URLs in this pattern that have been visited.
+        brokenUrls:
+          type: integer
+          minimum: 0
+          description: The number of URLs in this pattern that have been visited, but returned with 4xx or 5xx status codes.
+        latestFound:
+          type: string
+          format: date-time
+          description: The date and time of the last URL in this pattern that was found in ISO 8601 format
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    FoundSiteCensusesListResponseDTO:
+      type: object
+      required:
+      - metadata
+      - items
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoundSiteCensusDTO'
+    CensusId:
+      type: integer
+      format: int64
     SiteCensusSummariesResponseDTO:
       type: object
       required:
@@ -1126,43 +1148,66 @@ components:
           minItems: 0
           items:
             $ref: '#/components/schemas/SiteCensusSummaryDTO'
-    SiteCensusFilterPattern:
-      type: object
-      required:
-      - pathPattern
-      - fqdn
-      - type
-      properties:
-        pathPattern:
-          type: string
-          description: The GLOB pattern to match the path of the URL.
-        fqdn:
-          type: string
-          description: The fully qualified domain name (FQDN) to match against the URL.
-        type:
-          type: string
-          enum:
-          - PRIORITY
-          - IGNORE
-          description: Indicates whether matches should be prioritized or ignored.
-    SiteCensusSummaryDTO:
-      allOf:
-      - $ref: '#/components/schemas/SiteCensusResultsSummaryDTO'
-      - type: object
-        required:
-        - censusConfig
-        properties:
-          censusConfig:
-            $ref: '#/components/schemas/SiteCensusCompleteDTO'
+  parameters:
+    SiteCensus_Get_PageSizeParam:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 10
+        minimum: 10
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    SiteCensus_Filter_ByName:
+      in: query
+      name: filterByName
+      required: false
+      schema:
+        type: string
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    SiteCensusId:
+      name: censusId
+      in: path
+      required: true
+      description: Unique identification number for a site census
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/CensusId'
+    PageSize:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
   responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
+    Forbidden:
+      description: You don't have enough rights to access this resource
       content:
         application/json:
           schema:
@@ -1179,57 +1224,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-  parameters:
-    PageSize:
-      in: query
-      name: pageSize
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 100
-        minimum: 100
-    SiteCensusId:
-      name: censusId
-      in: path
-      required: true
-      description: Unique identification number for a site census
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/CensusId'
-    SiteCensus_Filter_ByName:
-      in: query
-      name: filterByName
-      required: false
-      schema:
-        type: string
-    PageParam:
-      in: query
-      name: page
-      description: Number of results page of an endpoint with paginated results
-      required: false
-      schema:
-        type: integer
-        default: 0
-        minimum: 0
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    SiteCensus_Get_PageSizeParam:
-      in: query
-      name: pageSize
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 10
-        minimum: 10
   securitySchemes:
     API_Key:
       type: apiKey

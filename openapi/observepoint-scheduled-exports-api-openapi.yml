@@ -82,7 +82,7 @@ paths:
           $ref: '#/components/responses/responses-Forbidden'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/exports/scheduled</div>
+      description: GET /v3/exports/scheduled
     post:
       tags:
       - scheduled-exports
@@ -110,7 +110,7 @@ paths:
           $ref: '#/components/responses/responses-Forbidden'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/exports/scheduled</div>
+      description: POST /v3/exports/scheduled
   /v3/exports/scheduled/{scheduledExportId}:
     parameters:
     - name: scheduledExportId
@@ -141,7 +141,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/exports/scheduled/<span class="op-path-parameter">{scheduledExportId}</span></div>
+      description: GET /v3/exports/scheduled/{scheduledExportId}
     put:
       tags:
       - scheduled-exports
@@ -171,7 +171,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/exports/scheduled/<span class="op-path-parameter">{scheduledExportId}</span></div>
+      description: PUT /v3/exports/scheduled/{scheduledExportId}
     delete:
       tags:
       - scheduled-exports
@@ -190,26 +190,9 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/exports/scheduled/<span class="op-path-parameter">{scheduledExportId}</span></div>
+      description: DELETE /v3/exports/scheduled/{scheduledExportId}
 components:
   schemas:
-    ScheduledExports_SortColumn:
-      type: string
-      enum:
-      - name
-      - schedule_description
-      - schedule_is_paused
-      - owner_user_name
-      - exported_item_type
-      - exported_item_name
-      - is_editable
-      - created_at
-      - updated_at
-    ScheduledExports_ReportLinkType:
-      type: string
-      enum:
-      - public_link
-      - regular_link
     ScheduledExports_ScheduleConfigWithDescription:
       allOf:
       - $ref: '#/components/schemas/ScheduledExports_ScheduleConfig'
@@ -226,40 +209,9 @@ components:
             example: DAILY
           nextExportAt:
             $ref: '#/components/schemas/DateAndTime'
-    User:
-      type: object
-      required:
-      - id
-      - userName
-      properties:
-        id:
-          $ref: '#/components/schemas/UserId'
-        userName:
-          type: string
-    ScheduledExportDTO:
-      allOf:
-      - $ref: '#/components/schemas/ScheduledExports_CommonTrait'
-      - type: object
-        required:
-        - id
-        - schedule
-        - exportedItemName
-        - isEditable
-        properties:
-          id:
-            $ref: '#/components/schemas/ScheduledExportId'
-          createdAt:
-            $ref: '#/components/schemas/DateAndTime'
-          updatedAt:
-            $ref: '#/components/schemas/DateAndTime'
-          owner:
-            $ref: '#/components/schemas/User'
-          schedule:
-            $ref: '#/components/schemas/ScheduledExports_ScheduleConfigWithDescription'
-          exportedItemName:
-            type: string
-          isEditable:
-            type: boolean
+    ScheduledExports_ExportedItemId:
+      type: integer
+      format: int64
     ScheduledExports_CommonTrait:
       type: object
       required:
@@ -284,84 +236,31 @@ components:
           description: List of email addresses that will receive export email. If empty, no emails will be sent. If omitted, emails will not be changed (update only).
           items:
             $ref: '#/components/schemas/EmailAddress'
-    EmailAddress:
-      type: string
-      format: email
-      minLength: 3
-      example: user@example.com
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
     ScheduledExports_ExportFileFormat:
       type: string
       enum:
       - csv
       - tsv
       - xlsx
-    PaginationMetadata:
+    ScheduledExports_ExportEmailConfig:
       type: object
+      description: Configuration for the email sent when export completes.
       required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
+      - addExportFileAttachment
       properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    ScheduledExports_ExportedItemType:
-      type: string
-      enum:
-      - saved_report
-    ScheduledExports_ExportedItemId:
-      type: integer
-      format: int64
-    CreateScheduledExportRequestDTO:
-      allOf:
-      - $ref: '#/components/schemas/ScheduledExports_CommonTrait'
-      - type: object
-        required:
-        - schedule
-        properties:
-          schedule:
-            $ref: '#/components/schemas/ScheduledExports_ScheduleConfig'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
+        addExportFileAttachment:
+          type: boolean
+        customMessage:
           type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    ScheduledExportId:
-      type: integer
-      format: int64
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    UserId:
-      type: integer
-      description: ID of a user
-      example: 123
+        reportLinkType:
+          $ref: '#/components/schemas/ScheduledExports_ReportLinkType'
+        suppressEmailWhenNoData:
+          type: boolean
+          default: false
     DateAndTime:
       type: string
       format: date-time
@@ -389,6 +288,52 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ScheduledExportDTO'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CreateScheduledExportRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/ScheduledExports_CommonTrait'
+      - type: object
+        required:
+        - schedule
+        properties:
+          schedule:
+            $ref: '#/components/schemas/ScheduledExports_ScheduleConfig'
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    ScheduledExports_SortColumn:
+      type: string
+      enum:
+      - name
+      - schedule_description
+      - schedule_is_paused
+      - owner_user_name
+      - exported_item_type
+      - exported_item_name
+      - is_editable
+      - created_at
+      - updated_at
+    ScheduledExports_ReportLinkType:
+      type: string
+      enum:
+      - public_link
+      - regular_link
     ScheduledExports_ScheduleConfig:
       type: object
       description: When and how often Scheduled Export will be run.
@@ -421,21 +366,76 @@ components:
             type: string
             format: local-date-time
             example: '2025-03-14T12:00:00'
-    ScheduledExports_ExportEmailConfig:
+    ScheduledExports_ExportedItemType:
+      type: string
+      enum:
+      - saved_report
+    PaginationMetadata:
       type: object
-      description: Configuration for the email sent when export completes.
       required:
-      - addExportFileAttachment
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
       properties:
-        addExportFileAttachment:
-          type: boolean
-        customMessage:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    ScheduledExportDTO:
+      allOf:
+      - $ref: '#/components/schemas/ScheduledExports_CommonTrait'
+      - type: object
+        required:
+        - id
+        - schedule
+        - exportedItemName
+        - isEditable
+        properties:
+          id:
+            $ref: '#/components/schemas/ScheduledExportId'
+          createdAt:
+            $ref: '#/components/schemas/DateAndTime'
+          updatedAt:
+            $ref: '#/components/schemas/DateAndTime'
+          owner:
+            $ref: '#/components/schemas/User'
+          schedule:
+            $ref: '#/components/schemas/ScheduledExports_ScheduleConfigWithDescription'
+          exportedItemName:
+            type: string
+          isEditable:
+            type: boolean
+    User:
+      type: object
+      required:
+      - id
+      - userName
+      properties:
+        id:
+          $ref: '#/components/schemas/UserId'
+        userName:
           type: string
-        reportLinkType:
-          $ref: '#/components/schemas/ScheduledExports_ReportLinkType'
-        suppressEmailWhenNoData:
-          type: boolean
-          default: false
+    ScheduledExportId:
+      type: integer
+      format: int64
+    EmailAddress:
+      type: string
+      format: email
+      minLength: 3
+      example: user@example.com
   parameters:
     pageParam:
       name: page
@@ -455,14 +455,14 @@ components:
         type: boolean
         default: false
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    responses-Forbidden:
+      description: You don't have enough rights to access this resource
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    responses-Forbidden:
-      description: You don't have enough rights to access this resource
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

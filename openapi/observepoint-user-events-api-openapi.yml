@@ -10,16 +10,16 @@ servers:
 - url: https://api.observepoint.com
   description: ObservePoint Production API
 tags:
-- name: user-events
+- name: User Events
   x-displayName: User Events
   description: APIs for managing User Events
 paths:
   /v3/user-events:
     get:
       tags:
-      - user-events
+      - User Events
       summary: Get user events in the account
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/user-events</div>
+      description: 'GET /v3/user-events
 
 
         This endpoint will get all the changes made by users in the account. This endpoint is only for Admins'
@@ -96,27 +96,41 @@ paths:
       - API_Key: []
 components:
   schemas:
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    UserEvents_ResponseDTO:
-      type: object
-      properties:
-        nextPage:
-          type: boolean
-          description: true if there are more pages of data to return
-        userEvents:
-          items:
-            $ref: '#/components/schemas/UserEvent_ItemDTO'
+    UserEventTypeApi:
+      type: string
+      enum:
+      - created
+      - deleted
+      - run-requested
+      - uploaded
+      - edited
+      - overage-enabled
+      - overage-disabled
+      - undeleted
+    UserEventSortByEnum:
+      type: string
+      enum:
+      - userId
+      - userName
+      - eventType
+      - itemId
+      - itemName
+      - eventTimeStamp
+      default: eventTimeStamp
+    UserEventItemTypeApi:
+      type: string
+      enum:
+      - audit
+      - web-journey
+      - mobile-journey
+      - mobile-app-file
+      - folder
+      - subfolder
+      - consent-category
+      - account
+      - email-inbox
+      - grid-saved-report
+      - custom-http-header-group
     UserEvent_ItemDTO:
       description: event log by user
       type: object
@@ -136,72 +150,31 @@ components:
         eventTimeStamp:
           type: string
           format: date-time
-    UserEventSortByEnum:
-      type: string
-      enum:
-      - userId
-      - userName
-      - eventType
-      - itemId
-      - itemName
-      - eventTimeStamp
-      default: eventTimeStamp
+    UserEvents_ResponseDTO:
+      type: object
+      properties:
+        nextPage:
+          type: boolean
+          description: true if there are more pages of data to return
+        userEvents:
+          items:
+            $ref: '#/components/schemas/UserEvent_ItemDTO'
     UserId:
       type: integer
       description: ID of a user
       example: 123
-    UserEventItemTypeApi:
-      type: string
-      enum:
-      - audit
-      - web-journey
-      - mobile-journey
-      - mobile-app-file
-      - folder
-      - subfolder
-      - consent-category
-      - account
-      - email-inbox
-      - grid-saved-report
-      - custom-http-header-group
-    UserEventTypeApi:
-      type: string
-      enum:
-      - created
-      - deleted
-      - run-requested
-      - uploaded
-      - edited
-      - overage-enabled
-      - overage-disabled
-      - undeleted
-  parameters:
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    PageParam:
-      in: query
-      name: page
-      description: Number of results page of an endpoint with paginated results
-      required: false
-      schema:
-        type: integer
-        default: 0
-        minimum: 0
-    PageSize:
-      in: query
-      name: pageSize
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 100
-        minimum: 100
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
   responses:
     Forbidden:
       description: You don't have enough rights to access this resource
@@ -221,6 +194,33 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    PageSize:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
   securitySchemes:
     API_Key:
       type: apiKey

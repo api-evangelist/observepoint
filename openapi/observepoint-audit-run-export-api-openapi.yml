@@ -71,28 +71,32 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/exports/<span class="op-path-parameter">{exportType}</span></div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/exports/{exportType}
 components:
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    ExportResultDTO:
-      type: object
-      required:
-      - exportId
-      properties:
-        exportId:
-          $ref: '#/components/schemas/ExportId'
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
     AuditRun_ExportTypeEnum:
       type: string
       description: All supported audit run export types
@@ -136,15 +140,56 @@ components:
       type: integer
       format: int64
       example: 107239
+    ExportResultDTO:
+      type: object
+      required:
+      - exportId
+      properties:
+        exportId:
+          $ref: '#/components/schemas/ExportId'
     RunId:
       type: integer
       format: int64
       example: 33010
-    ExportId:
-      type: integer
-      format: int64
-      description: Unique ID of an export
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
   parameters:
+    Export_AllDataParam:
+      in: query
+      name: allData
+      schema:
+        type: boolean
+        default: false
+      required: false
+      description: IF `false` THEN only one results page will be exported ELSE all data will be exported
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
     SortDescendingParam:
       name: sortDesc
       in: query
@@ -162,32 +207,6 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/AuditId'
-    Export_AllDataParam:
-      in: query
-      name: allData
-      schema:
-        type: boolean
-        default: false
-      required: false
-      description: IF `false` THEN only one results page will be exported ELSE all data will be exported
-    pageParam:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
-    RunId:
-      name: runId
-      in: path
-      required: true
-      description: Unique identification number for web audit or journey run
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/RunId'
     Export_NoLimitParam:
       in: query
       name: noLimit
@@ -196,25 +215,6 @@ components:
         default: false
       required: false
       description: IF `false` or not specified THEN export will be limited to 1,000,000 rows ELSE all data will be exported
-  responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

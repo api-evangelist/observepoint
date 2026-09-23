@@ -37,12 +37,12 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/consent-categories</div>
+      description: GET /v3/web-audits/{auditId}/consent-categories
     patch:
       tags:
       - audits-consent-category
       summary: Update the consent categories assigned to an audit
-      description: '<div class="op-path-box"><span class="op-http-method-patch">PATCH</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/consent-categories</div>
+      description: 'PATCH /v3/web-audits/{auditId}/consent-categories
 
 
         Update the consent categories assigned to an audit. The request will be rejected if trying to assign conflicting consent category types to the same audit'
@@ -75,7 +75,7 @@ paths:
     get:
       tags:
       - audits-consent-category
-      summary: 'Retrieve all consent categories snapshots that are applied to a specific audit run. '
+      summary: Retrieve all consent categories snapshots that are applied to a specific audit…
       operationId: getAuditRunConsentCategories
       responses:
         '200':
@@ -92,7 +92,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/consent-categories</div>
+      description: GET /v3/web-audits/{auditId}/runs/{runId}/consent-categories
   /v3/web-audits/{auditId}/runs/{runId}/consent-categories/reprocess:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -111,47 +111,44 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/consent-categories/reprocess</div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/consent-categories/reprocess
 components:
   schemas:
+    AttachmentPatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
     AuditId:
       type: integer
       format: int64
       example: 107239
-    AttachmentPatchDocument_ItemDTO:
-      description: A JSONPatch document for modifying consent preference attachments
-      properties:
-        op:
-          type: string
-          description: The operation to be performed
-          enum:
-          - add
-          - remove
-        path:
-          type: string
-        value:
-          type: integer
-          description: id of the item to assign
-      example:
-      - op: add
-        path: /-
-        value: 1
-      - op: remove
-        path: /
-        value: 2
-    WebAudit_ConsentCategorySnapshots_ResponseDTO:
-      type: object
-      description: 'NOTE: For individual consent category snapshot, Field consentCategoryId is omitted when the consent category is deleted'
-      properties:
-        consentCategorySnapshots:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
     ConsentCategory_TypeEnum:
       type: string
       enum:
       - approved
       - unapproved
+    ConsentCategoryDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+        type:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        id:
+          $ref: '#/components/schemas/ConsentCategoryId'
+        isDefaultCC:
+          type: boolean
+          description: If true, this is the default consent category
+        cmpData:
+          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
+        updatedType:
+          $ref: '#/components/schemas/ConsentCategory_updatedType'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last time this consent category was updated in UTC timezone
     ConsentCategorySnapshotDTO:
       type: object
       description: A consent category snapshot dto
@@ -184,6 +181,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ConsentCategoryDTO'
+    WebAudit_ConsentCategorySnapshots_ResponseDTO:
+      type: object
+      description: 'NOTE: For individual consent category snapshot, Field consentCategoryId is omitted when the consent category is deleted'
+      properties:
+        consentCategorySnapshots:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
     ConsentCategory_Cmp_Data:
       type: object
       required:
@@ -213,44 +222,6 @@ components:
           type: string
           description: The full URL of the page where the CMP import was run
           example: https://example.com
-    AttachmentPatchDocument_RequestDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
-    ConsentCategoryDTO:
-      type: object
-      properties:
-        name:
-          type: string
-        notes:
-          type: string
-        type:
-          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
-        id:
-          $ref: '#/components/schemas/ConsentCategoryId'
-        isDefaultCC:
-          type: boolean
-          description: If true, this is the default consent category
-        cmpData:
-          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
-        updatedType:
-          $ref: '#/components/schemas/ConsentCategory_updatedType'
-        updatedAt:
-          type: string
-          format: date-time
-          description: The last time this consent category was updated in UTC timezone
-    ConsentCategory_VendorTypeEnum:
-      type: string
-      enum:
-      - ONE_TRUST
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ConsentCategoryId:
-      type: integer
-      example: 3301
-      description: ID of consent category
     ErrorModel:
       type: object
       properties:
@@ -263,36 +234,46 @@ components:
           type: string
         validationReport:
           type: object
-    ConsentCategorySnapshotId:
+    ConsentCategoryId:
       type: integer
-      format: int64
-      example: 33010
-      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
+      example: 3301
+      description: ID of consent category
     ConsentCategory_updatedType:
       type: string
       enum:
       - ONETRUST_IMPORT
       - FILE_IMPORT
       - APP_CREATE
-  parameters:
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
-    RunId:
-      name: runId
-      in: path
-      required: true
-      description: Unique identification number for web audit or journey run
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/RunId'
+    ConsentCategorySnapshotId:
+      type: integer
+      format: int64
+      example: 33010
+      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
+    ConsentCategory_VendorTypeEnum:
+      type: string
+      enum:
+      - ONE_TRUST
+    AttachmentPatchDocument_ItemDTO:
+      description: A JSONPatch document for modifying consent preference attachments
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+          - add
+          - remove
+        path:
+          type: string
+        value:
+          type: integer
+          description: id of the item to assign
+      example:
+      - op: add
+        path: /-
+        value: 1
+      - op: remove
+        path: /
+        value: 2
   responses:
     Forbidden:
       description: You don't have enough rights to access this resource
@@ -312,6 +293,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
   securitySchemes:
     API_Key:
       type: apiKey

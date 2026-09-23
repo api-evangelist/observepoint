@@ -19,7 +19,7 @@ paths:
       tags:
       - action-set-action-rules
       summary: Get action set action rules
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/action-sets/<span class="op-path-parameter">{actionSetId}</span>/actions/<span class="op-path-parameter">{actionId}</span>/rules</div>
+      description: 'GET /v3/action-sets/{actionSetId}/actions/{actionId}/rules
 
 
         Retrieve all rules for a specific action set and action'
@@ -60,7 +60,7 @@ paths:
       tags:
       - action-set-action-rules
       summary: Update action set action rules
-      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/action-sets/<span class="op-path-parameter">{actionSetId}</span>/actions/<span class="op-path-parameter">{actionId}</span>/rules</div>
+      description: 'PUT /v3/action-sets/{actionSetId}/actions/{actionId}/rules
 
 
         Update the rules for a specific action set and action with a new set of rule IDs'
@@ -110,18 +110,21 @@ paths:
       - API_Key: []
 components:
   schemas:
-    ErrorModel:
+    PageFilter:
       type: object
       properties:
-        timestamp:
+        id:
+          type: integer
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        value:
           type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
+        type:
+          $ref: '#/components/schemas/PageFilterTypeEnum'
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
     MatchTypeEnum:
       type:
       - string
@@ -145,6 +148,36 @@ components:
       - UrlParameter
       - DataLayer
       - Tag
+    RuleTagVariable:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleTagId:
+          type: integer
+          format: int32
+        variable:
+          type: string
+        value:
+          type: string
+        validationDescription:
+          type: string
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+        valueTagId:
+          type: integer
+          format: int32
+        selectorType:
+          $ref: '#/components/schemas/SelectorTypeEnum'
+    ClauseEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - If
+      - Then
+      - Else
     Label:
       description: DTO for Labels
       type: object
@@ -156,20 +189,36 @@ components:
           $ref: '#/components/schemas/LabelId'
         name:
           type: string
-    PageFilterTypeEnum:
-      type:
-      - integer
-      - 'null'
-      description: Type of the page filter.
-      enum:
-      - 1
-      - 2
-      x-enum-varnames:
-      - URL
-      - STATUSCODE
-      x-enum-descriptions:
-      - URL filter type
-      - StatusCode filter type
+    RuleTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        tagId:
+          type: integer
+          format: int32
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+        account:
+          type: string
+        validationDescription:
+          type: string
+        clause:
+          $ref: '#/components/schemas/ClauseEnum'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleTagVariable'
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
     Rule:
       type: object
       properties:
@@ -213,82 +262,39 @@ components:
             $ref: '#/components/schemas/Label'
         fromTemplate:
           type: boolean
-    PageFilter:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        ruleId:
-          type: integer
-          format: int32
-        value:
-          type: string
-        type:
-          $ref: '#/components/schemas/PageFilterTypeEnum'
-        matchType:
-          $ref: '#/components/schemas/MatchTypeEnum'
-    RuleTagVariable:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        ruleTagId:
-          type: integer
-          format: int32
-        variable:
-          type: string
-        value:
-          type: string
-        validationDescription:
-          type: string
-        matchType:
-          $ref: '#/components/schemas/MatchTypeEnum'
-        valueTagId:
-          type: integer
-          format: int32
-        selectorType:
-          $ref: '#/components/schemas/SelectorTypeEnum'
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
-    ClauseEnum:
+    PageFilterTypeEnum:
       type:
-      - string
+      - integer
       - 'null'
+      description: Type of the page filter.
       enum:
-      - If
-      - Then
-      - Else
-    RuleTag:
+      - 1
+      - 2
+      x-enum-varnames:
+      - URL
+      - STATUSCODE
+      x-enum-descriptions:
+      - URL filter type
+      - StatusCode filter type
+    ErrorModel:
       type: object
       properties:
-        id:
-          type: integer
-          format: int32
-        ruleId:
-          type: integer
-          format: int32
-        tagId:
-          type: integer
-          format: int32
-        matchType:
-          $ref: '#/components/schemas/MatchTypeEnum'
-        account:
+        timestamp:
           type: string
-        validationDescription:
+          format: date-time
+        message:
           type: string
-        clause:
-          $ref: '#/components/schemas/ClauseEnum'
-        variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/RuleTagVariable'
+        details:
+          type: string
+        validationReport:
+          type: object
   responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
     NotFound:
       description: The object you are looking is not found
       content:
@@ -297,12 +303,6 @@ components:
             $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
       content:
         application/json:
           schema:

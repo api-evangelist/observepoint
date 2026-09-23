@@ -21,7 +21,7 @@ paths:
       tags:
       - audit-login-actions
       summary: Get login actions for an audit
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/login-actions</div>
+      description: 'GET /v3/web-audits/{auditId}/login-actions
 
 
         Retrieve all login actions configured for the specified audit'
@@ -47,7 +47,7 @@ paths:
       tags:
       - audit-login-actions
       summary: Update login actions for an audit
-      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/login-actions</div>
+      description: 'PUT /v3/web-audits/{auditId}/login-actions
 
 
         Update the login actions configured for the specified audit'
@@ -82,32 +82,15 @@ paths:
       - API_Key: []
 components:
   schemas:
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    WebActionSelector:
-      type: object
-      properties:
-        selectorType:
-          $ref: '#/components/schemas/WebActionSelectorType'
-        value:
-          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
-      required:
-      - selectorType
-      - value
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
+    AuditLoginSequencedAction:
+      allOf:
+      - $ref: '#/components/schemas/SequencedAction'
+      - type: object
+        properties:
+          actionSetId:
+            type: integer
+            format: int64
+            description: 'ID of the action set to reference. Present for actionType: actionset'
     SequencedAction:
       type: object
       properties:
@@ -173,15 +156,16 @@ components:
       required:
       - sequence
       - actionType
-    AuditLoginSequencedAction:
-      allOf:
-      - $ref: '#/components/schemas/SequencedAction'
-      - type: object
-        properties:
-          actionSetId:
-            type: integer
-            format: int64
-            description: 'ID of the action set to reference. Present for actionType: actionset'
+    WebActionSelector:
+      type: object
+      properties:
+        selectorType:
+          $ref: '#/components/schemas/WebActionSelectorType'
+        value:
+          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
+      required:
+      - selectorType
+      - value
     WebActionSelectorType:
       type: string
       enum:
@@ -190,17 +174,29 @@ components:
       - css
       - xpath
       - htmlattributes
-  parameters:
     AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
+      type: integer
+      format: int64
+      example: 107239
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
   responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
     Forbidden:
       description: You don't have enough rights to access this resource
       content:
@@ -213,18 +209,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
   securitySchemes:
     API_Key:
       type: apiKey

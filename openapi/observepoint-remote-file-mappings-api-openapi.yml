@@ -19,7 +19,7 @@ paths:
       tags:
       - remote-file-mappings
       summary: Get remote file mappings
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/remote-file-mappings</div>
+      description: 'GET /v3/remote-file-mappings
 
 
         Retrieve all remote file mappings with optional account filtering'
@@ -51,7 +51,7 @@ paths:
       tags:
       - remote-file-mappings
       summary: Create remote file mapping
-      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/remote-file-mappings</div>
+      description: 'POST /v3/remote-file-mappings
 
 
         Create a new remote file mapping configuration'
@@ -102,7 +102,7 @@ paths:
       tags:
       - remote-file-mappings
       summary: Get remote file mapping by ID
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/remote-file-mappings/<span class="op-path-parameter">{rfmId}</span></div>
+      description: 'GET /v3/remote-file-mappings/{rfmId}
 
 
         Retrieve a specific remote file mapping by its ID'
@@ -126,7 +126,7 @@ paths:
       tags:
       - remote-file-mappings
       summary: Update remote file mapping
-      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/remote-file-mappings/<span class="op-path-parameter">{rfmId}</span></div>
+      description: 'PUT /v3/remote-file-mappings/{rfmId}
 
 
         Update an existing remote file mapping'
@@ -159,7 +159,7 @@ paths:
       tags:
       - remote-file-mappings
       summary: Delete remote file mapping
-      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/remote-file-mappings/<span class="op-path-parameter">{rfmId}</span></div>
+      description: 'DELETE /v3/remote-file-mappings/{rfmId}
 
 
         Delete a specific remote file mapping by its ID'
@@ -176,19 +176,32 @@ paths:
       security:
       - API_Key: []
 components:
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     RemoteFileMappingRequest:
       type: object
       description: Request data for creating or updating remote file mapping
@@ -296,31 +309,18 @@ components:
           format: date-time
           description: When this RFM was last updated
           example: '2024-01-02T10:15:00.000Z'
-  responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
   securitySchemes:
     API_Key:
       type: apiKey

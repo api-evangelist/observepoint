@@ -45,7 +45,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory</div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory
   /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/trends:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -68,7 +68,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/trends</div>
+      description: GET /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/trends
   /v3/web-audits/{auditId}/reports/cookie-inventory/trends/{trendName}:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -97,7 +97,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/reports/cookie-inventory/trends/<span class="op-path-parameter">{trendName}</span></div>
+      description: GET /v3/web-audits/{auditId}/reports/cookie-inventory/trends/{trendName}
   /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/cookies:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -137,7 +137,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/cookies</div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/cookies
   /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/pages:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -173,7 +173,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/pages</div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/pages
   /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/cookie-pages:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -209,7 +209,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/cookie-pages</div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/cookie-pages
   /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/domains:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -245,9 +245,194 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/cookie-inventory/domains</div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/cookie-inventory/domains
 components:
   schemas:
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    StringInclusionFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          minLength: 1
+    CookieOriginInclusionTypeEnum:
+      type: string
+      description: '- `exclude_pre_audit_action_only_cookies` - exclude cookies which were only changed during pre-audit actions
+
+        '
+      enum:
+      - exclude_pre_audit_action_only_cookies
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    AuditRun_CookieInventory_DomainSortColumn:
+      type: string
+      enum:
+      - domain
+      - page_count
+      - party_type
+      default: domain
+    AuditRun_CookieInventory_SelectedCookie:
+      description: '- `partitionKey` is absent — property is ignored for backward compatibility,
+
+        - `partitionKey` is present and `partitionKey.value` is absent — cookies in old runs without partition key and new runs with partition key set to null,
+
+        - `partitionKey` is present and `partitionKey.value` is present — cookies in new runs with requested partition key
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListItemTrait'
+      - type: object
+        properties:
+          partitionKey:
+            $ref: '#/components/schemas/CookiePartitionKey'
+    AuditRun_CookieInventory_CookiesListItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListItemTrait'
+      - $ref: '#/components/schemas/AggregatedCookieTrait'
+      - type: object
+        required:
+        - averageSize
+        - filteredPageCount
+        properties:
+          averageSize:
+            $ref: '#/components/schemas/CookieSize'
+          filteredPageCount:
+            type: integer
+            description: Number of pages this cookie was found on
+          minDurationInMinutes:
+            type: integer
+            description: Minimum cookie duration in minutes
+          maxDurationInMinutes:
+            type: integer
+            description: Maximum cookie duration in minutes
+          initiators:
+            type: array
+            items:
+              $ref: '#/components/schemas/AuditRun_CookieInventory_CookieInitiatorItem'
+          initiatorTagIds:
+            type: array
+            description: List of tag IDs, associated with initiators that set this cookie
+            minItems: 0
+            items:
+              type: integer
+          initiatorTotalCount:
+            type: integer
+            description: Total number of unique initiators that set this cookie
+          partitionKey:
+            type: string
+    CookieSameSiteExtended:
+      type:
+      - string
+      - 'null'
+      enum:
+      - None
+      - Lax
+      - Strict
+      - Empty
+    CookieName:
+      type: string
+      description: Cookie name
+    CookieSameSite:
+      type:
+      - string
+      - 'null'
+      enum:
+      - None
+      - Lax
+      - Strict
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
+      properties:
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    AuditRun_CookieInventory_DomainsItem:
+      type: object
+      required:
+      - domain
+      - partyType
+      - pageCount
+      properties:
+        domain:
+          $ref: '#/components/schemas/CookieDomain'
+        partyType:
+          $ref: '#/components/schemas/CookiePartyType'
+        pageCount:
+          type: integer
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    CookieFiltersTrait:
+      type: object
+      description: Common trait for cookie filters
+      properties:
+        cookieOriginInclusion:
+          $ref: '#/components/schemas/CookieOriginInclusionTypeEnum'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRun_CookieInventory_CookieDurationRangeFilter:
+      description: Cookie duration in minutes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. Ignored when expirationType == "session"
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
     AuditRun_CookieInventory_RequestDTO:
       description: Request body with filters for Cookie Inventory report
       allOf:
@@ -291,90 +476,38 @@ components:
             $ref: '#/components/schemas/TagVendorId'
           partitionKeyIsSet:
             type: boolean
-    PageStatusCode:
-      type: integer
-      description: Page HTTP status code
-    CookieOriginTypeEnum:
-      type:
-      - string
-      - 'null'
-      enum:
-      - PRE_AUDIT_ACTION
-      - PAGE_LOAD
-      - ON_PAGE_ACTION
-    ItemRunTrendsItemTrait:
-      type: object
-      required:
-      - runId
-      - completedAt
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          $ref: '#/components/schemas/DateAndTime'
-    TagId:
-      type: integer
-      description: Tag ID
-    AuditRun_CookieInventory_CookieInitiatorItem:
-      type: object
-      description: Represents unique initiator for the cookie, deduplicated by `initiatorType`, `tagId` and `urlDomain`
-      required:
-      - initiatorType
-      - foundDuring
-      - instanceCount
-      properties:
-        initiatorType:
-          $ref: '#/components/schemas/CookieInitiatorTypeEnum'
-        tagId:
-          $ref: '#/components/schemas/TagId'
-        urlDomain:
-          type: string
-          description: Domain part of initiator's URL
-        foundDuring:
-          type: array
-          description: List of phases during which this initiator was observed
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/CookieOriginTypeEnum'
-        instanceCount:
-          type: integer
-          description: Number of instances of this initiator across all pages
-    CookiePartyType:
+    CookieDomain:
       type: string
-      description: 'Indicates if cookie domain is different from domain of a page it was set on.
-
-        `owned_3rd_party` is deprecated
-
-        '
-      enum:
-      - 1st_party
-      - owned_3rd_party
-      - 3rd_party
-    AuditRun_CookieInventory_PagesListItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
-      - type: object
-        required:
-        - cookieCount
-        - totalCookieSize
-        properties:
-          cookieCount:
-            type: integer
-            description: Number of cookies on a page
-          totalCookieSize:
-            $ref: '#/components/schemas/CookieSize'
-    AuditRun_CookieInventory_CookiesListDTO:
+      description: Cookie domain; preceding dot removed
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    AuditRun_CookieInventory_PagesListDTO:
       type: object
       required:
       - metadata
-      - cookies
+      - pages
       properties:
         metadata:
           $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        cookies:
+        pages:
           type: array
           items:
-            $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListItem'
+            $ref: '#/components/schemas/AuditRun_CookieInventory_PagesListItem'
+    CookiePartitionKey:
+      type: object
+      properties:
+        value:
+          type: string
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
     PaginationMetadata:
       type: object
       required:
@@ -399,167 +532,6 @@ components:
         currentPageNumber:
           description: Current page number/ordinal
           type: integer
-    PageFiltersTrait:
-      type: object
-      description: Common trait for page filters
-      properties:
-        pageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        finalPageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        pageTitle:
-          $ref: '#/components/schemas/PageTitleFilter'
-        initialPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        finalPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        combinedPageStatusCode:
-          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
-        pageLoadTime:
-          $ref: '#/components/schemas/PageLoadTimeFilter'
-        pageSize:
-          $ref: '#/components/schemas/PageSizeFilter'
-        redirectCount:
-          $ref: '#/components/schemas/PageRedirectCountFilter'
-        hasBrokenLinks:
-          type: boolean
-    CookiePartitionKey:
-      type: object
-      properties:
-        value:
-          type: string
-    CookieOriginInclusionTypeEnum:
-      type: string
-      description: '- `exclude_pre_audit_action_only_cookies` - exclude cookies which were only changed during pre-audit actions
-
-        '
-      enum:
-      - exclude_pre_audit_action_only_cookies
-    CombinedPageStatusCodeEnum:
-      type: string
-      description: '- `broken` - initial or final URL are `broken`,
-
-        - `good` - initial URL is `good` or `redirect` and final URL is `good`
-
-        '
-      enum:
-      - broken
-      - good
-    PageSizeFilter:
-      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
-    PageLoadTime:
-      type: integer
-      description: Time page took to load, in milliseconds
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    TagCategoryId:
-      type: integer
-      description: Tag category ID
-    AuditRun_CookieInventory_TrendsItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        required:
-        - totalUniqueCookieCount
-        - totalFirstPartyCookieCount
-        - totalThirdPartyCookieCount
-        - totalNonSecureCookieCount
-        - totalSameSiteEmptyCookieCount
-        properties:
-          totalUniqueCookieCount:
-            type: integer
-          totalFirstPartyCookieCount:
-            type: integer
-          totalThirdPartyCookieCount:
-            type: integer
-          totalNonSecureCookieCount:
-            type: integer
-          totalSameSiteEmptyCookieCount:
-            type: integer
-    LongIntegerRangeFilterTrait:
-      type: object
-      description: Common trait for long integer min max filter
-      properties:
-        min:
-          type: integer
-          format: int64
-          minimum: 0
-        max:
-          type: integer
-          format: int64
-    PageTitleFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          description: Page title as displayed by browser
-          minLength: 1
-          example: ObserveP
-    TagVendorId:
-      type: integer
-      description: Tag vendor ID
-    CookieFiltersTrait:
-      type: object
-      description: Common trait for cookie filters
-      properties:
-        cookieOriginInclusion:
-          $ref: '#/components/schemas/CookieOriginInclusionTypeEnum'
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    ItemRun_SpecificTrendValuesDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
-    PageUrlFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/PageUrlFilterEnum'
-        filterValue:
-          type: string
-          minLength: 1
-        negated:
-          type: boolean
-          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
-          default: false
-    CookieName:
-      type: string
-      description: Cookie name
-    AuditRunPageCommonColumnsWithFinalValuesTrait:
-      description: Trait for audit page with final URL and final status code
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
-      - type: object
-        properties:
-          finalPageUrl:
-            $ref: '#/components/schemas/PageUrl'
-          finalPageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
     AuditRun_CookieInventory_CookiePagesRequestDTO:
       allOf:
       - $ref: '#/components/schemas/PageFiltersTrait'
@@ -585,26 +557,40 @@ components:
             $ref: '#/components/schemas/TagCategoryId'
           tagVendorId:
             $ref: '#/components/schemas/TagVendorId'
-    AuditRun_CookieInventory_DomainsListDTO:
+    PageFiltersTrait:
       type: object
-      required:
-      - metadata
-      - domains
+      description: Common trait for page filters
       properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        domains:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_CookieInventory_DomainsItem'
-    CookieSameSite:
-      type:
-      - string
-      - 'null'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
+    IntegerFilterTypeEnum:
+      type: string
       enum:
-      - None
-      - Lax
-      - Strict
+      - specific
+      - range
+    CookieExpirationType:
+      type: string
+      enum:
+      - session
+      - timestamp
     ItemRun_SpecificTrendValueItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
@@ -616,304 +602,24 @@ components:
         properties:
           trendValue:
             type: number
-    AuditRun_CookieInventory_CookiesListItemTrait:
-      type: object
-      required:
-      - name
-      - domain
-      - partyType
-      - expirationType
-      - secure
-      - httpOnly
-      properties:
-        name:
-          $ref: '#/components/schemas/CookieName'
-        domain:
-          $ref: '#/components/schemas/CookieDomain'
-        partyType:
-          $ref: '#/components/schemas/CookiePartyType'
-        expirationType:
-          $ref: '#/components/schemas/CookieExpirationType'
-        sameSite:
-          $ref: '#/components/schemas/CookieSameSite'
-        secure:
-          type: boolean
-        httpOnly:
-          type: boolean
-    AuditRunPageCommonColumnsTrait:
-      description: Trait for audit page with common page properties
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageTrait'
-      - type: object
-        required:
-        - pageLoadTime
-        - pageStatusCode
-        properties:
-          pageLoadTime:
-            $ref: '#/components/schemas/PageLoadTime'
-          pageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    AggregatedCookieTrait:
-      type: object
-      description: Common trait for cookies from Cookie Inventory Cookies and Cookie Privacy Compliance
-      properties:
-        cookieChangedDuring:
-          type: array
-          description: List of phases during which this cookie was changed, aggregated across all pages
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/CookieOriginTypeEnum'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    CookieSameSiteExtended:
+    CookieOriginTypeEnum:
       type:
       - string
       - 'null'
       enum:
-      - None
-      - Lax
-      - Strict
-      - Empty
-    IntegerFilter:
-      type: object
-      required:
-      - filterType
-      - negated
-      properties:
-        filterType:
-          $ref: '#/components/schemas/IntegerFilterTypeEnum'
-        negated:
-          type: boolean
-          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
-      discriminator:
-        propertyName: filterType
-        mapping:
-          specific: '#/components/schemas/SpecificIntegerFilter'
-          range: '#/components/schemas/IntegerRangeFilter'
-    AuditRun_CookieInventory_DomainSortColumn:
-      type: string
-      enum:
-      - domain
-      - page_count
-      - party_type
-      default: domain
-    PageUrlFilterEnum:
-      type: string
-      enum:
-      - contains
-      - regex
-    PageId:
-      type: string
-      example: f9d32cc7cc2046d6decb145a80289287f5226323
-    AuditRunPageTrait:
-      description: Common trait for audit page with mandatory page properties
-      type: object
-      required:
-      - pageId
-      - pageUrl
-      properties:
-        pageId:
-          $ref: '#/components/schemas/PageId'
-        pageUrl:
-          $ref: '#/components/schemas/PageUrl'
-    AuditRun_CookieInventory_PagesListDTO:
-      type: object
-      required:
-      - metadata
-      - pages
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_CookieInventory_PagesListItem'
-    AuditRun_CookieInventory_PageSortColumn:
-      type: string
-      enum:
-      - page_url
-      - final_page_url
-      - page_status_code
-      - final_page_status_code
-      - page_load_time
-      - cookie_count
-      - total_cookie_size
-    AuditRun_CookieInventory_CookiesSortColumn:
-      type: string
-      enum:
-      - page_count
-      - name
-      - domain
-      - party_type
-      - expiration_type
-      - secure
-      - same_site
-      - http_only
-      - avg_size
-      - min_duration_in_minutes
-      - max_duration_in_minutes
-      - initiator_tag_count
-      - unique_initiator_count
-      - partition_key
-      - cookie_changed_during
-    PageRedirectCountFilter:
-      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    AuditRun_CookieInventory_CookieDurationRangeFilter:
-      description: Cookie duration in minutes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. Ignored when expirationType == "session"
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    AuditRun_CookieInventory_SelectedCookie:
-      description: '- `partitionKey` is absent — property is ignored for backward compatibility,
-
-        - `partitionKey` is present and `partitionKey.value` is absent — cookies in old runs without partition key and new runs with partition key set to null,
-
-        - `partitionKey` is present and `partitionKey.value` is present — cookies in new runs with requested partition key
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListItemTrait'
-      - type: object
-        properties:
-          partitionKey:
-            $ref: '#/components/schemas/CookiePartitionKey'
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    StringInclusionFilterTypeEnum:
-      type: string
-      enum:
-      - contains
-      - not_contains
-    PageLoadTimeFilter:
-      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    CookieExpirationType:
-      type: string
-      enum:
-      - session
-      - timestamp
-    AuditRun_CookieInventory_CookiesListItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListItemTrait'
-      - $ref: '#/components/schemas/AggregatedCookieTrait'
-      - type: object
-        required:
-        - averageSize
-        - filteredPageCount
-        properties:
-          averageSize:
-            $ref: '#/components/schemas/CookieSize'
-          filteredPageCount:
-            type: integer
-            description: Number of pages this cookie was found on
-          minDurationInMinutes:
-            type: integer
-            description: Minimum cookie duration in minutes
-          maxDurationInMinutes:
-            type: integer
-            description: Maximum cookie duration in minutes
-          initiators:
-            type: array
-            items:
-              $ref: '#/components/schemas/AuditRun_CookieInventory_CookieInitiatorItem'
-          initiatorTagIds:
-            type: array
-            description: List of tag IDs, associated with initiators that set this cookie
-            minItems: 0
-            items:
-              type: integer
-          initiatorTotalCount:
-            type: integer
-            description: Total number of unique initiators that set this cookie
-          partitionKey:
-            type: string
-    AuditRun_CookieInventory_CookieSizeRangeFilter:
-      description: Cookie size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    IntegerFilterTypeEnum:
-      type: string
-      enum:
-      - specific
-      - range
-    CookieDomain:
-      type: string
-      description: Cookie domain; preceding dot removed
-    IntegerRangeFilterTrait:
-      type: object
-      description: Common trait for integer min max filter
-      properties:
-        min:
-          type: integer
-          minimum: 0
-        max:
-          type: integer
+      - PRE_AUDIT_ACTION
+      - PAGE_LOAD
+      - ON_PAGE_ACTION
     CookieSize:
       type:
       - integer
       - 'null'
       description: Cookie value size, in bytes. May not be available for old runs
-    PageUrl:
-      type: string
-      format: url
-      example: https://example.com/about
-    CookieInitiatorTypeEnum:
-      type: string
-      description: Type of event that created the cookie
-      enum:
-      - HTTP
-      - APP
-      - OP_ACTION
-      - UNKNOWN
-    AuditRun_CookieInventory_TrendsEnum:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+    StringInclusionFilterTypeEnum:
       type: string
       enum:
-      - unique_cookies
-      - first_party
-      - third_party
-      - non_secure_count
-      - same_site_empty
-    StringInclusionFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          minLength: 1
+      - contains
+      - not_contains
     AuditRun_CookieInventory_TrendsDTO:
       type: object
       required:
@@ -924,10 +630,9 @@ components:
           maxItems: 5
           items:
             $ref: '#/components/schemas/AuditRun_CookieInventory_TrendsItem'
-    RunId:
+    TagId:
       type: integer
-      format: int64
-      example: 33010
+      description: Tag ID
     AuditRun_CookieInventory_SummaryDTO:
       description: Cookie Inventory report summary
       type: object
@@ -981,19 +686,333 @@ components:
         filteredUniqueCookieDomainCount:
           type: integer
           description: Number of unique cookie domains passing all applied filters
-    AuditRun_CookieInventory_DomainsItem:
+    AuditRunPageTrait:
+      description: Common trait for audit page with mandatory page properties
       type: object
       required:
+      - pageId
+      - pageUrl
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    AggregatedCookieTrait:
+      type: object
+      description: Common trait for cookies from Cookie Inventory Cookies and Cookie Privacy Compliance
+      properties:
+        cookieChangedDuring:
+          type: array
+          description: List of phases during which this cookie was changed, aggregated across all pages
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CookieOriginTypeEnum'
+    AuditRun_CookieInventory_CookiesSortColumn:
+      type: string
+      enum:
+      - page_count
+      - name
+      - domain
+      - party_type
+      - expiration_type
+      - secure
+      - same_site
+      - http_only
+      - avg_size
+      - min_duration_in_minutes
+      - max_duration_in_minutes
+      - initiator_tag_count
+      - unique_initiator_count
+      - partition_key
+      - cookie_changed_during
+    CookiePartyType:
+      type: string
+      description: 'Indicates if cookie domain is different from domain of a page it was set on.
+
+        `owned_3rd_party` is deprecated
+
+        '
+      enum:
+      - 1st_party
+      - owned_3rd_party
+      - 3rd_party
+    CookieInitiatorTypeEnum:
+      type: string
+      description: Type of event that created the cookie
+      enum:
+      - HTTP
+      - APP
+      - OP_ACTION
+      - UNKNOWN
+    AuditRun_CookieInventory_TrendsItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - totalUniqueCookieCount
+        - totalFirstPartyCookieCount
+        - totalThirdPartyCookieCount
+        - totalNonSecureCookieCount
+        - totalSameSiteEmptyCookieCount
+        properties:
+          totalUniqueCookieCount:
+            type: integer
+          totalFirstPartyCookieCount:
+            type: integer
+          totalThirdPartyCookieCount:
+            type: integer
+          totalNonSecureCookieCount:
+            type: integer
+          totalSameSiteEmptyCookieCount:
+            type: integer
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    AuditRun_CookieInventory_CookieSizeRangeFilter:
+      description: Cookie size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    AuditRun_CookieInventory_TrendsEnum:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      type: string
+      enum:
+      - unique_cookies
+      - first_party
+      - third_party
+      - non_secure_count
+      - same_site_empty
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
+    AuditRun_CookieInventory_PageSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_status_code
+      - final_page_status_code
+      - page_load_time
+      - cookie_count
+      - total_cookie_size
+    AuditRun_CookieInventory_CookiesListDTO:
+      type: object
+      required:
+      - metadata
+      - cookies
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_CookiesListItem'
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    AuditRun_CookieInventory_DomainsListDTO:
+      type: object
+      required:
+      - metadata
+      - domains
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        domains:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_CookieInventory_DomainsItem'
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    AuditRun_CookieInventory_PagesListItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - cookieCount
+        - totalCookieSize
+        properties:
+          cookieCount:
+            type: integer
+            description: Number of cookies on a page
+          totalCookieSize:
+            $ref: '#/components/schemas/CookieSize'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun_CookieInventory_CookieInitiatorItem:
+      type: object
+      description: Represents unique initiator for the cookie, deduplicated by `initiatorType`, `tagId` and `urlDomain`
+      required:
+      - initiatorType
+      - foundDuring
+      - instanceCount
+      properties:
+        initiatorType:
+          $ref: '#/components/schemas/CookieInitiatorTypeEnum'
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        urlDomain:
+          type: string
+          description: Domain part of initiator's URL
+        foundDuring:
+          type: array
+          description: List of phases during which this initiator was observed
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CookieOriginTypeEnum'
+        instanceCount:
+          type: integer
+          description: Number of instances of this initiator across all pages
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    AuditRun_CookieInventory_CookiesListItemTrait:
+      type: object
+      required:
+      - name
       - domain
       - partyType
-      - pageCount
+      - expirationType
+      - secure
+      - httpOnly
       properties:
+        name:
+          $ref: '#/components/schemas/CookieName'
         domain:
           $ref: '#/components/schemas/CookieDomain'
         partyType:
           $ref: '#/components/schemas/CookiePartyType'
-        pageCount:
-          type: integer
+        expirationType:
+          $ref: '#/components/schemas/CookieExpirationType'
+        sameSite:
+          $ref: '#/components/schemas/CookieSameSite'
+        secure:
+          type: boolean
+        httpOnly:
+          type: boolean
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   parameters:
     AuditRun_Trends_DaysParam:
       name: days
@@ -1004,33 +1023,6 @@ components:
         description: Number of days to get trend values for, relative to current time
         maximum: 390
         minimum: 1
-    AuditRun_PagesList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 50
-        minimum: 50
-    pageParam:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
-    RunId:
-      name: runId
-      in: path
-      required: true
-      description: Unique identification number for web audit or journey run
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/RunId'
     AuditId:
       name: auditId
       in: path
@@ -1046,7 +1038,7 @@ components:
       required: false
       schema:
         $ref: '#/components/schemas/AuditRun_CookieInventory_PageSortColumn'
-    AuditRun_CookieInventory_PageSizeParam:
+    AuditRun_PagesList_PageSizeParam:
       in: query
       name: size
       required: false
@@ -1064,6 +1056,39 @@ components:
         maximum: 1000
         default: 100
         minimum: 100
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    AuditRun_CookieInventory_DomainsSortParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_CookieInventory_DomainSortColumn'
+    AuditRun_CookieInventory_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
     SortDescendingParam:
       name: sortDesc
       in: query
@@ -1072,31 +1097,6 @@ components:
       schema:
         type: boolean
         default: false
-    AuditRun_CookieInventory_DomainsSortParam:
-      name: sortBy
-      in: query
-      required: false
-      schema:
-        $ref: '#/components/schemas/AuditRun_CookieInventory_DomainSortColumn'
-  responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

@@ -7,11 +7,11 @@ servers:
 - url: https://api.observepoint.com/v2
 tags:
 - description: Endpoints for managing sub-folders including creation, configuration, and sub-folder-based audit and journey management
-  name: Sub-Folders
+  name: Sub Folders
 paths:
   /domains:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/domains</div>
+      description: GET /v2/domains
       operationId: getDomains
       responses:
         '200':
@@ -28,9 +28,9 @@ paths:
       - API_Key: []
       summary: Get list of all sub-folders
       tags:
-      - Sub-Folders
+      - Sub Folders
     post:
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/domains</div>
+      description: POST /v2/domains
       operationId: createDomain
       requestBody:
         content:
@@ -52,10 +52,10 @@ paths:
       - API_Key: []
       summary: Create new sub-folder
       tags:
-      - Sub-Folders
+      - Sub Folders
   /domains/{domainId}:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/domains/<span class="op-path-parameter">{domainId}</span></div>
+      description: GET /v2/domains/{domainId}
       operationId: getDomain
       parameters:
       - name: domainId
@@ -79,9 +79,9 @@ paths:
       - API_Key: []
       summary: Get sub-folder by id
       tags:
-      - Sub-Folders
+      - Sub Folders
     put:
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/domains/<span class="op-path-parameter">{domainId}</span></div>
+      description: PUT /v2/domains/{domainId}
       operationId: updateDomain
       parameters:
       - name: domainId
@@ -112,9 +112,9 @@ paths:
       - API_Key: []
       summary: Update sub-folder with given id
       tags:
-      - Sub-Folders
+      - Sub Folders
     delete:
-      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/domains/<span class="op-path-parameter">{domainId}</span></div>
+      description: DELETE /v2/domains/{domainId}
       operationId: deleteDomain
       parameters:
       - name: domainId
@@ -136,10 +136,10 @@ paths:
       - API_Key: []
       summary: Delete sub-folder with given id
       tags:
-      - Sub-Folders
+      - Sub Folders
   /domains/{domainId}/web-audits:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/domains/<span class="op-path-parameter">{domainId}</span>/web-audits</div>
+      description: GET /v2/domains/{domainId}/web-audits
       operationId: getAudits
       parameters:
       - name: domainId
@@ -175,10 +175,10 @@ paths:
       - API_Key: []
       summary: Get web audits for sub-folder with given id
       tags:
-      - Sub-Folders
+      - Sub Folders
   /domains/{domainId}/web-journeys:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/domains/<span class="op-path-parameter">{domainId}</span>/web-journeys</div>
+      description: GET /v2/domains/{domainId}/web-journeys
       operationId: getWebJourneys
       parameters:
       - name: domainId
@@ -204,7 +204,7 @@ paths:
       - API_Key: []
       summary: Get web journeys for sub-folder with given id
       tags:
-      - Sub-Folders
+      - Sub Folders
 components:
   schemas:
     RuleDescription:
@@ -241,153 +241,56 @@ components:
         updatedAt:
           format: date-time
           type: string
-    AuditOptions:
+    ItemWithActiveRun:
       type: object
       required:
-      - fireTags
-      - loadFlash
-      - location
-      - requestRate
-      - stripQueryString
-      - userAgent
+      - itemId
+      - itemName
+      - itemType
+      - runId
       properties:
-        adobeAuditor:
-          type: boolean
-        blockThirdPartyCookies:
-          type: boolean
-        browserHeight:
-          format: int32
+        itemId:
+          format: int64
           type: integer
-        browserWidth:
-          format: int32
+        itemName:
+          type: string
+        itemType:
+          type: string
+        runId:
+          format: int64
           type: integer
-        customHttpHeaders:
-          items:
-            $ref: '#/components/schemas/CustomHttpHeaderAssignment'
-          type: array
-        customProxy:
-          type: string
-        discoverSitemap:
-          type: boolean
-        fireTags:
-          type: boolean
-        gpcEnabled:
-          type: boolean
-        loadFlash:
-          type: boolean
-        location:
-          type: string
-        remoteFileMapConfig:
-          items:
-            $ref: '#/components/schemas/RemoteFileMapping'
-          type: array
-        requestRate:
-          format: int32
-          type: integer
-        sameUrlRunId:
-          type: number
-        stripQueryString:
-          type: boolean
-        userAgent:
-          type: string
-        vpnEnabled:
-          type: boolean
-        webHookUrl:
-          type: string
-    AuditFilters:
+    DomainTotals:
       type: object
       required:
-      - exclude
-      - include
+      - auditsRunning
+      - automatedJourneys
+      - averageScore
+      - errors
+      - guidedJourneys
+      - pages
+      - simulationsRunning
       properties:
-        exclude:
-          items:
-            type: string
-          type: array
-        include:
-          items:
-            $ref: '#/components/schemas/IncludeFilter'
-          type: array
-    IncludeFilter:
-      type: object
-      required:
-      - includeLimit
-      - value
-      properties:
-        includeLimit:
+        auditsRunning:
           format: int32
           type: integer
-        value:
-          type: string
-    AuditRunSwaggerReference:
-      type: object
-      required:
-      - adobeAuditor
-      - id
-      - limit
-      - silentMode
-      - taggedUrl
-      - totalUrl
-      - userId
-      - webAuditId
-      properties:
-        adobeAuditor:
-          type: boolean
-        completed:
-          format: date-time
-          type: string
-        id:
+        automatedJourneys:
           format: int32
           type: integer
-        limit:
+        averageScore:
           format: int32
           type: integer
-        score:
-          description: Deprecated. Use `/v3/web-audits/{auditId}/runs/{runId}/scores` instead
+        errors:
           format: int32
           type: integer
-        silentMode:
-          type: boolean
-        started:
-          format: date-time
-          type: string
-        supportedFeatures:
-          example: '[TagLoadtimeReport, ConsoleLogsReport]'
-          items:
-            type: string
-          type: array
-        taggedUrl:
+        guidedJourneys:
           format: int32
           type: integer
-        totalUrl:
+        pages:
           format: int32
           type: integer
-        userId:
+        simulationsRunning:
           format: int32
           type: integer
-        webAuditId:
-          format: int32
-          type: integer
-    Label:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-    WebActionSelectorSwaggerReference:
-      type: object
-      discriminator:
-        propertyName: selectorType
-      properties:
-        selectorType:
-          format: int32
-          type: integer
-      description: 'Children: AttributesSelector, SimpleSelector'
     SequencedActionSwaggerReference:
       type: object
       required:
@@ -442,99 +345,70 @@ components:
           maximum: 1800
           minimum: 0
           type: integer
-    WebJourneyOptions:
+    CustomHttpHeaderAssignment:
       type: object
       required:
-      - alerts
-      - browserWidth
+      - groupId
+      - isApplyToAll
+      properties:
+        groupId:
+          format: int64
+          type: integer
+        isApplyToAll:
+          type: boolean
+    AuditOptions:
+      type: object
+      required:
+      - fireTags
       - loadFlash
       - location
+      - requestRate
+      - stripQueryString
       - userAgent
       properties:
-        alerts:
+        adobeAuditor:
           type: boolean
+        blockThirdPartyCookies:
+          type: boolean
+        browserHeight:
+          format: int32
+          type: integer
         browserWidth:
           format: int32
           type: integer
+        customHttpHeaders:
+          items:
+            $ref: '#/components/schemas/CustomHttpHeaderAssignment'
+          type: array
         customProxy:
           type: string
-        flashLiveVideoEnabled:
+        discoverSitemap:
           type: boolean
-        frequency:
-          type: string
+        fireTags:
+          type: boolean
+        gpcEnabled:
+          type: boolean
         loadFlash:
           type: boolean
         location:
-          type: string
-        monitoredByScriptServices:
-          type: number
-        nextRun:
-          format: date-time
           type: string
         remoteFileMapConfig:
           items:
             $ref: '#/components/schemas/RemoteFileMapping'
           type: array
+        requestRate:
+          format: int32
+          type: integer
+        sameUrlRunId:
+          type: number
+        stripQueryString:
+          type: boolean
         userAgent:
-          type: string
-        userAgentDescription:
           type: string
         vpnEnabled:
           type: boolean
         webHookUrl:
           type: string
-    DomainUpdate:
-      type: object
-      required:
-      - domain
-      - folderId
-      - name
-      properties:
-        dataLayer:
-          type: string
-        domain:
-          type: string
-        folderId:
-          format: int32
-          type: integer
-        name:
-          type: string
-      description: Domain update information
-    RemoteFileMapping:
-      type: object
-      required:
-      - matchType
-      - matchValue
-      properties:
-        createdAt:
-          format: date-time
-          type: string
-        createdBy:
-          format: int32
-          type: integer
-        fileId:
-          format: int32
-          type: integer
-        fileUrl:
-          type: string
-        id:
-          format: int32
-          type: integer
-        matchType:
-          enum:
-          - '[equals'
-          - regex]
-          type: string
-        matchValue:
-          type: string
-        name:
-          type: string
-        updatedAt:
-          format: date-time
-          type: string
-        updatedBy:
-          format: int32
-          type: integer
     WebJourney:
       type: object
       required:
@@ -598,38 +472,39 @@ components:
         webJourneyRunning:
           type: boolean
       description: Web journey model
-    DomainTotals:
+    Domain:
       type: object
       required:
-      - auditsRunning
-      - automatedJourneys
-      - averageScore
-      - errors
-      - guidedJourneys
-      - pages
-      - simulationsRunning
+      - accountId
+      - createdAt
+      - domain
+      - folderId
+      - id
+      - name
+      - userId
       properties:
-        auditsRunning:
+        accountId:
           format: int32
           type: integer
-        automatedJourneys:
+        createdAt:
+          format: date-time
+          type: string
+        domain:
+          type: string
+        folderId:
           format: int32
           type: integer
-        averageScore:
+        id:
           format: int32
           type: integer
-        errors:
+        name:
+          type: string
+        totals:
+          $ref: '#/components/schemas/DomainTotals'
+        userId:
           format: int32
           type: integer
-        guidedJourneys:
-          format: int32
-          type: integer
-        pages:
-          format: int32
-          type: integer
-        simulationsRunning:
-          format: int32
-          type: integer
+      description: Domain model
     ItemsAreRunningApiError:
       type: object
       required:
@@ -646,17 +521,210 @@ components:
           type: array
         message:
           type: string
-    CustomHttpHeaderAssignment:
+    NewDomain:
       type: object
       required:
-      - groupId
-      - isApplyToAll
+      - domain
+      - folderId
+      - name
       properties:
-        groupId:
-          format: int64
+        dataLayer:
+          type: string
+        domain:
+          type: string
+        folderId:
+          format: int32
           type: integer
-        isApplyToAll:
+        name:
+          type: string
+      description: Domain creation information
+    RemoteFileMapping:
+      type: object
+      required:
+      - matchType
+      - matchValue
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        createdBy:
+          format: int32
+          type: integer
+        fileId:
+          format: int32
+          type: integer
+        fileUrl:
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+          - '[equals'
+          - regex]
+          type: string
+        matchValue:
+          type: string
+        name:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        updatedBy:
+          format: int32
+          type: integer
+    Label:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    IncludeFilter:
+      type: object
+      required:
+      - includeLimit
+      - value
+      properties:
+        includeLimit:
+          format: int32
+          type: integer
+        value:
+          type: string
+    WebActionSelectorSwaggerReference:
+      type: object
+      discriminator:
+        propertyName: selectorType
+      properties:
+        selectorType:
+          format: int32
+          type: integer
+      description: 'Children: AttributesSelector, SimpleSelector'
+    AuditFilters:
+      type: object
+      required:
+      - exclude
+      - include
+      properties:
+        exclude:
+          items:
+            type: string
+          type: array
+        include:
+          items:
+            $ref: '#/components/schemas/IncludeFilter'
+          type: array
+    AuditRunSwaggerReference:
+      type: object
+      required:
+      - adobeAuditor
+      - id
+      - limit
+      - silentMode
+      - taggedUrl
+      - totalUrl
+      - userId
+      - webAuditId
+      properties:
+        adobeAuditor:
           type: boolean
+        completed:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        limit:
+          format: int32
+          type: integer
+        score:
+          description: Deprecated. Use `/v3/web-audits/{auditId}/runs/{runId}/scores` instead
+          format: int32
+          type: integer
+        silentMode:
+          type: boolean
+        started:
+          format: date-time
+          type: string
+        supportedFeatures:
+          example: '[TagLoadtimeReport, ConsoleLogsReport]'
+          items:
+            type: string
+          type: array
+        taggedUrl:
+          format: int32
+          type: integer
+        totalUrl:
+          format: int32
+          type: integer
+        userId:
+          format: int32
+          type: integer
+        webAuditId:
+          format: int32
+          type: integer
+    DomainUpdate:
+      type: object
+      required:
+      - domain
+      - folderId
+      - name
+      properties:
+        dataLayer:
+          type: string
+        domain:
+          type: string
+        folderId:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: Domain update information
+    WebJourneyOptions:
+      type: object
+      required:
+      - alerts
+      - browserWidth
+      - loadFlash
+      - location
+      - userAgent
+      properties:
+        alerts:
+          type: boolean
+        browserWidth:
+          format: int32
+          type: integer
+        customProxy:
+          type: string
+        flashLiveVideoEnabled:
+          type: boolean
+        frequency:
+          type: string
+        loadFlash:
+          type: boolean
+        location:
+          type: string
+        monitoredByScriptServices:
+          type: number
+        nextRun:
+          format: date-time
+          type: string
+        remoteFileMapConfig:
+          items:
+            $ref: '#/components/schemas/RemoteFileMapping'
+          type: array
+        userAgent:
+          type: string
+        userAgentDescription:
+          type: string
+        vpnEnabled:
+          type: boolean
+        webHookUrl:
+          type: string
     Audit:
       type: object
       required:
@@ -742,74 +810,6 @@ components:
         webAuditRunning:
           type: number
       description: Web audit model
-    ItemWithActiveRun:
-      type: object
-      required:
-      - itemId
-      - itemName
-      - itemType
-      - runId
-      properties:
-        itemId:
-          format: int64
-          type: integer
-        itemName:
-          type: string
-        itemType:
-          type: string
-        runId:
-          format: int64
-          type: integer
-    Domain:
-      type: object
-      required:
-      - accountId
-      - createdAt
-      - domain
-      - folderId
-      - id
-      - name
-      - userId
-      properties:
-        accountId:
-          format: int32
-          type: integer
-        createdAt:
-          format: date-time
-          type: string
-        domain:
-          type: string
-        folderId:
-          format: int32
-          type: integer
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-        totals:
-          $ref: '#/components/schemas/DomainTotals'
-        userId:
-          format: int32
-          type: integer
-      description: Domain model
-    NewDomain:
-      type: object
-      required:
-      - domain
-      - folderId
-      - name
-      properties:
-        dataLayer:
-          type: string
-        domain:
-          type: string
-        folderId:
-          format: int32
-          type: integer
-        name:
-          type: string
-      description: Domain creation information
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

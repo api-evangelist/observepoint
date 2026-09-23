@@ -11,7 +11,7 @@ tags:
 paths:
   /folders:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/folders</div>
+      description: GET /v2/folders
       operationId: getFolders
       responses:
         '200':
@@ -30,7 +30,7 @@ paths:
       tags:
       - Folders
     post:
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/folders</div>
+      description: POST /v2/folders
       operationId: createFolder
       requestBody:
         content:
@@ -55,7 +55,7 @@ paths:
       - Folders
   /folders/{folderId}:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/folders/<span class="op-path-parameter">{folderId}</span></div>
+      description: GET /v2/folders/{folderId}
       operationId: findFolder
       parameters:
       - name: folderId
@@ -81,7 +81,7 @@ paths:
       tags:
       - Folders
     put:
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/folders/<span class="op-path-parameter">{folderId}</span></div>
+      description: PUT /v2/folders/{folderId}
       operationId: updateFolder
       parameters:
       - name: folderId
@@ -114,7 +114,7 @@ paths:
       tags:
       - Folders
     delete:
-      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/folders/<span class="op-path-parameter">{folderId}</span></div>
+      description: DELETE /v2/folders/{folderId}
       operationId: deleteFolder
       parameters:
       - name: folderId
@@ -143,7 +143,7 @@ paths:
       - Folders
   /folders/{folderId}/users:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/folders/<span class="op-path-parameter">{folderId}</span>/users</div>
+      description: GET /v2/folders/{folderId}/users
       operationId: GetUsersWithFolderId
       parameters:
       - name: folderId
@@ -171,7 +171,7 @@ paths:
       tags:
       - Folders
     post:
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/folders/<span class="op-path-parameter">{folderId}</span>/users</div>
+      description: POST /v2/folders/{folderId}/users
       operationId: addUsers
       parameters:
       - name: folderId
@@ -228,6 +228,85 @@ components:
         runId:
           format: int64
           type: integer
+    User:
+      type: object
+      required:
+      - accountId
+      - created
+      - email
+      - firstName
+      - fullUsageDashboardAccess
+      - id
+      - lastName
+      - maxPagesPerAudit
+      - timezone
+      - updated
+      - username
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        created:
+          format: date-time
+          type: string
+        deleted:
+          description: ISO 8601 date time string with offset when user was deleted, null if not deleted
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: boolean
+        id:
+          format: int32
+          type: integer
+        lastLogin:
+          format: date-time
+          type: string
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          format: int32
+          type: integer
+        permissions:
+          enum:
+          - guest
+          - user
+          - admin
+          type: string
+        timezone:
+          type: string
+        updated:
+          format: date-time
+          type: string
+        username:
+          type: string
+      description: User model
+    ItemsAreRunningApiError:
+      type: object
+      required:
+      - errorCode
+      - items
+      - message
+      properties:
+        errorCode:
+          format: int32
+          type: integer
+        items:
+          items:
+            $ref: '#/components/schemas/ItemWithActiveRun'
+          type: array
+        message:
+          type: string
+    NewFolder:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+      description: Folder create information
     Folder:
       type: object
       required:
@@ -299,85 +378,6 @@ components:
           format: int32
           type: integer
       description: Folder model
-    User:
-      type: object
-      required:
-      - accountId
-      - created
-      - email
-      - firstName
-      - fullUsageDashboardAccess
-      - id
-      - lastName
-      - maxPagesPerAudit
-      - timezone
-      - updated
-      - username
-      properties:
-        accountId:
-          format: int32
-          type: integer
-        created:
-          format: date-time
-          type: string
-        deleted:
-          description: ISO 8601 date time string with offset when user was deleted, null if not deleted
-          type: string
-        email:
-          type: string
-        firstName:
-          type: string
-        fullUsageDashboardAccess:
-          type: boolean
-        id:
-          format: int32
-          type: integer
-        lastLogin:
-          format: date-time
-          type: string
-        lastName:
-          type: string
-        maxPagesPerAudit:
-          format: int32
-          type: integer
-        permissions:
-          enum:
-          - guest
-          - user
-          - admin
-          type: string
-        timezone:
-          type: string
-        updated:
-          format: date-time
-          type: string
-        username:
-          type: string
-      description: User model
-    NewFolder:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-      description: Folder create information
-    ItemsAreRunningApiError:
-      type: object
-      required:
-      - errorCode
-      - items
-      - message
-      properties:
-        errorCode:
-          format: int32
-          type: integer
-        items:
-          items:
-            $ref: '#/components/schemas/ItemWithActiveRun'
-          type: array
-        message:
-          type: string
     UpdateFolder:
       type: object
       required:

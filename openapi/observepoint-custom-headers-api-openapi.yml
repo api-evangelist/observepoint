@@ -33,7 +33,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/custom-headers</div>
+      description: GET /v3/custom-headers
     post:
       tags:
       - custom-headers
@@ -57,7 +57,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/custom-headers</div>
+      description: POST /v3/custom-headers
   /v3/custom-headers/{customHeaderGroupId}:
     get:
       tags:
@@ -81,7 +81,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/custom-headers/<span class="op-path-parameter">{customHeaderGroupId}</span></div>
+      description: GET /v3/custom-headers/{customHeaderGroupId}
     put:
       tags:
       - custom-headers
@@ -109,7 +109,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/custom-headers/<span class="op-path-parameter">{customHeaderGroupId}</span></div>
+      description: PUT /v3/custom-headers/{customHeaderGroupId}
     delete:
       tags:
       - custom-headers
@@ -128,7 +128,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/custom-headers/<span class="op-path-parameter">{customHeaderGroupId}</span></div>
+      description: DELETE /v3/custom-headers/{customHeaderGroupId}
   /v3/custom-headers/target-items/{itemType}/search:
     post:
       tags:
@@ -167,85 +167,55 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/custom-headers/target-items/<span class="op-path-parameter">{itemType}</span>/search</div>
+      description: POST /v3/custom-headers/target-items/{itemType}/search
 components:
-  parameters:
-    SortByParam:
-      name: sortBy
-      in: query
-      required: false
-      schema:
-        $ref: '#/components/schemas/CustomHeaderSortByEnum'
-    PageSize:
-      in: query
-      name: pageSize
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 100
-        minimum: 100
-    CustomHeaderGroupId:
-      name: customHeaderGroupId
-      in: path
-      required: true
-      description: Unique identification number for custom header group
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        type: integer
-    PageParam:
-      in: query
-      name: page
-      description: Number of results page of an endpoint with paginated results
-      required: false
-      schema:
-        type: integer
-        default: 0
-        minimum: 0
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
   schemas:
-    CustomHeaderTargetItemsSearchRequest:
-      type: object
-      description: Filters supported by Custom Header Target Items Search
-      properties:
-        customHeaderGroupId:
-          type: integer
-          format: int64
-        assignedToCustomHeaderGroup:
-          type: boolean
-        itemName:
-          type: string
-          minLength: 1
-        itemLabels:
-          type: array
-          description: non-empty array of labels present on an item, works as "item has all specified labels" filter
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/LabelId'
-        folders:
-          $ref: '#/components/schemas/FolderDomainFilter'
-    CustomHeaderGroupSummaryResponse:
+    CustomHeader:
       type: object
       required:
-      - customHeaderGroups
+      - name
+      - value
+      - type
       properties:
-        customHeaderGroups:
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomHeaderGroupSummary'
-    CustomHeaderTargetItem:
+        name:
+          type: string
+        value:
+          type: string
+        type:
+          type: string
+          enum:
+          - REQUEST
+          - RESPONSE
+    FolderDomainFilter:
       type: object
+      description: non-empty array of folders with domains (subfolders), items from which will be included in response
+      required:
+      - folders
       properties:
-        isAssigned:
-          type: boolean
+        folders:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/FolderDomainFilterItem'
+    DataSourceItemTypeCap:
+      description: Type of data source item.
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    AssignedLabel:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+    CustomHeaderAssignments:
+      type: object
+      required:
+      - itemType
+      - itemId
+      properties:
         itemType:
           type: string
           enum:
@@ -254,34 +224,18 @@ components:
         itemId:
           type: integer
           format: int64
-        itemName:
-          type: string
-        lastRunAt:
-          type: string
-          format: date-time
-          description: The timestamp of the last run for this item
-        itemLabels:
-          type: array
-          items:
-            $ref: '#/components/schemas/AssignedLabel'
-    AssignedLabel:
+    FolderDomainFilterItem:
       type: object
       required:
-      - id
+      - folderId
       properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-    FolderId:
-      type: integer
-      format: int32
-      description: ID of a folder
-      example: 123
-    DataSourceItemTypeCap:
-      description: Type of data source item.
-      type: string
-      enum:
-      - AUDIT
-      - WEB_JOURNEY
+        folderId:
+          $ref: '#/components/schemas/FolderId'
+        domains:
+          type: array
+          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
+          items:
+            $ref: '#/components/schemas/DomainId'
     CustomHeaderBody:
       type: object
       required:
@@ -310,12 +264,11 @@ components:
             $ref: '#/components/schemas/CustomHeaderAssignments'
         applyToAll:
           type: boolean
-    CustomHeaderAssignments:
+    CustomHeaderTargetItem:
       type: object
-      required:
-      - itemType
-      - itemId
       properties:
+        isAssigned:
+          type: boolean
         itemType:
           type: string
           enum:
@@ -324,118 +277,16 @@ components:
         itemId:
           type: integer
           format: int64
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
-    FolderDomainFilter:
-      type: object
-      description: non-empty array of folders with domains (subfolders), items from which will be included in response
-      required:
-      - folders
-      properties:
-        folders:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/FolderDomainFilterItem'
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    FolderDomainFilterItem:
-      type: object
-      required:
-      - folderId
-      properties:
-        folderId:
-          $ref: '#/components/schemas/FolderId'
-        domains:
-          type: array
-          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
-          items:
-            $ref: '#/components/schemas/DomainId'
-    CustomHeader:
-      type: object
-      required:
-      - name
-      - value
-      - type
-      properties:
-        name:
+        itemName:
           type: string
-        value:
-          type: string
-        type:
-          type: string
-          enum:
-          - REQUEST
-          - RESPONSE
-    CustomHeaderTargetItemsSearchResponse:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/PaginationMetadata'
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomHeaderTargetItem'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
+        lastRunAt:
           type: string
           format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    CustomHeaderSortByEnum:
-      type: string
-      default: ITEM_NAME
-      enum:
-      - IS_ASSIGNED
-      - ITEM_NAME
-      - RUN_DATE
-    DomainId:
-      type: integer
-      format: int32
-      description: ID of a domain
-      example: 123
-    RequestUrlFilter:
-      type: object
-      required:
-      - requestUrlFilter
-      - allowSubdomains
-      properties:
-        requestUrlFilter:
-          type: string
-        allowSubdomains:
-          type: boolean
+          description: The timestamp of the last run for this item
+        itemLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssignedLabel'
     CustomHeaderGroupSummary:
       type: object
       required:
@@ -472,15 +323,164 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CustomHeaderAssignments'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CustomHeaderTargetItemsSearchResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/PaginationMetadata'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomHeaderTargetItem'
+    RequestUrlFilter:
+      type: object
+      required:
+      - requestUrlFilter
+      - allowSubdomains
+      properties:
+        requestUrlFilter:
+          type: string
+        allowSubdomains:
+          type: boolean
+    DomainId:
+      type: integer
+      format: int32
+      description: ID of a domain
+      example: 123
+    CustomHeaderGroupSummaryResponse:
+      type: object
+      required:
+      - customHeaderGroups
+      properties:
+        customHeaderGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomHeaderGroupSummary'
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    FolderId:
+      type: integer
+      format: int32
+      description: ID of a folder
+      example: 123
+    CustomHeaderTargetItemsSearchRequest:
+      type: object
+      description: Filters supported by Custom Header Target Items Search
+      properties:
+        customHeaderGroupId:
+          type: integer
+          format: int64
+        assignedToCustomHeaderGroup:
+          type: boolean
+        itemName:
+          type: string
+          minLength: 1
+        itemLabels:
+          type: array
+          description: non-empty array of labels present on an item, works as "item has all specified labels" filter
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        folders:
+          $ref: '#/components/schemas/FolderDomainFilter'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    CustomHeaderSortByEnum:
+      type: string
+      default: ITEM_NAME
+      enum:
+      - IS_ASSIGNED
+      - ITEM_NAME
+      - RUN_DATE
+  parameters:
+    CustomHeaderGroupId:
+      name: customHeaderGroupId
+      in: path
+      required: true
+      description: Unique identification number for custom header group
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        type: integer
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    SortByParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/CustomHeaderSortByEnum'
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    PageSize:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
   responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
+    Forbidden:
+      description: You don't have enough rights to access this resource
       content:
         application/json:
           schema:

@@ -45,7 +45,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/page-summary</div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/page-summary
   /v3/web-audits/{auditId}/runs/{runId}/reports/page-summary/pages:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -81,7 +81,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/page-summary/pages</div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/page-summary/pages
   /v3/web-audits/{auditId}/runs/{runId}/reports/page-summary/trends:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -106,7 +106,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/page-summary/trends</div>
+      description: GET /v3/web-audits/{auditId}/runs/{runId}/reports/page-summary/trends
   /v3/web-audits/{auditId}/runs/{runId}/reports/page-summary/trends/web-vitals:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -131,7 +131,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/page-summary/trends/web-vitals</div>
+      description: GET /v3/web-audits/{auditId}/runs/{runId}/reports/page-summary/trends/web-vitals
   /v3/web-audits/{auditId}/reports/page-summary/trends/{trendName}:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -147,7 +147,7 @@ paths:
       - page-summary-report
       operationId: getPageSummaryTrend
       summary: Return insights on a given page for all runs in the given duration
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/reports/page-summary/trends/<span class="op-path-parameter">{trendName}</span></div>
+      description: 'GET /v3/web-audits/{auditId}/reports/page-summary/trends/{trendName}
 
 
         Get page trend insight from specified time span of audit runs'
@@ -195,117 +195,18 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/reports/page-summary/trends/web-vitals/<span class="op-path-parameter">{trendName}</span></div>
+      description: GET /v3/web-audits/{auditId}/reports/page-summary/trends/web-vitals/{trendName}
 components:
   schemas:
-    PageErrorTypeEnum:
-      type: string
-      enum:
-      - ON_PAGE_ACTION_ERROR
-    AuditRun_PageSummary_WebVitals_FirstContentfulPaintFilter:
-      description: First Contentful Paint time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    AuditRun_PageSummary_WebVitalsTrendsItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        required:
-        - largestContentfulPaintStats
-        - firstContentfulPaintStats
-        - timeToFirstByteStats
-        - cumulativeLayoutShiftStats
-        properties:
-          largestContentfulPaintStats:
-            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_Stats'
-          firstContentfulPaintStats:
-            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_Stats'
-          timeToFirstByteStats:
-            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_Stats'
-          cumulativeLayoutShiftStats:
-            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_Stats'
-    PageErrorsFilter:
+    IntegerRangeFilterTrait:
       type: object
-      description: 'non-empty list of kinds of errors present on a page, depends on `filterType`:
-
-        - `ALL`: page has all types of errors specified in `errorTypes` list
-
-        - `ANY`: page has any type of errors present in specified `errorTypes` list
-
-        '
-      required:
-      - filterType
-      - errorTypes
+      description: Common trait for integer min max filter
       properties:
-        filterType:
-          $ref: '#/components/schemas/PageErrorsFilterTypeEnum'
-        errorTypes:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/PageErrorTypeEnum'
-    PageSummaryPagesDTO:
-      type: object
-      required:
-      - metadata
-      - pages
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/InsightsByPageResponse'
-    PageUrlFilterEnum:
-      type: string
-      enum:
-      - contains
-      - regex
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    InsightsByPageResponse:
-      allOf:
-      - $ref: '#/components/schemas/AuditRun_PageWebVitals'
-      - type: object
-        properties:
-          pageId:
-            type: string
-          dataCollectionUuid:
-            type: string
-          pageUrl:
-            type: string
-          finalPageUrl:
-            type: string
-          pageTitle:
-            type: string
-          pageLoadTime:
-            type: integer
-          pageStatusCode:
-            type: integer
-            deprecated: true
-            description: Deprecated, use `initialPageStatusCode` & `finalPageStatusCode` instead
-          initialPageStatusCode:
-            type: integer
-          finalPageStatusCode:
-            type: integer
-          redirectCount:
-            type: integer
-            description: Number of redirects from initialUrl to finalUrl of the page or 0 if none
-          size:
-            type: integer
-            format: int64
-          browserError:
-            type: string
-            description: error produced by browser upon opening the page
-            example: This site can’t be reached. example.com’s server IP address could not be found. ERR_NAME_NOT_RESOLVED
-    IntegerFilterTypeEnum:
-      type: string
-      enum:
-      - specific
-      - range
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
     PageInsightsResponse:
       type: object
       properties:
@@ -342,12 +243,17 @@ components:
           description: Count of all pages that have broken links pointing to other pages
         webVitals:
           $ref: '#/components/schemas/AuditRun_PageSummary_AggregatedRunWebVitals'
-    PageErrorsFilterTypeEnum:
+    CombinedPageStatusCodeEnum:
       type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
       enum:
-      - ALL
-      - ANY
-    ItemRun_SpecificTrendValuesDTO:
+      - broken
+      - good
+    AuditRun_PageSummary_WebVitalsTrends_Response:
       type: object
       required:
       - runs
@@ -355,133 +261,11 @@ components:
         runs:
           type: array
           items:
-            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
-    PageSummarySparkLineDTO:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        properties:
-          averagePageLoadTime:
-            type: integer
-          pagesWithBrokenInitialStatusCode:
-            type: integer
-          pagesWithBrokenFinalStatusCode:
-            type: integer
-          pagesWithBrokenLinks:
-            type: integer
-    ItemRunTrendsItemTrait:
-      type: object
-      required:
-      - runId
-      - completedAt
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          $ref: '#/components/schemas/DateAndTime'
-    AuditRun_PageSummary_TrendsEnum:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
-      type: string
-      enum:
-      - avg_page_load_time
-      - broken_initial_page
-      - broken_final_page
-      - pages_with_broken_links
-    WebVitalsLargestContentfulPaint:
-      type: number
-      format: double
-      description: LCP time in milliseconds
-    PageUrlFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/PageUrlFilterEnum'
-        filterValue:
-          type: string
-          minLength: 1
-        negated:
-          type: boolean
-          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
-          default: false
-    IntegerRangeFilterTrait:
-      type: object
-      description: Common trait for integer min max filter
-      properties:
-        min:
-          type: integer
-          minimum: 0
-        max:
-          type: integer
-    AuditRun_PageSummary_WebVitalsTrends_Stats:
-      type: object
-      description: Web Vitals trends statistics (min, max, average, median, 25th and 75th percentiles)
-      required:
-      - min
-      - max
-      - average
-      - median
-      - p25
-      - p75
-      properties:
-        min:
-          type: number
-          format: double
-        max:
-          type: number
-          format: double
-        average:
-          type: number
-          format: double
-        median:
-          type: number
-          format: double
-        p25:
-          type: number
-          format: double
-        p75:
-          type: number
-          format: double
-    PageRedirectCountFilter:
-      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    AuditRun_PageWebVitals:
-      type: object
-      description: Web Vitals for a single page
-      properties:
-        largestContentfulPaint:
-          $ref: '#/components/schemas/WebVitalsLargestContentfulPaint'
-        firstContentfulPaint:
-          type: number
-          format: double
-          description: FCP time in milliseconds
-        timeToFirstByte:
-          type: number
-          format: double
-          description: TTFB time in milliseconds
-        cumulativeLayoutShift:
-          type: number
-          format: double
-          description: unitless measurement of CLS
-    TagVendorId:
+            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrendsItem'
+    AuditId:
       type: integer
-      description: Tag vendor ID
-    AuditRun_PageSummary_WebVitals_CumulativeLayoutShiftFilter:
-      description: Cumulative Layout Shift unitless measurement. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      $ref: '#/components/schemas/DoubleRangeFilterTrait'
-    PageSummarySparkLinesDTO:
-      type: object
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/PageSummarySparkLineDTO'
+      format: int64
+      example: 107239
     AuditRun_PageSummary_PagesSortColumn:
       type: string
       enum:
@@ -498,44 +282,115 @@ components:
       - first_contentful_paint
       - time_to_first_byte
       - cumulative_layout_shift
-    AuditRun_PageSummary_WebVitalsTrends_RunItem_PagesDistribution:
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
+    PageErrorsFilter:
       type: object
-      description: Distribution of pages by buckets of web vitals values
+      description: 'non-empty list of kinds of errors present on a page, depends on `filterType`:
+
+        - `ALL`: page has all types of errors specified in `errorTypes` list
+
+        - `ANY`: page has any type of errors present in specified `errorTypes` list
+
+        '
       required:
-      - good
-      - needsImprovement
-      - poor
+      - filterType
+      - errorTypes
       properties:
-        good:
-          type: integer
-        needsImprovement:
-          type: integer
-        poor:
-          type: integer
-    PaginationMetadata:
+        filterType:
+          $ref: '#/components/schemas/PageErrorsFilterTypeEnum'
+        errorTypes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PageErrorTypeEnum'
+    PageUrlFilter:
       type: object
       required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
+      - filterType
+      - filterValue
       properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    PageSummarySparkLineDTO:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        properties:
+          averagePageLoadTime:
+            type: integer
+          pagesWithBrokenInitialStatusCode:
+            type: integer
+          pagesWithBrokenFinalStatusCode:
+            type: integer
+          pagesWithBrokenLinks:
+            type: integer
+    WebVitalsLargestContentfulPaint:
+      type: number
+      format: double
+      description: LCP time in milliseconds
+    DoubleRangeFilterTrait:
+      type: object
+      description: Common trait for double min max filter
+      properties:
+        min:
+          type: number
+          format: double
+          minimum: 0
+        max:
+          type: number
+          format: double
+    AuditRun_PageSummary_WebVitals_TimeToFirstByteFilter:
+      description: Time to First Byte time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRun_WebVitalsTrends_Enum:
+      type: string
+      enum:
+      - largest_contentful_paint
+      - first_contentful_paint
+      - time_to_first_byte
+      - cumulative_layout_shift
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
     AuditRun_PageSummary_AggregatedRunWebVitals:
       type: object
       description: Web Vitals aggregated on run level
@@ -593,6 +448,63 @@ components:
           format: double
           minimum: 0
           description: 75th percentile CLS, unitless measurement.
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRun_PageWebVitals:
+      type: object
+      description: Web Vitals for a single page
+      properties:
+        largestContentfulPaint:
+          $ref: '#/components/schemas/WebVitalsLargestContentfulPaint'
+        firstContentfulPaint:
+          type: number
+          format: double
+          description: FCP time in milliseconds
+        timeToFirstByte:
+          type: number
+          format: double
+          description: TTFB time in milliseconds
+        cumulativeLayoutShift:
+          type: number
+          format: double
+          description: unitless measurement of CLS
+    InsightsByPageResponse:
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_PageWebVitals'
+      - type: object
+        properties:
+          pageId:
+            type: string
+          dataCollectionUuid:
+            type: string
+          pageUrl:
+            type: string
+          finalPageUrl:
+            type: string
+          pageTitle:
+            type: string
+          pageLoadTime:
+            type: integer
+          pageStatusCode:
+            type: integer
+            deprecated: true
+            description: Deprecated, use `initialPageStatusCode` & `finalPageStatusCode` instead
+          initialPageStatusCode:
+            type: integer
+          finalPageStatusCode:
+            type: integer
+          redirectCount:
+            type: integer
+            description: Number of redirects from initialUrl to finalUrl of the page or 0 if none
+          size:
+            type: integer
+            format: int64
+          browserError:
+            type: string
+            description: error produced by browser upon opening the page
+            example: This site can’t be reached. example.com’s server IP address could not be found. ERR_NAME_NOT_RESOLVED
     PageInsightsResponsePageCountsByStatusCodes:
       type: object
       properties:
@@ -602,77 +514,6 @@ components:
           type: integer
         broken:
           type: integer
-    AuditRun_PageSummary_SpecificWebVitalsTrend_Response:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_PageSummary_SpecificWebVitalsTrend_ResponseItem'
-    StatusCodeEnum:
-      description: good - 2xx, redirects - 3xx, broken - all others
-      deprecated: true
-      type: string
-      enum:
-      - good
-      - redirects
-      - broken
-    CombinedPageStatusCodeEnum:
-      type: string
-      description: '- `broken` - initial or final URL are `broken`,
-
-        - `good` - initial URL is `good` or `redirect` and final URL is `good`
-
-        '
-      enum:
-      - broken
-      - good
-    ItemRun_SpecificTrendValueItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        required:
-        - trendValue
-        properties:
-          trendValue:
-            type: number
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    PageSizeFilter:
-      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
-    AuditRun_PageSummary_WebVitals_TimeToFirstByteFilter:
-      description: Time to First Byte time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AuditRun_WebVitalsTrends_Enum:
-      type: string
-      enum:
-      - largest_contentful_paint
-      - first_contentful_paint
-      - time_to_first_byte
-      - cumulative_layout_shift
-    AuditRun_PageSummary_WebVitals_LargestContentfulPaintFilter:
-      description: Largest Contentful Paint time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      $ref: '#/components/schemas/IntegerRangeFilterTrait'
     PageSummaryRequestDTO:
       type: object
       description: Filter `pageStatusCode` is deprecated
@@ -730,6 +571,57 @@ components:
           $ref: '#/components/schemas/AuditRun_PageSummary_WebVitals_TimeToFirstByteFilter'
         cumulativeLayoutShift:
           $ref: '#/components/schemas/AuditRun_PageSummary_WebVitals_CumulativeLayoutShiftFilter'
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun_PageSummary_WebVitalsTrendsItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - largestContentfulPaintStats
+        - firstContentfulPaintStats
+        - timeToFirstByteStats
+        - cumulativeLayoutShiftStats
+        properties:
+          largestContentfulPaintStats:
+            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_Stats'
+          firstContentfulPaintStats:
+            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_Stats'
+          timeToFirstByteStats:
+            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_Stats'
+          cumulativeLayoutShiftStats:
+            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_Stats'
+    AuditRun_PageSummary_WebVitals_FirstContentfulPaintFilter:
+      description: First Contentful Paint time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      $ref: '#/components/schemas/IntegerRangeFilterTrait'
     AuditRun_PageSummary_SpecificWebVitalsTrend_ResponseItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
@@ -744,15 +636,6 @@ components:
             $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_RunItem_PagesDistribution'
           stats:
             $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrends_Stats'
-    AuditRun_PageSummary_WebVitalsTrends_Response:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_PageSummary_WebVitalsTrendsItem'
     CommonIterableResponseMetadata:
       description: Common metadata for iterable
       type: object
@@ -761,24 +644,169 @@ components:
       properties:
         pagination:
           $ref: '#/components/schemas/PaginationMetadata'
-    DateAndTime:
+    AuditRun_PageSummary_TrendsEnum:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
       type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
+      enum:
+      - avg_page_load_time
+      - broken_initial_page
+      - broken_final_page
+      - pages_with_broken_links
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    PageErrorTypeEnum:
+      type: string
+      enum:
+      - ON_PAGE_ACTION_ERROR
+    PageSummaryPagesDTO:
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/InsightsByPageResponse'
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    AuditRun_PageSummary_WebVitalsTrends_RunItem_PagesDistribution:
+      type: object
+      description: Distribution of pages by buckets of web vitals values
+      required:
+      - good
+      - needsImprovement
+      - poor
+      properties:
+        good:
+          type: integer
+        needsImprovement:
+          type: integer
+        poor:
+          type: integer
+    AuditRun_PageSummary_WebVitals_CumulativeLayoutShiftFilter:
+      description: Cumulative Layout Shift unitless measurement. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      $ref: '#/components/schemas/DoubleRangeFilterTrait'
+    StatusCodeEnum:
+      description: good - 2xx, redirects - 3xx, broken - all others
+      deprecated: true
+      type: string
+      enum:
+      - good
+      - redirects
+      - broken
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AuditRun_PageSummary_WebVitals_LargestContentfulPaintFilter:
+      description: Largest Contentful Paint time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRun_PageSummary_WebVitalsTrends_Stats:
+      type: object
+      description: Web Vitals trends statistics (min, max, average, median, 25th and 75th percentiles)
+      required:
+      - min
+      - max
+      - average
+      - median
+      - p25
+      - p75
+      properties:
+        min:
+          type: number
+          format: double
+        max:
+          type: number
+          format: double
+        average:
+          type: number
+          format: double
+        median:
+          type: number
+          format: double
+        p25:
+          type: number
+          format: double
+        p75:
+          type: number
+          format: double
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    PageErrorsFilterTypeEnum:
+      type: string
+      enum:
+      - ALL
+      - ANY
+    PageSummarySparkLinesDTO:
+      type: object
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageSummarySparkLineDTO'
+    AuditRun_PageSummary_SpecificWebVitalsTrend_Response:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_PageSummary_SpecificWebVitalsTrend_ResponseItem'
     LongIntegerRangeFilterTrait:
       type: object
       description: Common trait for long integer min max filter
@@ -790,39 +818,11 @@ components:
         max:
           type: integer
           format: int64
-    StringInclusionFilterTypeEnum:
+    IntegerFilterTypeEnum:
       type: string
       enum:
-      - contains
-      - not_contains
-    PageLoadTimeFilter:
-      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    PageTitleFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          description: Page title as displayed by browser
-          minLength: 1
-          example: ObserveP
-    DoubleRangeFilterTrait:
-      type: object
-      description: Common trait for double min max filter
-      properties:
-        min:
-          type: number
-          format: double
-          minimum: 0
-        max:
-          type: number
-          format: double
+      - specific
+      - range
     IntegerFilter:
       type: object
       required:
@@ -840,6 +840,15 @@ components:
           specific: '#/components/schemas/SpecificIntegerFilter'
           range: '#/components/schemas/IntegerRangeFilter'
   parameters:
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
     AuditRun_Trends_DaysParam:
       name: days
       in: query
@@ -858,6 +867,14 @@ components:
         maximum: 10000
         default: 50
         minimum: 50
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
     AuditId:
       name: auditId
       in: path
@@ -867,21 +884,6 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/AuditId'
-    AuditRun_PageSummary_PageSortParam:
-      in: query
-      name: sortBy
-      required: false
-      schema:
-        $ref: '#/components/schemas/AuditRun_PageSummary_PagesSortColumn'
-    pageParam:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
     RunId:
       name: runId
       in: path
@@ -891,14 +893,12 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
-    SortDescendingParam:
-      name: sortDesc
+    AuditRun_PageSummary_PageSortParam:
       in: query
-      description: Controls sorting order
+      name: sortBy
       required: false
       schema:
-        type: boolean
-        default: false
+        $ref: '#/components/schemas/AuditRun_PageSummary_PagesSortColumn'
   responses:
     BadRequest:
       description: The request cannot be accepted

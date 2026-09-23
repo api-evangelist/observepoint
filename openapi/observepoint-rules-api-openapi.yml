@@ -13,7 +13,7 @@ tags:
 paths:
   /rules:
     post:
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/rules</div>
+      description: POST /v2/rules
       operationId: createRule
       requestBody:
         content:
@@ -42,7 +42,7 @@ paths:
     - url: https://api.observepoint.com/v2
   /rules/previews:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/rules/previews</div>
+      description: GET /v2/rules/previews
       operationId: getRulePreviews
       responses:
         '200':
@@ -64,7 +64,7 @@ paths:
     - url: https://api.observepoint.com/v2
   /rules/snapshots/page-filters/{pageFilterSnapshotId}/original:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/rules/snapshots/page-filters/<span class="op-path-parameter">{pageFilterSnapshotId}</span>/original</div>
+      description: GET /v2/rules/snapshots/page-filters/{pageFilterSnapshotId}/original
       operationId: getOriginalRulePageFilterIdFromSnapshot
       parameters:
       - name: pageFilterSnapshotId
@@ -93,7 +93,7 @@ paths:
     - url: https://api.observepoint.com/v2
   /rules/snapshots/tags/variables/{tagVariableSnapshotId}/original:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/rules/snapshots/tags/variables/<span class="op-path-parameter">{tagVariableSnapshotId}</span>/original</div>
+      description: GET /v2/rules/snapshots/tags/variables/{tagVariableSnapshotId}/original
       operationId: getOriginalRuleTagVariableIdFromSnapshot
       parameters:
       - name: tagVariableSnapshotId
@@ -122,7 +122,7 @@ paths:
     - url: https://api.observepoint.com/v2
   /rules/snapshots/tags/{tagSnapshotId}/original:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/rules/snapshots/tags/<span class="op-path-parameter">{tagSnapshotId}</span>/original</div>
+      description: GET /v2/rules/snapshots/tags/{tagSnapshotId}/original
       operationId: getOriginalRuleTagIdFromSnapshot
       parameters:
       - name: tagSnapshotId
@@ -151,7 +151,7 @@ paths:
     - url: https://api.observepoint.com/v2
   /rules/snapshots/{ruleSnapshotId}/original:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/rules/snapshots/<span class="op-path-parameter">{ruleSnapshotId}</span>/original</div>
+      description: GET /v2/rules/snapshots/{ruleSnapshotId}/original
       operationId: getOriginalRuleIdFromSnapshot
       parameters:
       - name: ruleSnapshotId
@@ -180,7 +180,7 @@ paths:
     - url: https://api.observepoint.com/v2
   /rules/{ruleId}:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/rules/<span class="op-path-parameter">{ruleId}</span></div>
+      description: GET /v2/rules/{ruleId}
       operationId: getRule
       parameters:
       - name: ruleId
@@ -204,7 +204,7 @@ paths:
       tags:
       - Rules
     put:
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/rules/<span class="op-path-parameter">{ruleId}</span></div>
+      description: PUT /v2/rules/{ruleId}
       operationId: updateRule
       parameters:
       - name: ruleId
@@ -237,7 +237,7 @@ paths:
       tags:
       - Rules
     delete:
-      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/rules/<span class="op-path-parameter">{ruleId}</span></div>
+      description: DELETE /v2/rules/{ruleId}
       operationId: deleteRule
       parameters:
       - name: ruleId
@@ -262,7 +262,7 @@ paths:
     - url: https://api.observepoint.com/v2
   /rules/{ruleId}/web-journeys:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/rules/<span class="op-path-parameter">{ruleId}</span>/web-journeys</div>
+      description: GET /v2/rules/{ruleId}/web-journeys
       operationId: getAllWebJourneysByRule
       parameters:
       - name: ruleId
@@ -332,51 +332,562 @@ paths:
           $ref: '#/components/responses/UnAuthorized'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/rule-library</div>
+      description: POST /v3/rule-library
     servers:
     - url: https://api.observepoint.com
       description: ObservePoint Production API
 components:
-  requestBodies:
-    UserContext:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UserContext'
   schemas:
-    SnowflakeUsage:
+    PageFilter:
       type: object
       required:
-      - useForAdobeAuditor
-      - useForAppJourneyRuleResults
-      - useForAppJourneys
-      - useForAudits
-      - useForLiveConnect
-      - useForLiveConnectRuleResults
-      - useForWebJourneyRuleResults
-      - useForWebJourneys
-      - used
+      - id
+      - ruleId
       properties:
-        useForAdobeAuditor:
-          type: boolean
-        useForAppJourneyRuleResults:
-          type: boolean
-        useForAppJourneys:
-          type: boolean
-        useForAudits:
-          type: boolean
-        useForLiveConnect:
-          type: boolean
-        useForLiveConnectRuleResults:
-          type: boolean
-        useForWebJourneyRuleResults:
-          type: boolean
-        useForWebJourneys:
-          type: boolean
-        used:
-          type: boolean
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        type:
+          description: 1 - url, 2 - status code, 3 - final url, 4 - final status code
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          format: int32
+          type: integer
+        value:
+          type: string
+    UpdateRuleTagVariable:
+      type: object
+      required:
+      - variable
+      properties:
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        ruleTagId:
+          format: int32
+          type: integer
+        selectorType:
+          enum:
+          - String
+          - UrlParameter
+          - DataLayer
+          - Tag
+          - FinalUrlParameter
+          type: string
+        validationDescription:
+          type: string
+        value:
+          type: string
+        valueTagId:
+          format: int32
+          type: integer
+        variable:
+          type: string
     Value:
       type: object
+    NewRule:
+      type: object
+      required:
+      - checkTimes
+      - matchAllFilters
+      - name
+      properties:
+        checkTimes:
+          format: int32
+          type: integer
+        isDefaultRule:
+          type: number
+        labels:
+          items:
+            $ref: '#/components/schemas/LabelId'
+          type: array
+        matchAllFilters:
+          type: boolean
+        name:
+          type: string
+        notes:
+          type: string
+        pageFilters:
+          items:
+            $ref: '#/components/schemas/NewPageFilter'
+          type: array
+        recipients:
+          items:
+            type: string
+          type: array
+        tags:
+          items:
+            $ref: '#/components/schemas/NewRuleTag'
+          type: array
+      description: Rule create information
+    Rule:
+      type: object
+      required:
+      - accountId
+      - checkTimes
+      - createdAt
+      - createdBy
+      - fromTemplate
+      - id
+      - isDefaultRule
+      - matchAllFilters
+      - name
+      - updatedAt
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        checkTimes:
+          format: int32
+          type: integer
+        createdAt:
+          format: date-time
+          type: string
+        createdBy:
+          format: int32
+          type: integer
+        fromTemplate:
+          type: boolean
+        id:
+          format: int32
+          type: integer
+        isDefaultRule:
+          type: boolean
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        matchAllFilters:
+          type: boolean
+        name:
+          type: string
+        notes:
+          type: string
+        pageFilters:
+          items:
+            $ref: '#/components/schemas/PageFilter'
+          type: array
+        recipients:
+          items:
+            type: string
+          type: array
+        tags:
+          items:
+            $ref: '#/components/schemas/RuleTag'
+          type: array
+        updatedAt:
+          format: date-time
+          type: string
+      description: Rule model
+    SequencedActionSwaggerReference:
+      type: object
+      required:
+      - preventNav
+      - selectors
+      - sequence
+      properties:
+        action:
+          enum:
+          - navto
+          - click
+          - input
+          - select
+          - check
+          - uncheck
+          - execute
+          - watch
+          - maskedInput
+          - enterIframe
+          - exitIframe
+          type: string
+        actionId:
+          type: number
+        js:
+          type: string
+        label:
+          type: string
+        maskedValue:
+          type: string
+        preventNav:
+          type: boolean
+        rules:
+          items:
+            type: number
+          type: array
+        seconds:
+          format: int32
+          type: integer
+        selectors:
+          items:
+            $ref: '#/components/schemas/WebActionSelectorSwaggerReference'
+          type: array
+        sequence:
+          format: int32
+          type: integer
+        url:
+          type: string
+        value:
+          type: string
+        waitDuration:
+          format: int32
+          maximum: 1800
+          minimum: 0
+          type: integer
+    UpdatePageFilter:
+      type: object
+      properties:
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        type:
+          description: 1 - url, 2 - status code, 3 - final url, 4 - final status code
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          format: int32
+          type: integer
+        value:
+          type: string
+    WebJourney:
+      type: object
+      required:
+      - actions
+      - domainId
+      - emails
+      - folderId
+      - id
+      - name
+      - options
+      - queued
+      - userId
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/SequencedActionSwaggerReference'
+          type: array
+        createdAt:
+          format: date-time
+          type: string
+        domainId:
+          format: int64
+          type: integer
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        lastCheck:
+          format: date-time
+          type: string
+        name:
+          type: string
+        nextCheck:
+          format: date-time
+          type: string
+        options:
+          $ref: '#/components/schemas/WebJourneyOptions'
+        queued:
+          type: boolean
+        screenshot:
+          type: string
+        status:
+          enum:
+          - Ok
+          - Failed
+          - NotChecked
+          - RulesFailed
+          - ActionFailed
+          - PageFailed
+          - DataCollectionFailure
+          type: string
+        userId:
+          format: int64
+          type: integer
+        webJourneyRunning:
+          type: boolean
+      description: Web journey model
+    AuthToken:
+      type: object
+      required:
+      - created
+      - decryptedToken
+      - token
+      - tokenType
+      - userId
+      properties:
+        created:
+          type: string
+        decryptedToken:
+          type: string
+        token:
+          type: string
+        tokenType:
+          $ref: '#/components/schemas/TokenType'
+        userId:
+          type: string
+    RuleTagVariable:
+      type: object
+      required:
+      - id
+      - ruleTagId
+      - variable
+      properties:
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        ruleTagId:
+          format: int32
+          type: integer
+        selectorType:
+          enum:
+          - String
+          - UrlParameter
+          - DataLayer
+          - Tag
+          - FinalUrlParameter
+          type: string
+        validationDescription:
+          type: string
+        value:
+          type: string
+        valueTagId:
+          format: int32
+          type: integer
+        variable:
+          type: string
+    RemoteFileMapping:
+      type: object
+      required:
+      - matchType
+      - matchValue
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        createdBy:
+          format: int32
+          type: integer
+        fileId:
+          format: int32
+          type: integer
+        fileUrl:
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+          - '[equals'
+          - regex]
+          type: string
+        matchValue:
+          type: string
+        name:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        updatedBy:
+          format: int32
+          type: integer
+    NewPageFilter:
+      type: object
+      properties:
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        type:
+          description: 1 - url, 2 - status code, 3 - final url, 4 - final status code
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          format: int32
+          type: integer
+        value:
+          type: string
+    Label:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    RuleTag:
+      type: object
+      required:
+      - id
+      - ruleId
+      - tagId
+      properties:
+        account:
+          type: string
+        clause:
+          enum:
+          - If
+          - Then
+          - Else
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        statusCode:
+          $ref: '#/components/schemas/RuleTagStatusCode'
+        tagId:
+          format: int32
+          type: integer
+        validationDescription:
+          type: string
+        variables:
+          items:
+            $ref: '#/components/schemas/RuleTagVariable'
+          type: array
+    NewRuleTagVariable:
+      type: object
+      required:
+      - variable
+      properties:
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        ruleTagId:
+          format: int32
+          type: integer
+        selectorType:
+          enum:
+          - String
+          - UrlParameter
+          - DataLayer
+          - Tag
+          - FinalUrlParameter
+          type: string
+        validationDescription:
+          type: string
+        value:
+          type: string
+        valueTagId:
+          format: int32
+          type: integer
+        variable:
+          type: string
+    AccountCapabilities:
+      type: object
+      required:
+      - customProxySupport
+      - strongPasswordPolicy
+      - vpnSupport
+      properties:
+        customProxySupport:
+          type: boolean
+        strongPasswordPolicy:
+          type: boolean
+        vpnSupport:
+          type: boolean
     UserContext:
       type: object
       required:
@@ -470,166 +981,6 @@ components:
           $ref: '#/components/schemas/DateTimeZone'
         tokenType:
           $ref: '#/components/schemas/TokenType'
-    UpdatePageFilter:
-      type: object
-      properties:
-        id:
-          format: int32
-          type: integer
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-        ruleId:
-          format: int32
-          type: integer
-        type:
-          description: 1 - url, 2 - status code, 3 - final url, 4 - final status code
-          enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          format: int32
-          type: integer
-        value:
-          type: string
-    Label:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-    AccountCapabilities:
-      type: object
-      required:
-      - customProxySupport
-      - strongPasswordPolicy
-      - vpnSupport
-      properties:
-        customProxySupport:
-          type: boolean
-        strongPasswordPolicy:
-          type: boolean
-        vpnSupport:
-          type: boolean
-    Rule:
-      type: object
-      required:
-      - accountId
-      - checkTimes
-      - createdAt
-      - createdBy
-      - fromTemplate
-      - id
-      - isDefaultRule
-      - matchAllFilters
-      - name
-      - updatedAt
-      properties:
-        accountId:
-          format: int32
-          type: integer
-        checkTimes:
-          format: int32
-          type: integer
-        createdAt:
-          format: date-time
-          type: string
-        createdBy:
-          format: int32
-          type: integer
-        fromTemplate:
-          type: boolean
-        id:
-          format: int32
-          type: integer
-        isDefaultRule:
-          type: boolean
-        labels:
-          items:
-            $ref: '#/components/schemas/Label'
-          type: array
-        matchAllFilters:
-          type: boolean
-        name:
-          type: string
-        notes:
-          type: string
-        pageFilters:
-          items:
-            $ref: '#/components/schemas/PageFilter'
-          type: array
-        recipients:
-          items:
-            type: string
-          type: array
-        tags:
-          items:
-            $ref: '#/components/schemas/RuleTag'
-          type: array
-        updatedAt:
-          format: date-time
-          type: string
-      description: Rule model
-    LabelId:
-      type: object
-      required:
-      - id
-      properties:
-        id:
-          format: int32
-          type: integer
-    NewRuleTagVariable:
-      type: object
-      required:
-      - variable
-      properties:
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-        ruleTagId:
-          format: int32
-          type: integer
-        selectorType:
-          enum:
-          - String
-          - UrlParameter
-          - DataLayer
-          - Tag
-          - FinalUrlParameter
-          type: string
-        validationDescription:
-          type: string
-        value:
-          type: string
-        valueTagId:
-          format: int32
-          type: integer
-        variable:
-          type: string
     WebActionSelectorSwaggerReference:
       type: object
       discriminator:
@@ -639,123 +990,6 @@ components:
           format: int32
           type: integer
       description: 'Children: AttributesSelector, SimpleSelector'
-    SequencedActionSwaggerReference:
-      type: object
-      required:
-      - preventNav
-      - selectors
-      - sequence
-      properties:
-        action:
-          enum:
-          - navto
-          - click
-          - input
-          - select
-          - check
-          - uncheck
-          - execute
-          - watch
-          - maskedInput
-          - enterIframe
-          - exitIframe
-          type: string
-        actionId:
-          type: number
-        js:
-          type: string
-        label:
-          type: string
-        maskedValue:
-          type: string
-        preventNav:
-          type: boolean
-        rules:
-          items:
-            type: number
-          type: array
-        seconds:
-          format: int32
-          type: integer
-        selectors:
-          items:
-            $ref: '#/components/schemas/WebActionSelectorSwaggerReference'
-          type: array
-        sequence:
-          format: int32
-          type: integer
-        url:
-          type: string
-        value:
-          type: string
-        waitDuration:
-          format: int32
-          maximum: 1800
-          minimum: 0
-          type: integer
-    RuleTag:
-      type: object
-      required:
-      - id
-      - ruleId
-      - tagId
-      properties:
-        account:
-          type: string
-        clause:
-          enum:
-          - If
-          - Then
-          - Else
-          type: string
-        id:
-          format: int32
-          type: integer
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-        ruleId:
-          format: int32
-          type: integer
-        statusCode:
-          $ref: '#/components/schemas/RuleTagStatusCode'
-        tagId:
-          format: int32
-          type: integer
-        validationDescription:
-          type: string
-        variables:
-          items:
-            $ref: '#/components/schemas/RuleTagVariable'
-          type: array
-    AuthToken:
-      type: object
-      required:
-      - created
-      - decryptedToken
-      - token
-      - tokenType
-      - userId
-      properties:
-        created:
-          type: string
-        decryptedToken:
-          type: string
-        token:
-          type: string
-        tokenType:
-          $ref: '#/components/schemas/TokenType'
-        userId:
-          type: string
     UpdateRuleTag:
       type: object
       required:
@@ -798,6 +1032,109 @@ components:
           items:
             $ref: '#/components/schemas/UpdateRuleTagVariable'
           type: array
+    RulePreview:
+      type: object
+      required:
+      - id
+      - isDefaultRule
+      - labels
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        isDefaultRule:
+          type: boolean
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        name:
+          type: string
+      description: Rule preview model
+    LabelId:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          format: int32
+          type: integer
+    RuleTagStatusCode:
+      type: object
+      properties:
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        value:
+          format: int32
+          type: integer
+        valueType:
+          enum:
+          - Specific
+          - SuccessAndRedirect
+          - Broken
+          type: string
+    TokenType:
+      type: object
+    DateTimeZone:
+      type: object
+      required:
+      - fixed
+      - id
+      properties:
+        fixed:
+          type: boolean
+        id:
+          type: string
+    NewRuleTag:
+      type: object
+      required:
+      - tagId
+      properties:
+        account:
+          type: string
+        clause:
+          enum:
+          - If
+          - Then
+          - Else
+          type: string
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        statusCode:
+          $ref: '#/components/schemas/RuleTagStatusCode'
+        tagId:
+          format: int32
+          type: integer
+        validationDescription:
+          type: string
+        variables:
+          items:
+            $ref: '#/components/schemas/NewRuleTagVariable'
+          type: array
     WebJourneyOptions:
       type: object
       required:
@@ -839,314 +1176,37 @@ components:
           type: boolean
         webHookUrl:
           type: string
-    TokenType:
-      type: object
-    UpdateRuleTagVariable:
+    SnowflakeUsage:
       type: object
       required:
-      - variable
+      - useForAdobeAuditor
+      - useForAppJourneyRuleResults
+      - useForAppJourneys
+      - useForAudits
+      - useForLiveConnect
+      - useForLiveConnectRuleResults
+      - useForWebJourneyRuleResults
+      - useForWebJourneys
+      - used
       properties:
-        id:
-          format: int32
-          type: integer
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-        ruleTagId:
-          format: int32
-          type: integer
-        selectorType:
-          enum:
-          - String
-          - UrlParameter
-          - DataLayer
-          - Tag
-          - FinalUrlParameter
-          type: string
-        validationDescription:
-          type: string
-        value:
-          type: string
-        valueTagId:
-          format: int32
-          type: integer
-        variable:
-          type: string
-    DateTimeZone:
-      type: object
-      required:
-      - fixed
-      - id
-      properties:
-        fixed:
+        useForAdobeAuditor:
           type: boolean
-        id:
-          type: string
-    WebJourney:
-      type: object
-      required:
-      - actions
-      - domainId
-      - emails
-      - folderId
-      - id
-      - name
-      - options
-      - queued
-      - userId
-      properties:
-        actions:
-          items:
-            $ref: '#/components/schemas/SequencedActionSwaggerReference'
-          type: array
-        createdAt:
-          format: date-time
-          type: string
-        domainId:
-          format: int64
-          type: integer
-        emails:
-          items:
-            type: string
-          type: array
-        folderId:
-          format: int64
-          type: integer
-        id:
-          format: int64
-          type: integer
-        lastCheck:
-          format: date-time
-          type: string
-        name:
-          type: string
-        nextCheck:
-          format: date-time
-          type: string
-        options:
-          $ref: '#/components/schemas/WebJourneyOptions'
-        queued:
+        useForAppJourneyRuleResults:
           type: boolean
-        screenshot:
-          type: string
-        status:
-          enum:
-          - Ok
-          - Failed
-          - NotChecked
-          - RulesFailed
-          - ActionFailed
-          - PageFailed
-          - DataCollectionFailure
-          type: string
-        userId:
-          format: int64
-          type: integer
-        webJourneyRunning:
+        useForAppJourneys:
           type: boolean
-      description: Web journey model
-    RemoteFileMapping:
-      type: object
-      required:
-      - matchType
-      - matchValue
-      properties:
-        createdAt:
-          format: date-time
-          type: string
-        createdBy:
-          format: int32
-          type: integer
-        fileId:
-          format: int32
-          type: integer
-        fileUrl:
-          type: string
-        id:
-          format: int32
-          type: integer
-        matchType:
-          enum:
-          - '[equals'
-          - regex]
-          type: string
-        matchValue:
-          type: string
-        name:
-          type: string
-        updatedAt:
-          format: date-time
-          type: string
-        updatedBy:
-          format: int32
-          type: integer
-    RulePreview:
-      type: object
-      required:
-      - id
-      - isDefaultRule
-      - labels
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        isDefaultRule:
+        useForAudits:
           type: boolean
-        labels:
-          items:
-            $ref: '#/components/schemas/Label'
-          type: array
-        name:
-          type: string
-      description: Rule preview model
-    NewRuleTag:
-      type: object
-      required:
-      - tagId
-      properties:
-        account:
-          type: string
-        clause:
-          enum:
-          - If
-          - Then
-          - Else
-          type: string
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-        ruleId:
-          format: int32
-          type: integer
-        statusCode:
-          $ref: '#/components/schemas/RuleTagStatusCode'
-        tagId:
-          format: int32
-          type: integer
-        validationDescription:
-          type: string
-        variables:
-          items:
-            $ref: '#/components/schemas/NewRuleTagVariable'
-          type: array
-    NewRule:
-      type: object
-      required:
-      - checkTimes
-      - matchAllFilters
-      - name
-      properties:
-        checkTimes:
-          format: int32
-          type: integer
-        isDefaultRule:
-          type: number
-        labels:
-          items:
-            $ref: '#/components/schemas/LabelId'
-          type: array
-        matchAllFilters:
+        useForLiveConnect:
           type: boolean
-        name:
-          type: string
-        notes:
-          type: string
-        pageFilters:
-          items:
-            $ref: '#/components/schemas/NewPageFilter'
-          type: array
-        recipients:
-          items:
-            type: string
-          type: array
-        tags:
-          items:
-            $ref: '#/components/schemas/NewRuleTag'
-          type: array
-      description: Rule create information
-    Permissions:
-      type: object
-      required:
-      - intValue
-      - stringValue
-      properties:
-        intValue:
-          format: int32
-          type: integer
-        stringValue:
-          type: string
-    NewPageFilter:
-      type: object
-      properties:
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-        ruleId:
-          format: int32
-          type: integer
-        type:
-          description: 1 - url, 2 - status code, 3 - final url, 4 - final status code
-          enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          format: int32
-          type: integer
-        value:
-          type: string
-    RuleTagStatusCode:
-      type: object
-      properties:
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-        value:
-          format: int32
-          type: integer
-        valueType:
-          enum:
-          - Specific
-          - SuccessAndRedirect
-          - Broken
-          type: string
+        useForLiveConnectRuleResults:
+          type: boolean
+        useForWebJourneyRuleResults:
+          type: boolean
+        useForWebJourneys:
+          type: boolean
+        used:
+          type: boolean
     UpdateRule:
       type: object
       required:
@@ -1185,83 +1245,46 @@ components:
             $ref: '#/components/schemas/UpdateRuleTag'
           type: array
       description: Rule update information
-    PageFilter:
+    Permissions:
       type: object
       required:
-      - id
-      - ruleId
+      - intValue
+      - stringValue
       properties:
-        id:
+        intValue:
           format: int32
           type: integer
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
+        stringValue:
           type: string
-        ruleId:
-          format: int32
-          type: integer
-        type:
-          description: 1 - url, 2 - status code, 3 - final url, 4 - final status code
-          enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          format: int32
-          type: integer
-        value:
-          type: string
-    RuleTagVariable:
+    PaginationMetadata:
       type: object
       required:
-      - id
-      - ruleTagId
-      - variable
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
       properties:
-        id:
-          format: int32
+        totalCount:
+          description: Total number of items available from all result pages combined
           type: integer
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-        ruleTagId:
-          format: int32
+        totalPageCount:
+          description: Total number of pages available
           type: integer
-        selectorType:
-          enum:
-          - String
-          - UrlParameter
-          - DataLayer
-          - Tag
-          - FinalUrlParameter
-          type: string
-        validationDescription:
-          type: string
-        value:
-          type: string
-        valueTagId:
-          format: int32
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
           type: integer
-        variable:
-          type: string
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    RuleId:
+      type: integer
+      format: int64
+      description: Rule ID
+      example: 12
     ErrorModel:
       type: object
       properties:
@@ -1274,72 +1297,16 @@ components:
           type: string
         validationReport:
           type: object
-    RuleLibrary_RuleUsage:
-      type: object
-      required:
-      - auditCount
-      - webJourneyCount
-      - appJourneyCount
-      properties:
-        auditCount:
-          type: integer
-          example: 0
-        webJourneyCount:
-          type: integer
-          example: 3
-        appJourneyCount:
-          type: integer
-          example: 1
-    UserId:
-      type: integer
-      description: ID of a user
-      example: 123
-    DateAndTime:
+    RuleLibrary_SortColumn:
       type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    RuleLibrary_ResponseDTO:
-      type: object
-      properties:
-        paginationMetadata:
-          $ref: '#/components/schemas/PaginationMetadata'
-        rules:
-          type: array
-          items:
-            $ref: '#/components/schemas/RuleLibrary_RuleItem'
-    RuleLibrary_RequestDTO:
-      type: object
-      description: Filters supported by Rule Library
-      properties:
-        id:
-          $ref: '#/components/schemas/RuleId'
-        ruleName:
-          type: string
-          example: Filter by rule name. Matched as contains, case insensitive.
-        labels:
-          type: array
-          items:
-            $ref: '#/components/schemas/LabelId_2'
-        notificationEnabled:
-          type: boolean
-        createdByUserId:
-          $ref: '#/components/schemas/UserId'
-        fromTemplate:
-          type: boolean
+      enum:
+      - NAME
+      - TYPE
+      - AUDITS
+      - WEB_JOURNEYS
+      - APP_JOURNEYS
+      - OWNER
+      - MODIFIED_AT
     RuleLibrary_RuleItem:
       type: object
       required:
@@ -1371,41 +1338,53 @@ components:
           type: array
           items:
             type: string
-    LabelId_2:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
-    RuleId:
-      type: integer
-      format: int64
-      description: Rule ID
-      example: 12
-    PaginationMetadata:
+    RuleLibrary_ResponseDTO:
+      type: object
+      properties:
+        paginationMetadata:
+          $ref: '#/components/schemas/PaginationMetadata'
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleLibrary_RuleItem'
+    RuleLibrary_RuleUsage:
       type: object
       required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
+      - auditCount
+      - webJourneyCount
+      - appJourneyCount
       properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
+        auditCount:
           type: integer
-        totalPageCount:
-          description: Total number of pages available
+          example: 0
+        webJourneyCount:
           type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          example: 3
+        appJourneyCount:
           type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
+          example: 1
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
     AssignedLabel:
       type: object
       required:
@@ -1413,34 +1392,37 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/LabelId_2'
-    RuleLibrary_SortColumn:
-      type: string
-      enum:
-      - NAME
-      - TYPE
-      - AUDITS
-      - WEB_JOURNEYS
-      - APP_JOURNEYS
-      - OWNER
-      - MODIFIED_AT
-  parameters:
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    PageParam:
-      in: query
-      name: page
-      description: Number of results page of an endpoint with paginated results
-      required: false
-      schema:
-        type: integer
-        default: 0
-        minimum: 0
+    LabelId_2:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    RuleLibrary_RequestDTO:
+      type: object
+      description: Filters supported by Rule Library
+      properties:
+        id:
+          $ref: '#/components/schemas/RuleId'
+        ruleName:
+          type: string
+          example: Filter by rule name. Matched as contains, case insensitive.
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/LabelId_2'
+        notificationEnabled:
+          type: boolean
+        createdByUserId:
+          $ref: '#/components/schemas/UserId'
+        fromTemplate:
+          type: boolean
+  requestBodies:
+    UserContext:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserContext'
   responses:
     BadRequest:
       description: The request cannot be accepted
@@ -1454,6 +1436,24 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

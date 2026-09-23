@@ -19,7 +19,7 @@ paths:
       tags:
       - email-inbox-configuration
       summary: Add a new Email Inbox
-      description: '<div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/email-inboxes</div>
+      description: 'POST /v3/email-inboxes
 
 
         Add a new Email Inbox'
@@ -53,7 +53,7 @@ paths:
       tags:
       - email-inbox-configuration
       summary: Update an existing Email Inbox
-      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span></div>
+      description: 'PUT /v3/email-inboxes/{emailInboxId}
 
 
         Update an existing Email Inbox by Id'
@@ -86,7 +86,7 @@ paths:
       tags:
       - email-inbox-configuration
       summary: Delete an Email Inbox
-      description: '<div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span></div>
+      description: 'DELETE /v3/email-inboxes/{emailInboxId}
 
 
         Delete an Email Inbox by Id'
@@ -133,7 +133,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/audit-configurations</div>
+      description: PUT /v3/email-inboxes/{emailInboxId}/audit-configurations
   /v3/email-inboxes/{emailInboxId}/audit-configurations/{auditId}:
     parameters:
     - $ref: '#/components/parameters/EmailInboxId'
@@ -156,7 +156,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/audit-configurations/<span class="op-path-parameter">{auditId}</span></div>
+      description: PUT /v3/email-inboxes/{emailInboxId}/audit-configurations/{auditId}
     delete:
       tags:
       - email-inbox-configuration
@@ -175,7 +175,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/audit-configurations/<span class="op-path-parameter">{auditId}</span></div>
+      description: DELETE /v3/email-inboxes/{emailInboxId}/audit-configurations/{auditId}
   /v3/email-inboxes/{emailInboxId}/labels:
     parameters:
     - $ref: '#/components/parameters/EmailInboxId'
@@ -213,7 +213,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/labels</div>
+      description: PUT /v3/email-inboxes/{emailInboxId}/labels
   /v3/email-inboxes/{emailInboxId}/notes:
     parameters:
     - $ref: '#/components/parameters/EmailInboxId'
@@ -247,7 +247,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/notes</div>
+      description: PUT /v3/email-inboxes/{emailInboxId}/notes
   /v3/email-inboxes/{emailInboxId}/messages/{receivedEmailMessageId}/runs:
     parameters:
     - $ref: '#/components/parameters/EmailInboxId'
@@ -268,21 +268,34 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v3/email-inboxes/<span class="op-path-parameter">{emailInboxId}</span>/messages/<span class="op-path-parameter">{receivedEmailMessageId}</span>/runs</div>
+      description: DELETE /v3/email-inboxes/{emailInboxId}/messages/{receivedEmailMessageId}/runs
 components:
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     EmailInboxSubscribersDTO:
       type: object
       properties:
@@ -296,56 +309,6 @@ components:
           items:
             type: string
             description: Email address subscribers to be alerted on email message processed.
-    Label:
-      description: DTO for Labels
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-        name:
-          type: string
-    EmailInboxId:
-      type: integer
-    EmailInboxLinkExclusionFilters:
-      description: A regex to be used to exclude links in email scans.
-      type: string
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    EmailInboxRequestDTO:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          example: Adove Campaign Holidays, Marketing Department
-        notes:
-          type: string
-        labelIds:
-          description: The ids of the labels to be associated to the Email Inbox
-          type: array
-          uniqueItems: true
-          items:
-            $ref: '#/components/schemas/LabelId'
-        subscribers:
-          $ref: '#/components/schemas/EmailInboxSubscribersDTO'
-        linkExclusionFilters:
-          type: array
-          items:
-            $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
-        omitSocialLinks:
-          type: boolean
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
     EmailInboxResponseDTO:
       type: object
       required:
@@ -383,16 +346,69 @@ components:
             $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
         omitSocialLinks:
           type: boolean
-  parameters:
     AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
+      type: integer
+      format: int64
+      example: 107239
+    EmailInboxRequestDTO:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          example: Adove Campaign Holidays, Marketing Department
+        notes:
+          type: string
+        labelIds:
+          description: The ids of the labels to be associated to the Email Inbox
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/LabelId'
+        subscribers:
+          $ref: '#/components/schemas/EmailInboxSubscribersDTO'
+        linkExclusionFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
+        omitSocialLinks:
+          type: boolean
+    EmailInboxId:
+      type: integer
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    EmailInboxLinkExclusionFilters:
+      description: A regex to be used to exclude links in email scans.
+      type: string
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+  parameters:
     ReceivedEmailMessageId:
       name: receivedEmailMessageId
       in: path
@@ -411,31 +427,15 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/EmailInboxId'
-  responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
   securitySchemes:
     API_Key:
       type: apiKey

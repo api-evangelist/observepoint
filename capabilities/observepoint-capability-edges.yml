@@ -1,0 +1,54 @@
+slug: observepoint
+provider: ObservePoint
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 4
+edges:
+- tag: cookie-privacy-report
+  spec_file: observepoint-cookie-privacy-report-api-openapi.yml
+  capability_id: BC-130.50
+  capability_id_l1: BC-130
+  capability_name: Privacy & Data Protection Management
+  confidence: 0.8
+  evidence: '"Get Cookie Privacy compliance for specified audit run"; AuditRun_CookiePrivacy_SummaryDTO'
+  reason: Operations explicitly return cookie privacy compliance results and trends for scanned pages,
+    which realises privacy and data-protection compliance monitoring for the customer's web properties.
+- tag: consent-categories
+  spec_file: observepoint-consent-categories-api-openapi.yml
+  capability_id: BC-130.50
+  capability_id_l1: BC-130
+  capability_name: Privacy & Data Protection Management
+  confidence: 0.72
+  evidence: '"Get all the consent categories assigned to an audit"; "ConsentCategory_Cmp_Data", "CookieNameMatchType"
+    — configure scans and privacy settings'
+  reason: Operations manage libraries of cookie/tag consent categories used to validate consent-banner
+    behaviour against declared categories — a privacy/data-protection compliance control (GDPR-style consent
+    management), not generic configuration. Some ambiguity as the objects are scan configuration artefacts,
+    hence moderate confidence.
+- tag: audits-consent-category
+  spec_file: observepoint-audits-consent-category-api-openapi.yml
+  capability_id: BC-130.50
+  capability_id_l1: BC-130
+  capability_name: Privacy & Data Protection Management
+  confidence: 0.7
+  evidence: Get all the consent categories assigned to an audit; ConsentCategory_Cmp_Data; ConsentCategory_VendorTypeEnum
+  reason: Consent categories classify cookies/tags against consent-management-platform declarations, validating
+    privacy/consent compliance of the web estate — supports privacy & data protection management.
+- tag: tag-privacy-report
+  spec_file: observepoint-tag-privacy-report-api-openapi.yml
+  capability_id: BC-130.50
+  capability_id_l1: BC-130
+  capability_name: Privacy & Data Protection Management
+  confidence: 0.7
+  evidence: '"Get Tag Privacy compliance for specified audit run"; schema "ConsentCategoryComplianceStatus"'
+  reason: Endpoints assess tag behaviour against consent categories and report privacy compliance status,
+    which realises privacy/data-protection compliance monitoring rather than generic reporting.

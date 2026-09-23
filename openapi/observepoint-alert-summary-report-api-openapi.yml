@@ -38,7 +38,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/alert-summary/overview</div>
+      description: GET /v3/web-audits/{auditId}/runs/{runId}/reports/alert-summary/overview
   /v3/web-audits/{auditId}/runs/{runId}/reports/alert-summary/alerts:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -87,7 +87,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/alert-summary/alerts</div>
+      description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/alert-summary/alerts
   /v3/web-audits/{auditId}/runs/{runId}/reports/alert-summary/alerts/{alertId}:
     parameters:
     - $ref: '#/components/parameters/AuditId'
@@ -113,30 +113,9 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/runs/<span class="op-path-parameter">{runId}</span>/reports/alert-summary/alerts/<span class="op-path-parameter">{alertId}</span></div>
+      description: GET /v3/web-audits/{auditId}/runs/{runId}/reports/alert-summary/alerts/{alertId}
 components:
   schemas:
-    AlertMetricValueComparator:
-      type: object
-      description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
-
-        '
-      required:
-      - operator
-      properties:
-        operator:
-          $ref: '#/components/schemas/AlertMetricValueComparisonOperatorEnum'
-      discriminator:
-        propertyName: operator
-        mapping:
-          GREATER: '#/components/schemas/AlertMetricSpecificValueComparator'
-          GREATER_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          NOT_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          LESS_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
-          BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
-          NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
     AuditRun_AuditSummary_AlertsResponseItemConfig:
       allOf:
       - $ref: '#/components/schemas/AlertConfigTrait'
@@ -149,109 +128,19 @@ components:
             type: integer
           isUserSubscribed:
             type: boolean
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    AuditRun_AlertSummary_AlertsOverviewResponseDTO:
-      type: object
-      required:
-      - alerts
-      properties:
-        alerts:
-          type: array
-          minItems: 0
-          items:
-            title: AuditRun_AlertSummary_AlertsOverviewItem
-            type: object
-            required:
-            - id
-            - name
-            - metricType
-            - status
-            - isSubscribed
-            - alertConfigExists
-            properties:
-              id:
-                $ref: '#/components/schemas/AlertId'
-              name:
-                $ref: '#/components/schemas/AlertName'
-              metricType:
-                $ref: '#/components/schemas/AlertMetricTypeEnum'
-              status:
-                $ref: '#/components/schemas/AlertResultStatusEnum'
-              isSubscribed:
-                type: boolean
-              alertConfigExists:
-                $ref: '#/components/schemas/AlertConfigExistsFlag'
     AuditRun_AuditSummary_AlertsItem_HistoryItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
       allOf:
       - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
       - $ref: '#/components/schemas/AlertResultDetails'
-    AuditRun_AuditSummary_SpecificAlertResponseDTO:
-      type: object
-      required:
-      - id
-      - config
-      - result
-      - alertConfigExists
-      properties:
-        id:
-          $ref: '#/components/schemas/AlertId'
-        config:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
-        result:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
-        alertConfigExists:
-          $ref: '#/components/schemas/AlertConfigExistsFlag'
-    ItemRunTrendsItemTrait:
-      type: object
-      required:
-      - runId
-      - completedAt
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          $ref: '#/components/schemas/DateAndTime'
-    AlertMetricValueComparisonOperatorEnum:
-      type: string
-      enum:
-      - GREATER
-      - GREATER_OR_EQUAL
-      - EQUAL
-      - NOT_EQUAL
-      - LESS_OR_EQUAL
-      - LESS
-      - BETWEEN
-      - NOT_BETWEEN
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
     AuditRun_AuditSummary_AlertResult:
       allOf:
       - $ref: '#/components/schemas/AlertResultDetails'
-    AuditRun_AuditSummary_AlertsResponseItem:
-      type: object
-      required:
-      - id
-      - config
-      - result
-      - history
-      - alertConfigExists
-      properties:
-        id:
-          $ref: '#/components/schemas/AlertId'
-        config:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
-        result:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
-        history:
-          $ref: '#/components/schemas/AlertResultsHistoryArray'
-        alertConfigExists:
-          $ref: '#/components/schemas/AlertConfigExistsFlag'
-    AlertId:
-      type: integer
-      format: int64
     AlertResultsHistoryArray:
       type: array
       description: Returns up to 20 runs with alert results
@@ -259,143 +148,6 @@ components:
       maxItems: 20
       items:
         $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsItem_HistoryItem'
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    AlertResultDetails:
-      type: object
-      required:
-      - status
-      properties:
-        status:
-          $ref: '#/components/schemas/AlertResultStatusEnum'
-        actualValue:
-          description: Value of the computed metric or its change.
-          type: number
-          format: double
-        currentRunValue:
-          description: Value of computed metric for current run. Present when alert is configured on metric change, not on single run metric value
-          type: number
-          format: double
-        previousRunValue:
-          description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
-          type: number
-          format: double
-    AlertName:
-      type: string
-      minLength: 1
-      description: User-defined name of the alert
-    AuditRun_AlertSummary_SummaryRequestDTO:
-      description: Request body with filters for Alert Summary report
-      type: object
-      properties:
-        alertName:
-          type: string
-          description: when populated works as "alert `name` contains given substring" filter
-        metricTypes:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/AlertMetricTypeEnum'
-        status:
-          $ref: '#/components/schemas/AlertResultSimplifiedStatusEnum'
-        subscribedOnly:
-          type: boolean
-          description: when `false` or `null` then all alerts are returned, otherwise only alerts user is subscribed to are returned
-    AuditRun_AuditSummary_AlertsSortColumn:
-      type: string
-      enum:
-      - ALERT_NAME
-      - ALERT_LOGIC
-      - ACTUAL_VALUE
-      - SUBSCRIBERS
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    AuditRun_AuditSummary_AlertsResponseDTO:
-      type: object
-      required:
-      - metadata
-      - alerts
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        alerts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItem'
-    AlertConfigExistsFlag:
-      type: boolean
-      description: when `true` then alert config exists and can be edited, otherwise it is deleted
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AlertMetricChangeTypeEnum:
-      type: string
-      description: 'Behaviour per type:
-
-        - VALUE_CHANGE: current - previous
-
-        - VALUE_CHANGE_ABS: ABS(current - previous)
-
-        - RELATIVE_VALUE_CHANGE: 100% * (current - previous) / previous
-
-        - RELATIVE_VALUE_CHANGE: ABS(100% * (current - previous) / previous)
-
-
-        Composite metric change operators shown on ObservePoint UI should be defined as described below:
-
-        - `Changes by (∆)` = VALUE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
-
-        - `Increases by (+)` = VALUE_CHANGE + GREATER_OR_EQUAL(positive number)
-
-        - `Decreases by (-)` = VALUE_CHANGE + LESS_OR_EQUAL(negative number)
-
-        - `Any change` = VALUE_CHANGE_ABS (or VALUE_CHANGE) + NOT_EQUAL(0)
-
-        - `Changes by (∆ %)` = RELATIVE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
-
-        - `Increases by (+%)` = RELATIVE_CHANGE + GREATER_OR_EQUAL(positive number)
-
-        - `Decreases by (-%)` = RELATIVE_CHANGE + LESS_OR_EQUAL(negative number)
-
-        '
-      enum:
-      - VALUE_CHANGE
-      - VALUE_CHANGE_ABS
-      - RELATIVE_VALUE_CHANGE
-      - RELATIVE_VALUE_CHANGE_ABS
     AlertMetricTypeEnum:
       type: string
       description: "Deprecated metric types:\n  - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT\n  - PAGE_SUMMARY_FAILED_RULE_COUNT\n"
@@ -489,6 +241,83 @@ components:
       - RULE_RESULTS_FAILED_RULE_PAGE_COUNT
       - RULE_RESULTS_PASSED_RULE_PAGE_COUNT
       - RULE_RESULTS_NOT_APPLIED_RULE_PAGE_COUNT
+    AlertName:
+      type: string
+      minLength: 1
+      description: User-defined name of the alert
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRun_AlertSummary_SummaryRequestDTO:
+      description: Request body with filters for Alert Summary report
+      type: object
+      properties:
+        alertName:
+          type: string
+          description: when populated works as "alert `name` contains given substring" filter
+        metricTypes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AlertMetricTypeEnum'
+        status:
+          $ref: '#/components/schemas/AlertResultSimplifiedStatusEnum'
+        subscribedOnly:
+          type: boolean
+          description: when `false` or `null` then all alerts are returned, otherwise only alerts user is subscribed to are returned
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AlertConfigTrait:
+      description: Core parts of alert definition
+      type: object
+      required:
+      - name
+      - metricType
+      - targetValueComparator
+      - filtersV0
+      properties:
+        name:
+          $ref: '#/components/schemas/AlertName'
+        metricType:
+          $ref: '#/components/schemas/AlertMetricTypeEnum'
+        metricChangeType:
+          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
+        targetValueComparator:
+          $ref: '#/components/schemas/AlertMetricValueComparator'
+        filtersV0:
+          type: object
+          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
+
+            '
     CommonIterableResponseMetadata:
       description: Common metadata for iterable
       type: object
@@ -497,6 +326,112 @@ components:
       properties:
         pagination:
           $ref: '#/components/schemas/PaginationMetadata'
+    AuditRun_AuditSummary_SpecificAlertResponseDTO:
+      type: object
+      required:
+      - id
+      - config
+      - result
+      - alertConfigExists
+      properties:
+        id:
+          $ref: '#/components/schemas/AlertId'
+        config:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
+        result:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
+        alertConfigExists:
+          $ref: '#/components/schemas/AlertConfigExistsFlag'
+    AuditRun_AuditSummary_AlertsResponseDTO:
+      type: object
+      required:
+      - metadata
+      - alerts
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItem'
+    AlertMetricValueComparator:
+      type: object
+      description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
+
+        '
+      required:
+      - operator
+      properties:
+        operator:
+          $ref: '#/components/schemas/AlertMetricValueComparisonOperatorEnum'
+      discriminator:
+        propertyName: operator
+        mapping:
+          GREATER: '#/components/schemas/AlertMetricSpecificValueComparator'
+          GREATER_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          NOT_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
+          BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
+          NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
+    AlertResultDetails:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          $ref: '#/components/schemas/AlertResultStatusEnum'
+        actualValue:
+          description: Value of the computed metric or its change.
+          type: number
+          format: double
+        currentRunValue:
+          description: Value of computed metric for current run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+        previousRunValue:
+          description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+    AlertConfigExistsFlag:
+      type: boolean
+      description: when `true` then alert config exists and can be edited, otherwise it is deleted
+    AlertMetricChangeTypeEnum:
+      type: string
+      description: 'Behaviour per type:
+
+        - VALUE_CHANGE: current - previous
+
+        - VALUE_CHANGE_ABS: ABS(current - previous)
+
+        - RELATIVE_VALUE_CHANGE: 100% * (current - previous) / previous
+
+        - RELATIVE_VALUE_CHANGE: ABS(100% * (current - previous) / previous)
+
+
+        Composite metric change operators shown on ObservePoint UI should be defined as described below:
+
+        - `Changes by (∆)` = VALUE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+)` = VALUE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-)` = VALUE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        - `Any change` = VALUE_CHANGE_ABS (or VALUE_CHANGE) + NOT_EQUAL(0)
+
+        - `Changes by (∆ %)` = RELATIVE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+%)` = RELATIVE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-%)` = RELATIVE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        '
+      enum:
+      - VALUE_CHANGE
+      - VALUE_CHANGE_ABS
+      - RELATIVE_VALUE_CHANGE
+      - RELATIVE_VALUE_CHANGE_ABS
     AlertResultStatusEnum:
       type: string
       description: 'All statuses except `TRIGGERED` and `NOT_TRIGGERED` mean that alert/metric could not be computed. Statuses:
@@ -520,46 +455,111 @@ components:
       - NO_VALUE
       - PREVIOUS_RUN_NOT_FOUND
       - PREVIOUS_RUN_NO_VALUE
-    AlertConfigTrait:
-      description: Core parts of alert definition
+    AuditRun_AlertSummary_AlertsOverviewResponseDTO:
       type: object
       required:
-      - name
-      - metricType
-      - targetValueComparator
-      - filtersV0
+      - alerts
       properties:
-        name:
-          $ref: '#/components/schemas/AlertName'
-        metricType:
-          $ref: '#/components/schemas/AlertMetricTypeEnum'
-        metricChangeType:
-          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
-        targetValueComparator:
-          $ref: '#/components/schemas/AlertMetricValueComparator'
-        filtersV0:
-          type: object
-          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
-
-            '
-    DateAndTime:
+        alerts:
+          type: array
+          minItems: 0
+          items:
+            title: AuditRun_AlertSummary_AlertsOverviewItem
+            type: object
+            required:
+            - id
+            - name
+            - metricType
+            - status
+            - isSubscribed
+            - alertConfigExists
+            properties:
+              id:
+                $ref: '#/components/schemas/AlertId'
+              name:
+                $ref: '#/components/schemas/AlertName'
+              metricType:
+                $ref: '#/components/schemas/AlertMetricTypeEnum'
+              status:
+                $ref: '#/components/schemas/AlertResultStatusEnum'
+              isSubscribed:
+                type: boolean
+              alertConfigExists:
+                $ref: '#/components/schemas/AlertConfigExistsFlag'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AuditRun_AuditSummary_AlertsResponseItem:
+      type: object
+      required:
+      - id
+      - config
+      - result
+      - history
+      - alertConfigExists
+      properties:
+        id:
+          $ref: '#/components/schemas/AlertId'
+        config:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
+        result:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
+        history:
+          $ref: '#/components/schemas/AlertResultsHistoryArray'
+        alertConfigExists:
+          $ref: '#/components/schemas/AlertConfigExistsFlag'
+    AlertMetricValueComparisonOperatorEnum:
       type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
+      enum:
+      - GREATER
+      - GREATER_OR_EQUAL
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_OR_EQUAL
+      - LESS
+      - BETWEEN
+      - NOT_BETWEEN
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    AlertId:
+      type: integer
+      format: int64
+    AuditRun_AuditSummary_AlertsSortColumn:
+      type: string
+      enum:
+      - ALERT_NAME
+      - ALERT_LOGIC
+      - ACTUAL_VALUE
+      - SUBSCRIBERS
     AlertResultSimplifiedStatusEnum:
       type: string
       description: Simplified version of `#/components/schemas/AlertResultStatusEnum` for UI filters
@@ -567,15 +567,6 @@ components:
       - TRIGGERED
       - NOT_TRIGGERED
   parameters:
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
     pageParam:
       name: page
       in: query
@@ -585,6 +576,30 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    PathParamAlertId:
+      name: alertId
+      in: path
+      required: true
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AlertId'
     RunId:
       name: runId
       in: path
@@ -594,21 +609,6 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
-    PathParamAlertId:
-      name: alertId
-      in: path
-      required: true
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AlertId'
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
   responses:
     BadRequest:
       description: The request cannot be accepted

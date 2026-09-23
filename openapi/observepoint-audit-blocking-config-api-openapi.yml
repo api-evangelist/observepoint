@@ -37,7 +37,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/blocking-configuration</div>
+      description: GET /v3/web-audits/{auditId}/blocking-configuration
     put:
       tags:
       - audit-blocking-config
@@ -65,49 +65,8 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
       - API_Key: []
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/blocking-configuration</div>
+      description: PUT /v3/web-audits/{auditId}/blocking-configuration
 components:
-  schemas:
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    BlockingConfig_DTO:
-      type: object
-      description: The blocking configuration to be applied to the Audit or Journey.
-      properties:
-        tagIds:
-          description: (Optional) Present when blockingType is `tag_id`, a list of tag ids to block
-          type: array
-          items:
-            type: integer
-        tagCategoryIds:
-          description: (Optional) Present when blockingType is `tag_category`, a list of tag category ids to block
-          type: array
-          items:
-            type: integer
-  parameters:
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
   responses:
     Forbidden:
       description: You don't have enough rights to access this resource
@@ -127,6 +86,47 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+  schemas:
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    BlockingConfig_DTO:
+      type: object
+      description: The blocking configuration to be applied to the Audit or Journey.
+      properties:
+        tagIds:
+          description: (Optional) Present when blockingType is `tag_id`, a list of tag ids to block
+          type: array
+          items:
+            type: integer
+        tagCategoryIds:
+          description: (Optional) Present when blockingType is `tag_category`, a list of tag category ids to block
+          type: array
+          items:
+            type: integer
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+  parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
   securitySchemes:
     API_Key:
       type: apiKey

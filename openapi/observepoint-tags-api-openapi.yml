@@ -11,7 +11,7 @@ tags:
 paths:
   /tags:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/tags</div>
+      description: GET /v2/tags
       operationId: getAllTags
       responses:
         '200':
@@ -29,7 +29,7 @@ paths:
       - Tags
   /tags/{tagId}:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/tags/<span class="op-path-parameter">{tagId}</span></div>
+      description: GET /v2/tags/{tagId}
       operationId: getTag
       parameters:
       - name: tagId
@@ -56,29 +56,6 @@ paths:
       - Tags
 components:
   schemas:
-    TagVendor:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-    TagCategory:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-      description: Tag category data
     Tag:
       type: object
       required:
@@ -109,8 +86,31 @@ components:
         vendor:
           $ref: '#/components/schemas/TagVendor'
       description: Tag data
+    TagCategory:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: Tag category data
     TagType:
       type: object
+    TagVendor:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

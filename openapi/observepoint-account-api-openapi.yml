@@ -11,7 +11,7 @@ tags:
 paths:
   /account:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/account</div>
+      description: GET /v2/account
       operationId: getAccount
       responses:
         '200':

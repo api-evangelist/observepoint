@@ -18,7 +18,7 @@ paths:
     get:
       tags:
       - account-usage-alerts
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/usage/alert-summary/alerts</div>
+      description: 'GET /v3/usage/alert-summary/alerts
 
 
         Get Alert Summary alerts data for account usage'
@@ -37,21 +37,18 @@ paths:
       - API_Key: []
 components:
   schemas:
-    AuditRun_AuditSummary_AlertResult:
+    AuditRun_AuditSummary_AlertsResponseItemConfig:
       allOf:
-      - $ref: '#/components/schemas/AlertResultDetails'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
+      - $ref: '#/components/schemas/AlertConfigTrait'
+      - type: object
+        required:
+        - subscriberCount
+        - isUserSubscribed
+        properties:
+          subscriberCount:
+            type: integer
+          isUserSubscribed:
+            type: boolean
     AlertMetricChangeTypeEnum:
       type: string
       description: 'Behaviour per type:
@@ -87,6 +84,40 @@ components:
       - VALUE_CHANGE_ABS
       - RELATIVE_VALUE_CHANGE
       - RELATIVE_VALUE_CHANGE_ABS
+    AlertResultStatusEnum:
+      type: string
+      description: 'All statuses except `TRIGGERED` and `NOT_TRIGGERED` mean that alert/metric could not be computed. Statuses:
+
+        - UNKNOWN_ERROR: data retrieval or alert computation failed
+
+        - RUN_NOT_FOUND: requested run not found
+
+        - NO_VALUE: no data found for requested run (e.g. rules or consent categories were not applied)
+
+        - PREVIOUS_RUN_NOT_FOUND: previous run not found for run-over-run metric change alert
+
+        - PREVIOUS_RUN_NO_VALUE: no data found for previous run for run-over-run metric change alert
+
+        '
+      enum:
+      - TRIGGERED
+      - NOT_TRIGGERED
+      - UNKNOWN_ERROR
+      - RUN_NOT_FOUND
+      - NO_VALUE
+      - PREVIOUS_RUN_NOT_FOUND
+      - PREVIOUS_RUN_NO_VALUE
+    AlertMetricValueComparisonOperatorEnum:
+      type: string
+      enum:
+      - GREATER
+      - GREATER_OR_EQUAL
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_OR_EQUAL
+      - LESS
+      - BETWEEN
+      - NOT_BETWEEN
     AlertMetricTypeEnum:
       type: string
       description: "Deprecated metric types:\n  - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT\n  - PAGE_SUMMARY_FAILED_RULE_COUNT\n"
@@ -180,50 +211,10 @@ components:
       - RULE_RESULTS_FAILED_RULE_PAGE_COUNT
       - RULE_RESULTS_PASSED_RULE_PAGE_COUNT
       - RULE_RESULTS_NOT_APPLIED_RULE_PAGE_COUNT
-    AlertMetricValueComparator:
-      type: object
-      description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
-
-        '
-      required:
-      - operator
-      properties:
-        operator:
-          $ref: '#/components/schemas/AlertMetricValueComparisonOperatorEnum'
-      discriminator:
-        propertyName: operator
-        mapping:
-          GREATER: '#/components/schemas/AlertMetricSpecificValueComparator'
-          GREATER_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          NOT_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          LESS_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
-          BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
-          NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
-    AlertResultStatusEnum:
+    AlertName:
       type: string
-      description: 'All statuses except `TRIGGERED` and `NOT_TRIGGERED` mean that alert/metric could not be computed. Statuses:
-
-        - UNKNOWN_ERROR: data retrieval or alert computation failed
-
-        - RUN_NOT_FOUND: requested run not found
-
-        - NO_VALUE: no data found for requested run (e.g. rules or consent categories were not applied)
-
-        - PREVIOUS_RUN_NOT_FOUND: previous run not found for run-over-run metric change alert
-
-        - PREVIOUS_RUN_NO_VALUE: no data found for previous run for run-over-run metric change alert
-
-        '
-      enum:
-      - TRIGGERED
-      - NOT_TRIGGERED
-      - UNKNOWN_ERROR
-      - RUN_NOT_FOUND
-      - NO_VALUE
-      - PREVIOUS_RUN_NOT_FOUND
-      - PREVIOUS_RUN_NO_VALUE
+      minLength: 1
+      description: User-defined name of the alert
     AlertConfigTrait:
       description: Core parts of alert definition
       type: object
@@ -246,22 +237,27 @@ components:
           description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
 
             '
-    AuditRun_AuditSummary_AlertsResponseItemConfig:
-      allOf:
-      - $ref: '#/components/schemas/AlertConfigTrait'
-      - type: object
-        required:
-        - subscriberCount
-        - isUserSubscribed
-        properties:
-          subscriberCount:
-            type: integer
-          isUserSubscribed:
-            type: boolean
-    AlertName:
-      type: string
-      minLength: 1
-      description: User-defined name of the alert
+    AlertMetricValueComparator:
+      type: object
+      description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
+
+        '
+      required:
+      - operator
+      properties:
+        operator:
+          $ref: '#/components/schemas/AlertMetricValueComparisonOperatorEnum'
+      discriminator:
+        propertyName: operator
+        mapping:
+          GREATER: '#/components/schemas/AlertMetricSpecificValueComparator'
+          GREATER_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          NOT_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
+          BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
+          NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
     AccountUsage_AlertSummary_AlertsResponseItem:
       type: object
       required:
@@ -278,17 +274,18 @@ components:
     AlertId:
       type: integer
       format: int64
-    AlertMetricValueComparisonOperatorEnum:
-      type: string
-      enum:
-      - GREATER
-      - GREATER_OR_EQUAL
-      - EQUAL
-      - NOT_EQUAL
-      - LESS_OR_EQUAL
-      - LESS
-      - BETWEEN
-      - NOT_BETWEEN
+    AccountUsage_AlertSummary_AlertsResponseDTO:
+      type: object
+      required:
+      - alerts
+      properties:
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountUsage_AlertSummary_AlertsResponseItem'
+    AuditRun_AuditSummary_AlertResult:
+      allOf:
+      - $ref: '#/components/schemas/AlertResultDetails'
     AlertResultDetails:
       type: object
       required:
@@ -308,15 +305,18 @@ components:
           description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
           type: number
           format: double
-    AccountUsage_AlertSummary_AlertsResponseDTO:
+    ErrorModel:
       type: object
-      required:
-      - alerts
       properties:
-        alerts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AccountUsage_AlertSummary_AlertsResponseItem'
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
   responses:
     UnAuthorized:
       description: Your token is invalid.

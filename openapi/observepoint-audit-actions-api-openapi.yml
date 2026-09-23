@@ -10,7 +10,7 @@ servers:
 - url: https://api.observepoint.com
   description: ObservePoint Production API
 tags:
-- name: audit-actions
+- name: Audit Actions
   x-displayName: Audit Actions
   description: APIs for managing audit actions
 paths:
@@ -19,9 +19,9 @@ paths:
     - $ref: '#/components/parameters/AuditId'
     get:
       tags:
-      - audit-actions
+      - Audit Actions
       summary: Get actions for an audit
-      description: '<div class="op-path-box"><span class="op-http-method-get">GET</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/actions</div>
+      description: 'GET /v3/web-audits/{auditId}/actions
 
 
         Retrieve all actions configured for the specified audit'
@@ -45,9 +45,9 @@ paths:
       - API_Key: []
     put:
       tags:
-      - audit-actions
+      - Audit Actions
       summary: Update actions for an audit
-      description: '<div class="op-path-box"><span class="op-http-method-put">PUT</span> /v3/web-audits/<span class="op-path-parameter">{auditId}</span>/actions</div>
+      description: 'PUT /v3/web-audits/{auditId}/actions
 
 
         Update the actions configured for the specified audit'
@@ -81,33 +81,32 @@ paths:
       security:
       - API_Key: []
 components:
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    WebActionSelector:
-      type: object
-      properties:
-        selectorType:
-          $ref: '#/components/schemas/WebActionSelectorType'
-        value:
-          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
-      required:
-      - selectorType
-      - value
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
     ActionSetActionDto:
       allOf:
       - $ref: '#/components/schemas/SequencedAction'
@@ -185,6 +184,16 @@ components:
       required:
       - sequence
       - actionType
+    WebActionSelector:
+      type: object
+      properties:
+        selectorType:
+          $ref: '#/components/schemas/WebActionSelectorType'
+        value:
+          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
+      required:
+      - selectorType
+      - value
     WebActionSelectorType:
       type: string
       enum:
@@ -193,6 +202,22 @@ components:
       - css
       - xpath
       - htmlattributes
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
   parameters:
     AuditId:
       name: auditId
@@ -203,31 +228,6 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/AuditId'
-  responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

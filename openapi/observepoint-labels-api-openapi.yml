@@ -11,7 +11,7 @@ tags:
 paths:
   /labels:
     get:
-      description: <div class="op-path-box"><span class="op-http-method-get">GET</span> /v2/labels</div>
+      description: GET /v2/labels
       operationId: getLabels
       responses:
         '200':
@@ -30,7 +30,7 @@ paths:
       tags:
       - Labels
     post:
-      description: <div class="op-path-box"><span class="op-http-method-post">POST</span> /v2/labels</div>
+      description: POST /v2/labels
       operationId: createNewLabel
       requestBody:
         content:
@@ -57,7 +57,7 @@ paths:
       - Labels
   /labels/{labelId}:
     put:
-      description: <div class="op-path-box"><span class="op-http-method-put">PUT</span> /v2/labels/<span class="op-path-parameter">{labelId}</span></div>
+      description: PUT /v2/labels/{labelId}
       operationId: updateLabel
       parameters:
       - name: labelId
@@ -92,7 +92,7 @@ paths:
       tags:
       - Labels
     delete:
-      description: <div class="op-path-box"><span class="op-http-method-delete">DELETE</span> /v2/labels/<span class="op-path-parameter">{labelId}</span></div>
+      description: DELETE /v2/labels/{labelId}
       operationId: deleteALabel
       parameters:
       - name: labelId
