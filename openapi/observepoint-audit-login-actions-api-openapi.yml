@@ -156,16 +156,6 @@ components:
       required:
       - sequence
       - actionType
-    WebActionSelector:
-      type: object
-      properties:
-        selectorType:
-          $ref: '#/components/schemas/WebActionSelectorType'
-        value:
-          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
-      required:
-      - selectorType
-      - value
     WebActionSelectorType:
       type: string
       enum:
@@ -178,6 +168,16 @@ components:
       type: integer
       format: int64
       example: 107239
+    WebActionSelector:
+      type: object
+      properties:
+        selectorType:
+          $ref: '#/components/schemas/WebActionSelectorType'
+        value:
+          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
+      required:
+      - selectorType
+      - value
     ErrorModel:
       type: object
       properties:
@@ -191,8 +191,8 @@ components:
         validationReport:
           type: object
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    NotFound:
+      description: The object you are looking is not found
       content:
         application/json:
           schema:
@@ -203,14 +203,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
+    UnAuthorized:
+      description: Your token is invalid.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

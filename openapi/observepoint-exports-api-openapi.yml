@@ -105,7 +105,30 @@ paths:
       - API_Key: []
       description: GET /v3/exports/{exportUuid}
 components:
+  parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
   schemas:
+    ItemId:
+      type: integer
+      format: int64
+      description: ID of a data collector, see ItemType
+      example: 107239
     ExportCenter_ExportsDTO:
       type: object
       required:
@@ -118,6 +141,32 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ExportCenter_ExportsItem'
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    ExportCenter_ExportedItemTypeEnum:
+      type: string
+      enum:
+      - audit
+      - web_journey
+      - live_connect
+      - consent_categories
+      - alert
+      - account_usage
+      - grid_data
     ExportCenter_ExportsItem:
       type: object
       description: 'Not all exports are related to a particular audit/web-journey/manual-journey item or its run, e.g. consent category configs export. Such exports do not have `itemType`, `itemId`, `itemName`, `runId`, `runDate`
@@ -170,101 +219,10 @@ components:
           type: boolean
           description: Whether the export is scheduled or not
           default: false
-    ExportUuid:
-      type: string
-      format: uuid
-      description: Unique ID of an export link
-    ExportCenter_ExportsSortColumn:
-      type: string
-      enum:
-      - date_exported
-      - item_name
-      - run_date
-      - export_name
-      - exported_item_type
-      - requested_by
-      - status
-      - is_scheduled
-      default: date_exported
-    UserId:
-      type: integer
-      description: ID of a user
-      example: 123
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
     RunId:
       type: integer
       format: int64
       example: 33010
-    ExportId:
-      type: integer
-      format: int64
-      description: Unique ID of an export
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    ExportTypeEnum:
-      type: string
-      description: Enumeration of all high-level export types
-      enum:
-      - AUDIT_RUN_EXPORT
-      - WEB_JOURNEY_RUN_EXPORT
-      - MANUAL_JOURNEY_RUN_EXPORT
-      - CONSENT_CATEGORY_EXPORT
-      - ALERT_EXPORT
-      - ACCOUNT_USAGE_EXPORT
-      - GRID_DATA_EXPORT
-    ExportCenter_ExportedItemTypeEnum:
-      type: string
-      enum:
-      - audit
-      - web_journey
-      - live_connect
-      - consent_categories
-      - alert
-      - account_usage
-      - grid_data
-    ExportCenter_ExportStatus:
-      type: string
-      enum:
-      - queued
-      - in_progress
-      - completed
-      - failed
-      - no_data
     PaginationMetadata:
       type: object
       required:
@@ -289,41 +247,83 @@ components:
         currentPageNumber:
           description: Current page number/ordinal
           type: integer
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    ExportCenter_ExportStatus:
+      type: string
+      enum:
+      - queued
+      - in_progress
+      - completed
+      - failed
+      - no_data
+    ExportUuid:
+      type: string
+      format: uuid
+      description: Unique ID of an export link
+    ExportCenter_ExportsSortColumn:
+      type: string
+      enum:
+      - date_exported
+      - item_name
+      - run_date
+      - export_name
+      - exported_item_type
+      - requested_by
+      - status
+      - is_scheduled
+      default: date_exported
+    ExportTypeEnum:
+      type: string
+      description: Enumeration of all high-level export types
+      enum:
+      - AUDIT_RUN_EXPORT
+      - WEB_JOURNEY_RUN_EXPORT
+      - MANUAL_JOURNEY_RUN_EXPORT
+      - CONSENT_CATEGORY_EXPORT
+      - ALERT_EXPORT
+      - ACCOUNT_USAGE_EXPORT
+      - GRID_DATA_EXPORT
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
     ScheduledExportId:
       type: integer
       format: int64
-    ItemId:
+    UserId:
       type: integer
-      format: int64
-      description: ID of a data collector, see ItemType
-      example: 107239
-  parameters:
-    pageParam:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
+      description: ID of a user
+      example: 123
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    NotFound:
+      description: The object you are looking is not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

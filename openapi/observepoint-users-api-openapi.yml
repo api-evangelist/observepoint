@@ -213,47 +213,7 @@ paths:
       tags:
       - Users
 components:
-  requestBodies:
-    addUserFoldersBody:
-      content:
-        application/json:
-          schema:
-            items:
-              format: int32
-              type: integer
-            type: array
-      description: Folders id list
   schemas:
-    UserDocument:
-      type: object
-      required:
-      - email
-      - firstName
-      - lastName
-      - timezone
-      - username
-      properties:
-        email:
-          type: string
-        firstName:
-          type: string
-        fullUsageDashboardAccess:
-          type: number
-        lastName:
-          type: string
-        maxPagesPerAudit:
-          type: number
-        permissions:
-          enum:
-          - guest
-          - user
-          - admin
-          type: string
-        timezone:
-          type: string
-        username:
-          type: string
-      description: User create/update model
     User:
       type: object
       required:
@@ -325,6 +285,46 @@ components:
         name:
           type: string
       description: User folder model
+    UserDocument:
+      type: object
+      required:
+      - email
+      - firstName
+      - lastName
+      - timezone
+      - username
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: number
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          type: number
+        permissions:
+          enum:
+          - guest
+          - user
+          - admin
+          type: string
+        timezone:
+          type: string
+        username:
+          type: string
+      description: User create/update model
+  requestBodies:
+    addUserFoldersBody:
+      content:
+        application/json:
+          schema:
+            items:
+              format: int32
+              type: integer
+            type: array
+      description: Folders id list
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

@@ -209,51 +209,117 @@ paths:
       description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/tag-duplicates-and-multiples/pages
 components:
   schemas:
-    IntegerRangeFilterTrait:
+    TagAccount:
+      type: string
+      description: Tag account
+    PageTitleFilter:
       type: object
-      description: Common trait for integer min max filter
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    AuditRun_TagDuplicatesAndMultiples_TagAccountsDTO:
+      type: object
+      required:
+      - metadata
+      - tagAccounts
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        tagAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_TagAccountsItem'
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    TagName:
+      type: string
+      description: Tag name
+    AuditRun_TagDuplicatesAndMultiples_RequestDTO:
+      description: Request body with filters for Tag Duplicates & Multiples report
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        properties:
+          primaryTagsOnly:
+            type: boolean
+            description: if true then return only pages/tags with primary tags else return all pages/tags
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagCategoryId:
+            $ref: '#/components/schemas/TagCategoryId'
+          tagVendorId:
+            $ref: '#/components/schemas/TagVendorId'
+          tagAccount:
+            $ref: '#/components/schemas/TagAccount'
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
       properties:
         min:
           type: integer
+          format: int64
           minimum: 0
         max:
           type: integer
-    CombinedPageStatusCodeEnum:
-      type: string
-      description: '- `broken` - initial or final URL are `broken`,
-
-        - `good` - initial URL is `good` or `redirect` and final URL is `good`
-
-        '
-      enum:
-      - broken
-      - good
-    AuditRun_TagDuplicatesAndMultiples_PagesRequestDTO:
-      allOf:
-      - $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_RequestDTO'
-      - type: object
-        properties:
-          finalPageUrl:
-            $ref: '#/components/schemas/PageUrlFilter'
-          initialPageStatusCode:
-            $ref: '#/components/schemas/IntegerFilter'
-          finalPageStatusCode:
-            $ref: '#/components/schemas/IntegerFilter'
-          type:
-            type: string
-            enum:
-            - tag_duplicates
-            - tag_multiples
-    AuditRun_TagDuplicatesAndMultiples_PagesSortColumn:
+          format: int64
+    TagId:
+      type: integer
+      description: Tag ID
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun_TagDuplicatesAndMultiples_TagAccountsSortColumn:
       type: string
       enum:
-      - page_url
-      - final_page_url
-      - page_load_time
-      - page_status_code
-      - final_page_status_code
+      - tag_account
       - tag_duplicates
+      - duplicate_tag_pages
       - tag_multiples
+      - multiple_tag_pages
+      - tag_instance_count
     TagInfoTrait:
       type: object
       description: Common tag info
@@ -271,6 +337,22 @@ components:
           $ref: '#/components/schemas/TagCategoryId'
         tagCategoryName:
           $ref: '#/components/schemas/TagCategoryName'
+    AuditRun_TagDuplicatesAndMultiples_PagesRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_RequestDTO'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrlFilter'
+          initialPageStatusCode:
+            $ref: '#/components/schemas/IntegerFilter'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/IntegerFilter'
+          type:
+            type: string
+            enum:
+            - tag_duplicates
+            - tag_multiples
     AuditRun_TagDuplicatesAndMultiples_TagAccountsItem:
       allOf:
       - $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_TagsItemTrait'
@@ -280,24 +362,6 @@ components:
         properties:
           tagAccount:
             $ref: '#/components/schemas/TagAccount'
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    TagCategoryId:
-      type: integer
-      description: Tag category ID
-    ItemRun_SpecificTrendValueItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        required:
-        - trendValue
-        properties:
-          trendValue:
-            type: number
     PageUrlFilter:
       type: object
       required:
@@ -313,73 +377,92 @@ components:
           type: boolean
           description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
           default: false
-    AuditRun_TagDuplicatesAndMultiples_PagesDTO:
+    PageFiltersTrait:
       type: object
-      required:
-      - metadata
-      - pages
+      description: Common trait for page filters
       properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_PagesItem'
-    AuditRun_TagDuplicatesAndMultiples_FilteredRequestDTO:
-      description: Request body with filters for Tag Duplicates & Multiples report with filters present in path removed
-      type: object
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
       allOf:
-      - $ref: '#/components/schemas/PageFiltersTrait'
-      - type: object
-        properties:
-          tagAccount:
-            $ref: '#/components/schemas/TagAccount'
-    PageUrl:
-      type: string
-      format: url
-      example: https://example.com/about
-    PageStatusCode:
-      type: integer
-      description: Page HTTP status code
-    AuditRun_TagDuplicatesAndMultiples_TagsDTO:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    ItemRunTrendsItemTrait:
       type: object
       required:
-      - tags
+      - runId
+      - completedAt
       properties:
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_TagsItem'
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    StringInclusionFilterTypeEnum:
-      type: string
-      enum:
-      - contains
-      - not_contains
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    AuditRun_TagDuplicatesAndMultiples_TrendItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - totalUniqueTagCount
+        - totalTagInstanceCount
+        - totalTagDuplicateCount
+        - totalTagMultipleCount
+        properties:
+          totalUniqueTagCount:
+            type: integer
+          totalTagInstanceCount:
+            type: integer
+          totalTagDuplicateCount:
+            type: integer
+          totalTagMultipleCount:
+            type: integer
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
     RunId:
       type: integer
       format: int64
       example: 33010
-    TagId:
-      type: integer
-      description: Tag ID
     AuditRun_TagDuplicatesAndMultiples_TagsItemTrait:
       type: object
       required:
@@ -402,9 +485,117 @@ components:
         filteredTagInstanceCount:
           type: integer
           description: Number of tag requests passing all applied filters
-    TagVendorId:
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    PageStatusCode:
       type: integer
-      description: Tag vendor ID
+      description: Page HTTP status code
+    AuditRun_TagDuplicatesAndMultiples_TrendsDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_TrendItem'
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
+    AuditRun_TagDuplicatesAndMultiples_TagsDTO:
+      type: object
+      required:
+      - tags
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_TagsItem'
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    AuditRun_TagDuplicatesAndMultiples_TagsItem:
+      allOf:
+      - $ref: '#/components/schemas/TagInfoTrait'
+      - $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_TagsItemTrait'
+    AuditRun_TagDuplicatesAndMultiples_PagesDTO:
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_PagesItem'
+    AuditRun_TagDuplicatesAndMultiples_FilteredRequestDTO:
+      description: Request body with filters for Tag Duplicates & Multiples report with filters present in path removed
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        properties:
+          tagAccount:
+            $ref: '#/components/schemas/TagAccount'
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
     AuditRunPageTrait:
       description: Common trait for audit page with mandatory page properties
       type: object
@@ -416,43 +607,35 @@ components:
           $ref: '#/components/schemas/PageId'
         pageUrl:
           $ref: '#/components/schemas/PageUrl'
-    PageTitleFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          description: Page title as displayed by browser
-          minLength: 1
-          example: ObserveP
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AuditRun_TagDuplicatesAndMultiples_TrendsEnum:
+    CombinedPageStatusCodeEnum:
       type: string
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
       enum:
-      - unique_tags
-      - tag_requests
+      - broken
+      - good
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    TagCategoryName:
+      type: string
+      description: Name of a category of a tag
+    AuditRun_TagDuplicatesAndMultiples_PagesSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_load_time
+      - page_status_code
+      - final_page_status_code
       - tag_duplicates
       - tag_multiples
-    TagName:
-      type: string
-      description: Tag name
     AuditRun_TagDuplicatesAndMultiples_PagesItem:
       allOf:
       - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
@@ -465,9 +648,18 @@ components:
             type: integer
           filteredTagMultipleCount:
             type: integer
-    TagAccount:
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+    AuditRun_TagDuplicatesAndMultiples_TrendsEnum:
       type: string
-      description: Tag account
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      enum:
+      - unique_tags
+      - tag_requests
+      - tag_duplicates
+      - tag_multiples
     AuditRun_TagDuplicatesAndMultiples_SummaryDTO:
       type: object
       required:
@@ -500,235 +692,51 @@ components:
         filteredTagMultipleCount:
           type: integer
           description: Number of tag request instances that are not exact copies of each other and have the same account
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    AuditRun_TagDuplicatesAndMultiples_TagAccountsDTO:
-      type: object
-      required:
-      - metadata
-      - tagAccounts
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        tagAccounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_TagAccountsItem'
-    PageUrlFilterEnum:
-      type: string
-      enum:
-      - contains
-      - regex
-    AuditRun_TagDuplicatesAndMultiples_RequestDTO:
-      description: Request body with filters for Tag Duplicates & Multiples report
-      type: object
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
       allOf:
-      - $ref: '#/components/schemas/PageFiltersTrait'
-      - type: object
-        properties:
-          primaryTagsOnly:
-            type: boolean
-            description: if true then return only pages/tags with primary tags else return all pages/tags
-          tagId:
-            $ref: '#/components/schemas/TagId'
-          tagCategoryId:
-            $ref: '#/components/schemas/TagCategoryId'
-          tagVendorId:
-            $ref: '#/components/schemas/TagVendorId'
-          tagAccount:
-            $ref: '#/components/schemas/TagAccount'
-    AuditRun_TagDuplicatesAndMultiples_TrendItem:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    ItemRun_SpecificTrendValueItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
       allOf:
       - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
       - type: object
         required:
-        - totalUniqueTagCount
-        - totalTagInstanceCount
-        - totalTagDuplicateCount
-        - totalTagMultipleCount
+        - trendValue
         properties:
-          totalUniqueTagCount:
-            type: integer
-          totalTagInstanceCount:
-            type: integer
-          totalTagDuplicateCount:
-            type: integer
-          totalTagMultipleCount:
-            type: integer
-    ItemRun_SpecificTrendValuesDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
-    TagCategoryName:
-      type: string
-      description: Name of a category of a tag
-    AuditRun_TagDuplicatesAndMultiples_TagsItem:
-      allOf:
-      - $ref: '#/components/schemas/TagInfoTrait'
-      - $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_TagsItemTrait'
-    PageRedirectCountFilter:
-      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    AuditRun_TagDuplicatesAndMultiples_TagAccountsSortColumn:
-      type: string
-      enum:
-      - tag_account
-      - tag_duplicates
-      - duplicate_tag_pages
-      - tag_multiples
-      - multiple_tag_pages
-      - tag_instance_count
-    AuditRun_TagDuplicatesAndMultiples_TrendsDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_TrendItem'
-    PageLoadTimeFilter:
-      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    ItemRunTrendsItemTrait:
-      type: object
-      required:
-      - runId
-      - completedAt
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          $ref: '#/components/schemas/DateAndTime'
-    PageFiltersTrait:
-      type: object
-      description: Common trait for page filters
-      properties:
-        pageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        finalPageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        pageTitle:
-          $ref: '#/components/schemas/PageTitleFilter'
-        initialPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        finalPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        combinedPageStatusCode:
-          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
-        pageLoadTime:
-          $ref: '#/components/schemas/PageLoadTimeFilter'
-        pageSize:
-          $ref: '#/components/schemas/PageSizeFilter'
-        redirectCount:
-          $ref: '#/components/schemas/PageRedirectCountFilter'
-        hasBrokenLinks:
-          type: boolean
-    PageSizeFilter:
-      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
-    LongIntegerRangeFilterTrait:
-      type: object
-      description: Common trait for long integer min max filter
-      properties:
-        min:
-          type: integer
-          format: int64
-          minimum: 0
-        max:
-          type: integer
-          format: int64
-    PageId:
-      type: string
-      example: f9d32cc7cc2046d6decb145a80289287f5226323
-    AuditRunPageCommonColumnsWithFinalValuesTrait:
-      description: Trait for audit page with final URL and final status code
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
-      - type: object
-        properties:
-          finalPageUrl:
-            $ref: '#/components/schemas/PageUrl'
-          finalPageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    PageLoadTime:
-      type: integer
-      description: Time page took to load, in milliseconds
-    AuditRunPageCommonColumnsTrait:
-      description: Trait for audit page with common page properties
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageTrait'
-      - type: object
-        required:
-        - pageLoadTime
-        - pageStatusCode
-        properties:
-          pageLoadTime:
-            $ref: '#/components/schemas/PageLoadTime'
-          pageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    IntegerFilterTypeEnum:
-      type: string
-      enum:
-      - specific
-      - range
-    IntegerFilter:
-      type: object
-      required:
-      - filterType
-      - negated
-      properties:
-        filterType:
-          $ref: '#/components/schemas/IntegerFilterTypeEnum'
-        negated:
-          type: boolean
-          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
-      discriminator:
-        propertyName: filterType
-        mapping:
-          specific: '#/components/schemas/SpecificIntegerFilter'
-          range: '#/components/schemas/IntegerRangeFilter'
+          trendValue:
+            type: number
   parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
     pageParam:
       name: page
       in: query
@@ -738,33 +746,6 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
-    AuditRun_TagAccountList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 100
-        minimum: 100
-    AuditRun_PagesList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 50
-        minimum: 50
-    AuditRun_Trends_DaysParam:
-      name: days
-      in: query
-      required: true
-      schema:
-        type: integer
-        description: Number of days to get trend values for, relative to current time
-        maximum: 390
-        minimum: 1
     TagId:
       name: tagId
       in: path
@@ -772,29 +753,6 @@ components:
       description: Tag ID
       schema:
         $ref: '#/components/schemas/TagId'
-    AuditRun_TagDuplicatesAndMultiples_PagesSortParam:
-      name: sortBy
-      in: query
-      required: false
-      schema:
-        $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_PagesSortColumn'
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
     RunId:
       name: runId
       in: path
@@ -804,15 +762,57 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    AuditRun_TagDuplicatesAndMultiples_PagesSortParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_TagDuplicatesAndMultiples_PagesSortColumn'
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    AuditRun_TagAccountList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    AuditRun_Trends_DaysParam:
+      name: days
+      in: query
+      required: true
+      schema:
+        type: integer
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    NotFound:
+      description: The object you are looking is not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

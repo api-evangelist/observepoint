@@ -41,9 +41,17 @@ paths:
       - API_Key: []
       description: GET /v3/email-inbox-messages/{messageId}
 components:
+  parameters:
+    EmailInboxMessageId:
+      in: path
+      name: messageId
+      required: true
+      allowEmptyValue: false
+      schema:
+        type: number
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    NotFound:
+      description: The object you are looking is not found
       content:
         application/json:
           schema:
@@ -54,26 +62,18 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-  parameters:
-    EmailInboxMessageId:
-      in: path
-      name: messageId
-      required: true
-      allowEmptyValue: false
-      schema:
-        type: number
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
     EmailInboxMessageDetailsResponseDTO:
       type: object

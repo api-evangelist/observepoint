@@ -176,262 +176,9 @@ paths:
       description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/browser-logs/pages
 components:
   schemas:
-    IntegerRangeFilterTrait:
-      type: object
-      description: Common trait for integer min max filter
-      properties:
-        min:
-          type: integer
-          minimum: 0
-        max:
-          type: integer
-    CombinedPageStatusCodeEnum:
-      type: string
-      description: '- `broken` - initial or final URL are `broken`,
-
-        - `good` - initial URL is `good` or `redirect` and final URL is `good`
-
-        '
-      enum:
-      - broken
-      - good
-    AuditRun_BrowserLogs_SelectedMessage:
-      type: object
-      required:
-      - message
-      - level
-      properties:
-        message:
-          type: string
-          minLength: 1
-        level:
-          $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
-    StringInclusionFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          minLength: 1
-    TagInfoTrait:
-      type: object
-      description: Common tag info
-      required:
-      - tagId
-      - tagName
-      - tagCategoryId
-      - tagCategoryName
-      properties:
-        tagId:
-          $ref: '#/components/schemas/TagId'
-        tagName:
-          $ref: '#/components/schemas/TagName'
-        tagCategoryId:
-          $ref: '#/components/schemas/TagCategoryId'
-        tagCategoryName:
-          $ref: '#/components/schemas/TagCategoryName'
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    TagCategoryId:
-      type: integer
-      description: Tag category ID
-    IntegerFilter:
-      type: object
-      required:
-      - filterType
-      - negated
-      properties:
-        filterType:
-          $ref: '#/components/schemas/IntegerFilterTypeEnum'
-        negated:
-          type: boolean
-          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
-      discriminator:
-        propertyName: filterType
-        mapping:
-          specific: '#/components/schemas/SpecificIntegerFilter'
-          range: '#/components/schemas/IntegerRangeFilter'
-    PageUrlFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/PageUrlFilterEnum'
-        filterValue:
-          type: string
-          minLength: 1
-        negated:
-          type: boolean
-          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
-          default: false
-    ItemRun_SpecificTrendValueItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+    AuditRun_BrowserLogs_Messages_TagItem:
       allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        required:
-        - trendValue
-        properties:
-          trendValue:
-            type: number
-    AuditRun_BrowserLogs_TrendsDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_BrowserLogs_TrendsItem'
-    PageUrl:
-      type: string
-      format: url
-      example: https://example.com/about
-    AuditRun_BrowserLogs_SummaryDTO:
-      description: Log counts are actually filtered
-      allOf:
-      - $ref: '#/components/schemas/AuditRun_BrowserLogs_MessageCountTrait'
-      - type: object
-        required:
-        - totalPageCount
-        - filteredPageCount
-        properties:
-          totalPageCount:
-            type: integer
-            description: Total number of pages audited
-          filteredPageCount:
-            type: integer
-            description: Number of pages passing all applied filters
-    PageStatusCode:
-      type: integer
-      description: Page HTTP status code
-    AuditRun_BrowserLogs_MessagesSortColumn:
-      type: string
-      enum:
-      - level
-      - message
-      - instances_count
-      - pages_count
-      - related_tag
-    AuditRun_BrowserLogs_MessageCountTrait:
-      type: object
-      required:
-      - errorLogCount
-      - warnLogCount
-      - infoLogCount
-      - debugLogCount
-      - otherLogCount
-      properties:
-        errorLogCount:
-          type: integer
-          description: Number of error level messages
-        warnLogCount:
-          type: integer
-          description: Number of warn level messages
-        infoLogCount:
-          type: integer
-          description: Number of info level messages
-        debugLogCount:
-          type: integer
-          description: Number of debug level messages
-        otherLogCount:
-          type: integer
-          description: Number of other level messages
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    StringInclusionFilterTypeEnum:
-      type: string
-      enum:
-      - contains
-      - not_contains
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    TagId:
-      type: integer
-      description: Tag ID
-    TagVendorId:
-      type: integer
-      description: Tag vendor ID
-    AuditRunPageTrait:
-      description: Common trait for audit page with mandatory page properties
-      type: object
-      required:
-      - pageId
-      - pageUrl
-      properties:
-        pageId:
-          $ref: '#/components/schemas/PageId'
-        pageUrl:
-          $ref: '#/components/schemas/PageUrl'
-    PageTitleFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          description: Page title as displayed by browser
-          minLength: 1
-          example: ObserveP
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AuditRun_BrowserLogs_TrendsEnum:
-      type: string
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
-      enum:
-      - error_logs
-      - warn_logs
-      - info_logs
-      - debug_logs
-      - other_logs
-    TagName:
-      type: string
-      description: Tag name
-    AuditRun_BrowserLogs_PagesItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
-      - $ref: '#/components/schemas/AuditRun_BrowserLogs_MessageCountTrait'
+      - $ref: '#/components/schemas/TagInfoTrait'
     AuditRun_BrowserLogs_RequestDTO:
       allOf:
       - $ref: '#/components/schemas/PageFiltersTrait'
@@ -452,33 +199,20 @@ components:
           anyRelatedTag:
             type: boolean
             description: Show all messages with any related tag
-    AuditRun_BrowserLogs_MessagesDTO:
+    PageTitleFilter:
       type: object
       required:
-      - messages
-      - metadata
+      - filterType
+      - filterValue
       properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        messages:
-          type: array
-          description: Browser log messages discovered during audit run.
-          items:
-            $ref: '#/components/schemas/AuditRun_BrowserLogs_MessagesItem'
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    PageUrlFilterEnum:
-      type: string
-      enum:
-      - contains
-      - regex
-    ItemRun_SpecificTrendValuesDTO:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    AuditRun_BrowserLogs_TrendsDTO:
       type: object
       required:
       - runs
@@ -486,92 +220,125 @@ components:
         runs:
           type: array
           items:
-            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
-    TagCategoryName:
-      type: string
-      description: Name of a category of a tag
-    AuditRun_BrowserLogs_PagesRequestDTO:
-      description: If `message` filter is present, `messageText` filter will be ignored
+            $ref: '#/components/schemas/AuditRun_BrowserLogs_TrendsItem'
+    AuditRun_BrowserLogs_PagesItem:
       allOf:
-      - $ref: '#/components/schemas/AuditRun_BrowserLogs_RequestDTO'
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - $ref: '#/components/schemas/AuditRun_BrowserLogs_MessageCountTrait'
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
       - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
         properties:
-          message:
-            $ref: '#/components/schemas/AuditRun_BrowserLogs_SelectedMessage'
-    PageRedirectCountFilter:
-      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    StatusCodeEnum:
-      description: good - 2xx, redirects - 3xx, broken - all others
-      deprecated: true
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    IntegerFilterTypeEnum:
       type: string
       enum:
-      - good
-      - redirects
-      - broken
-    AuditRun_BrowserLogs_PagesSortColumn:
+      - specific
+      - range
+    TagName:
       type: string
-      enum:
-      - page_url
-      - final_page_url
-      - page_load_time
-      - page_status_code
-      - final_page_status_code
-      - error_log_count
-      - warn_log_count
-      - info_log_count
-      - debug_log_count
-      - other_log_count
-    AuditRun_BrowserLogs_MessagesItem:
+      description: Tag name
+    TagId:
+      type: integer
+      description: Tag ID
+    LongIntegerRangeFilterTrait:
       type: object
-      required:
-      - level
-      - message
-      - logCount
-      - pageCount
+      description: Common trait for long integer min max filter
       properties:
-        level:
-          $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
         message:
           type: string
-        logCount:
-          type: integer
-        pageCount:
-          type: integer
-        relatedTag:
-          $ref: '#/components/schemas/AuditRun_BrowserLogs_Messages_TagItem'
-    AuditRun_BrowserLogs_Messages_TagItem:
+        details:
+          type: string
+        validationReport:
+          type: object
+    TagInfoTrait:
+      type: object
+      description: Common tag info
+      required:
+      - tagId
+      - tagName
+      - tagCategoryId
+      - tagCategoryName
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagName:
+          $ref: '#/components/schemas/TagName'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        tagCategoryName:
+          $ref: '#/components/schemas/TagCategoryName'
+    AuditRun_BrowserLogs_SummaryDTO:
+      description: Log counts are actually filtered
       allOf:
-      - $ref: '#/components/schemas/TagInfoTrait'
-    PageLoadTimeFilter:
-      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+      - $ref: '#/components/schemas/AuditRun_BrowserLogs_MessageCountTrait'
+      - type: object
+        required:
+        - totalPageCount
+        - filteredPageCount
+        properties:
+          totalPageCount:
+            type: integer
+            description: Total number of pages audited
+          filteredPageCount:
+            type: integer
+            description: Number of pages passing all applied filters
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    AuditRun_BrowserLogs_SelectedMessage:
+      type: object
+      required:
+      - message
+      - level
+      properties:
+        message:
+          type: string
+          minLength: 1
+        level:
+          $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
     PageFiltersTrait:
       type: object
       description: Common trait for page filters
@@ -596,24 +363,10 @@ components:
           $ref: '#/components/schemas/PageRedirectCountFilter'
         hasBrokenLinks:
           type: boolean
-    LongIntegerRangeFilterTrait:
-      type: object
-      description: Common trait for long integer min max filter
-      properties:
-        min:
-          type: integer
-          format: int64
-          minimum: 0
-        max:
-          type: integer
-          format: int64
-    PageSizeFilter:
-      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
       allOf:
-      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
-    PageId:
-      type: string
-      example: f9d32cc7cc2046d6decb145a80289287f5226323
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
     ItemRunTrendsItemTrait:
       type: object
       required:
@@ -624,6 +377,126 @@ components:
           $ref: '#/components/schemas/RunId'
         completedAt:
           $ref: '#/components/schemas/DateAndTime'
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    AuditRun_BrowserLogs_MessagesItem:
+      type: object
+      required:
+      - level
+      - message
+      - logCount
+      - pageCount
+      properties:
+        level:
+          $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
+        message:
+          type: string
+        logCount:
+          type: integer
+        pageCount:
+          type: integer
+        relatedTag:
+          $ref: '#/components/schemas/AuditRun_BrowserLogs_Messages_TagItem'
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    AuditRun_BrowserLogs_MessagesSortColumn:
+      type: string
+      enum:
+      - level
+      - message
+      - instances_count
+      - pages_count
+      - related_tag
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    AuditRun_BrowserLogs_PagesSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_load_time
+      - page_status_code
+      - final_page_status_code
+      - error_log_count
+      - warn_log_count
+      - info_log_count
+      - debug_log_count
+      - other_log_count
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
+    BrowserLogMessageLevelEnum:
+      type: string
+      enum:
+      - error
+      - warn
+      - info
+      - debug
+      - other
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
     AuditRunPageCommonColumnsWithFinalValuesTrait:
       description: Trait for audit page with final URL and final status code
       allOf:
@@ -634,33 +507,132 @@ components:
             $ref: '#/components/schemas/PageUrl'
           finalPageStatusCode:
             $ref: '#/components/schemas/PageStatusCode'
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
+    AuditRunPageTrait:
+      description: Common trait for audit page with mandatory page properties
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+    AuditRun_BrowserLogs_MessagesDTO:
+      type: object
+      required:
+      - messages
+      - metadata
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        messages:
+          type: array
+          description: Browser log messages discovered during audit run.
+          items:
+            $ref: '#/components/schemas/AuditRun_BrowserLogs_MessagesItem'
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    StringInclusionFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          minLength: 1
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    StatusCodeEnum:
+      description: good - 2xx, redirects - 3xx, broken - all others
+      deprecated: true
+      type: string
+      enum:
+      - good
+      - redirects
+      - broken
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    AuditRun_BrowserLogs_TrendsEnum:
+      type: string
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      enum:
+      - error_logs
+      - warn_logs
+      - info_logs
+      - debug_logs
+      - other_logs
+    AuditRun_BrowserLogs_PagesRequestDTO:
+      description: If `message` filter is present, `messageText` filter will be ignored
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_BrowserLogs_RequestDTO'
+      - type: object
+        properties:
+          message:
+            $ref: '#/components/schemas/AuditRun_BrowserLogs_SelectedMessage'
+    TagCategoryName:
+      type: string
+      description: Name of a category of a tag
     AuditRun_BrowserLogs_TrendsItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
       allOf:
       - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
       - $ref: '#/components/schemas/AuditRun_BrowserLogs_MessageCountTrait'
-    BrowserLogMessageLevelEnum:
-      type: string
-      enum:
-      - error
-      - warn
-      - info
-      - debug
-      - other
-    AuditRunPageCommonColumnsTrait:
-      description: Trait for audit page with common page properties
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageTrait'
-      - type: object
-        required:
-        - pageLoadTime
-        - pageStatusCode
-        properties:
-          pageLoadTime:
-            $ref: '#/components/schemas/PageLoadTime'
-          pageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
+    AuditRun_BrowserLogs_MessageCountTrait:
+      type: object
+      required:
+      - errorLogCount
+      - warnLogCount
+      - infoLogCount
+      - debugLogCount
+      - otherLogCount
+      properties:
+        errorLogCount:
+          type: integer
+          description: Number of error level messages
+        warnLogCount:
+          type: integer
+          description: Number of warn level messages
+        infoLogCount:
+          type: integer
+          description: Number of info level messages
+        debugLogCount:
+          type: integer
+          description: Number of debug level messages
+        otherLogCount:
+          type: integer
+          description: Number of other level messages
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
     AuditRun_BrowserLogs_PagesDTO:
       description: Browser Logs pages list data
       type: object
@@ -674,15 +646,51 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditRun_BrowserLogs_PagesItem'
-    IntegerFilterTypeEnum:
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    PageId:
       type: string
-      enum:
-      - specific
-      - range
-    PageLoadTime:
-      type: integer
-      description: Time page took to load, in milliseconds
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
   parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
     pageParam:
       name: page
       in: query
@@ -692,47 +700,6 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
-    AuditRun_PagesList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 50
-        minimum: 50
-    AuditRun_Trends_DaysParam:
-      name: days
-      in: query
-      required: true
-      schema:
-        type: integer
-        description: Number of days to get trend values for, relative to current time
-        maximum: 390
-        minimum: 1
-    AuditRun_BrowserLogs_PagesSortParam:
-      name: sortBy
-      in: query
-      required: false
-      schema:
-        $ref: '#/components/schemas/AuditRun_BrowserLogs_PagesSortColumn'
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
     RunId:
       name: runId
       in: path
@@ -742,15 +709,48 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    AuditRun_BrowserLogs_PagesSortParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_BrowserLogs_PagesSortColumn'
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    AuditRun_Trends_DaysParam:
+      name: days
+      in: query
+      required: true
+      schema:
+        type: integer
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    NotFound:
+      description: The object you are looking is not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

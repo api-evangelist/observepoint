@@ -72,12 +72,6 @@ paths:
       description: POST /v3/alerts/exports/{exportType}
 components:
   responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     NotFound:
       description: The object you are looking is not found
       content:
@@ -90,11 +84,39 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    Export_AllDataParam:
+      in: query
+      name: allData
+      schema:
+        type: boolean
+        default: false
+      required: false
+      description: IF `false` THEN only one results page will be exported ELSE all data will be exported
   schemas:
-    ExportId:
-      type: integer
-      format: int64
-      description: Unique ID of an export
     ExportResultDTO:
       type: object
       required:
@@ -107,6 +129,10 @@ components:
       description: All supported alert export types
       enum:
       - ACCOUNT_LEVEL_TRIGGERED_ALERTS_EXPORT
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
     ErrorModel:
       type: object
       properties:
@@ -119,32 +145,6 @@ components:
           type: string
         validationReport:
           type: object
-  parameters:
-    Export_AllDataParam:
-      in: query
-      name: allData
-      schema:
-        type: boolean
-        default: false
-      required: false
-      description: IF `false` THEN only one results page will be exported ELSE all data will be exported
-    pageParam:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
   securitySchemes:
     API_Key:
       type: apiKey

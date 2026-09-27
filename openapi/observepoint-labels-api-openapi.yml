@@ -113,6 +113,14 @@ paths:
       - Labels
 components:
   schemas:
+    NewLabel:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+      description: Label creation information
     LabelWithSignedItems:
       type: object
       required:
@@ -165,14 +173,6 @@ components:
             type: number
           type: array
       description: Label with all items to which it was assigned
-    NewLabel:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-      description: Label creation information
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

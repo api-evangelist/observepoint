@@ -113,42 +113,26 @@ paths:
       - API_Key: []
       description: POST /v3/web-audits/{auditId}/runs/{runId}/consent-categories/reprocess
 components:
+  responses:
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    AttachmentPatchDocument_RequestDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    ConsentCategory_TypeEnum:
-      type: string
-      enum:
-      - approved
-      - unapproved
-    ConsentCategoryDTO:
-      type: object
-      properties:
-        name:
-          type: string
-        notes:
-          type: string
-        type:
-          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
-        id:
-          $ref: '#/components/schemas/ConsentCategoryId'
-        isDefaultCC:
-          type: boolean
-          description: If true, this is the default consent category
-        cmpData:
-          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
-        updatedType:
-          $ref: '#/components/schemas/ConsentCategory_updatedType'
-        updatedAt:
-          type: string
-          format: date-time
-          description: The last time this consent category was updated in UTC timezone
     ConsentCategorySnapshotDTO:
       type: object
       description: A consent category snapshot dto
@@ -172,27 +156,6 @@ components:
         consentCategoryConfigExists:
           type: boolean
           description: If false, the consent category config doesn't exist anymore
-    WebAudit_ConsentCategories_ResponseDTO:
-      type: object
-      required:
-      - consentCategories
-      properties:
-        consentCategories:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategoryDTO'
-    WebAudit_ConsentCategorySnapshots_ResponseDTO:
-      type: object
-      description: 'NOTE: For individual consent category snapshot, Field consentCategoryId is omitted when the consent category is deleted'
-      properties:
-        consentCategorySnapshots:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
     ConsentCategory_Cmp_Data:
       type: object
       required:
@@ -222,6 +185,11 @@ components:
           type: string
           description: The full URL of the page where the CMP import was run
           example: https://example.com
+    ConsentCategory_TypeEnum:
+      type: string
+      enum:
+      - approved
+      - unapproved
     ErrorModel:
       type: object
       properties:
@@ -234,25 +202,20 @@ components:
           type: string
         validationReport:
           type: object
-    ConsentCategoryId:
-      type: integer
-      example: 3301
-      description: ID of consent category
+    AttachmentPatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
     ConsentCategory_updatedType:
       type: string
       enum:
       - ONETRUST_IMPORT
       - FILE_IMPORT
       - APP_CREATE
-    ConsentCategorySnapshotId:
+    ConsentCategoryId:
       type: integer
-      format: int64
-      example: 33010
-      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
-    ConsentCategory_VendorTypeEnum:
-      type: string
-      enum:
-      - ONE_TRUST
+      example: 3301
+      description: ID of consent category
     AttachmentPatchDocument_ItemDTO:
       description: A JSONPatch document for modifying consent preference attachments
       properties:
@@ -274,35 +237,63 @@ components:
       - op: remove
         path: /
         value: 2
-  responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-  parameters:
     AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
+      type: integer
+      format: int64
+      example: 107239
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    WebAudit_ConsentCategorySnapshots_ResponseDTO:
+      type: object
+      description: 'NOTE: For individual consent category snapshot, Field consentCategoryId is omitted when the consent category is deleted'
+      properties:
+        consentCategorySnapshots:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
+    ConsentCategoryDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+        type:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        id:
+          $ref: '#/components/schemas/ConsentCategoryId'
+        isDefaultCC:
+          type: boolean
+          description: If true, this is the default consent category
+        cmpData:
+          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
+        updatedType:
+          $ref: '#/components/schemas/ConsentCategory_updatedType'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last time this consent category was updated in UTC timezone
+    ConsentCategory_VendorTypeEnum:
+      type: string
+      enum:
+      - ONE_TRUST
+    ConsentCategorySnapshotId:
+      type: integer
+      format: int64
+      example: 33010
+      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
+    WebAudit_ConsentCategories_ResponseDTO:
+      type: object
+      required:
+      - consentCategories
+      properties:
+        consentCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategoryDTO'
+  parameters:
     RunId:
       name: runId
       in: path
@@ -312,6 +303,15 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
   securitySchemes:
     API_Key:
       type: apiKey

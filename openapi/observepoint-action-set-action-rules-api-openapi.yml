@@ -110,44 +110,6 @@ paths:
       - API_Key: []
 components:
   schemas:
-    PageFilter:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        ruleId:
-          type: integer
-          format: int32
-        value:
-          type: string
-        type:
-          $ref: '#/components/schemas/PageFilterTypeEnum'
-        matchType:
-          $ref: '#/components/schemas/MatchTypeEnum'
-    MatchTypeEnum:
-      type:
-      - string
-      - 'null'
-      enum:
-      - IsPresent
-      - Equals
-      - DoesNotEqual
-      - Contains
-      - DoesNotContain
-      - IsSet
-      - IsNotSet
-      - Regex
-      - GreaterThanOrEqualTo
-      - LessThanOrEqualTo
-    SelectorTypeEnum:
-      type: string
-      enum:
-      - Empty
-      - String
-      - UrlParameter
-      - DataLayer
-      - Tag
     RuleTagVariable:
       type: object
       properties:
@@ -170,55 +132,6 @@ components:
           format: int32
         selectorType:
           $ref: '#/components/schemas/SelectorTypeEnum'
-    ClauseEnum:
-      type:
-      - string
-      - 'null'
-      enum:
-      - If
-      - Then
-      - Else
-    Label:
-      description: DTO for Labels
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-        name:
-          type: string
-    RuleTag:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        ruleId:
-          type: integer
-          format: int32
-        tagId:
-          type: integer
-          format: int32
-        matchType:
-          $ref: '#/components/schemas/MatchTypeEnum'
-        account:
-          type: string
-        validationDescription:
-          type: string
-        clause:
-          $ref: '#/components/schemas/ClauseEnum'
-        variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/RuleTagVariable'
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
     Rule:
       type: object
       properties:
@@ -262,6 +175,55 @@ components:
             $ref: '#/components/schemas/Label'
         fromTemplate:
           type: boolean
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    RuleTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        tagId:
+          type: integer
+          format: int32
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+        account:
+          type: string
+        validationDescription:
+          type: string
+        clause:
+          $ref: '#/components/schemas/ClauseEnum'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleTagVariable'
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    SelectorTypeEnum:
+      type: string
+      enum:
+      - Empty
+      - String
+      - UrlParameter
+      - DataLayer
+      - Tag
     PageFilterTypeEnum:
       type:
       - integer
@@ -276,6 +238,36 @@ components:
       x-enum-descriptions:
       - URL filter type
       - StatusCode filter type
+    PageFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        value:
+          type: string
+        type:
+          $ref: '#/components/schemas/PageFilterTypeEnum'
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+    MatchTypeEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - IsPresent
+      - Equals
+      - DoesNotEqual
+      - Contains
+      - DoesNotContain
+      - IsSet
+      - IsNotSet
+      - Regex
+      - GreaterThanOrEqualTo
+      - LessThanOrEqualTo
     ErrorModel:
       type: object
       properties:
@@ -288,15 +280,23 @@ components:
           type: string
         validationReport:
           type: object
+    ClauseEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - If
+      - Then
+      - Else
   responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
+    NotFound:
+      description: The object you are looking is not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
+    Forbidden:
+      description: You don't have enough rights to access this resource
       content:
         application/json:
           schema:

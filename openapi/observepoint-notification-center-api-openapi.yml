@@ -117,17 +117,31 @@ paths:
       description: POST /v3/notification-center/target-items/{itemType}/search
 components:
   schemas:
-    NotificationCenter_AssignmentItemTypeEnum:
-      type: string
-      enum:
-      - AUDIT
-      - WEB_JOURNEY
-      - RULE
-      - ALERT
-      - USAGE_ALERT
-      - EMAIL_INBOX_MESSAGE_RECEIVED
-      - EMAIL_INBOX_MESSAGE_PROCESSED
-      - SCHEDULED_EXPORT
+    NotificationCenter_GetEmails_ResponseDTO:
+      type: object
+      description: All emails in an account
+      required:
+      - emails
+      properties:
+        emails:
+          type: array
+          minItems: 0
+          items:
+            title: NotificationCenter_EmailItem
+            type: object
+            required:
+            - email
+            - usage
+            properties:
+              email:
+                type: string
+              usage:
+                $ref: '#/components/schemas/NotificationCenter_EmailUsage'
+    ItemId:
+      type: integer
+      format: int64
+      description: ID of a data collector, see ItemType
+      example: 107239
     NotificationCenter_SearchForAssignments_RequestDTO:
       type: object
       description: Filters for searching for items that may have specific email assigned or not assigned
@@ -157,50 +171,12 @@ components:
             - when UNDEFINED or NULL - flag is ignored.
 
             '
-    NotificationCenter_GetEmails_ResponseDTO:
-      type: object
-      description: All emails in an account
-      required:
-      - emails
-      properties:
-        emails:
-          type: array
-          minItems: 0
-          items:
-            title: NotificationCenter_EmailItem
-            type: object
-            required:
-            - email
-            - usage
-            properties:
-              email:
-                type: string
-              usage:
-                $ref: '#/components/schemas/NotificationCenter_EmailUsage'
-    NotificationCenter_AssignmentsSortColumn:
-      type: string
-      enum:
-      - IS_ASSIGNED
-      - ITEM_NAME
-      - RUN_DATE
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
     NotificationCenter_EmailUsage:
       type: object
       required:
@@ -240,20 +216,10 @@ components:
           type: string
         validationReport:
           type: object
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
+    NotificationCenter_EmailSubscriptionItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
     PaginationMetadata:
       type: object
       required:
@@ -278,10 +244,20 @@ components:
         currentPageNumber:
           description: Current page number/ordinal
           type: integer
-    NotificationCenter_EmailSubscriptionItemTypeEnum:
+    NotificationCenter_AssignmentsSortColumn:
       type: string
       enum:
-      - AUDIT
+      - IS_ASSIGNED
+      - ITEM_NAME
+      - RUN_DATE
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
     NotificationCenter_GetEmails_RequestDTO:
       type: object
       description: Filters for searching for emails
@@ -297,6 +273,17 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/ItemId'
+    NotificationCenter_AssignmentItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+      - RULE
+      - ALERT
+      - USAGE_ALERT
+      - EMAIL_INBOX_MESSAGE_RECEIVED
+      - EMAIL_INBOX_MESSAGE_PROCESSED
+      - SCHEDULED_EXPORT
     NotificationCenter_SearchForAssignments_ResponseDTO:
       type: object
       required:
@@ -341,12 +328,33 @@ components:
                 minItems: 0
                 items:
                   $ref: '#/components/schemas/LabelId'
-    ItemId:
-      type: integer
-      format: int64
-      description: ID of a data collector, see ItemType
-      example: 107239
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
   parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
     pageParam:
       name: page
       in: query
@@ -356,21 +364,7 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
   responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     Forbidden:
       description: You don't have enough rights to access this resource
       content:
@@ -379,6 +373,12 @@ components:
             $ref: '#/components/schemas/ErrorModel'
     NotFound:
       description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

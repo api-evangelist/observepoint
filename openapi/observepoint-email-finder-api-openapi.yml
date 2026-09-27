@@ -47,12 +47,6 @@ paths:
       - API_Key: []
 components:
   responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     Forbidden:
       description: You don't have enough rights to access this resource
       content:
@@ -65,7 +59,17 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
+    EmailFinderSearchParam:
+      type: string
+      minLength: 1
+      description: Parameter to search for email inboxes or messages
     EmailFinderResultsDTO:
       type: object
       required:
@@ -80,38 +84,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FoundEmailMessageDTO'
-    FoundEmailInboxDTO:
-      type: object
-      description: 'Represents an email inbox retrieved from a search operation. Email inboxes can be searched by the following properties:
-
-        - `id`
-
-        - `name`
-
-        '
-      required:
-      - id
-      - name
-      - accountId
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        accountId:
-          type: integer
-          format: int64
-        mostRecentMessageId:
-          type:
-          - integer
-          - 'null'
-          format: int64
-          description: ID of the most recently received message in this inbox, or null if the inbox has no messages
-    EmailFinderSearchParam:
-      type: string
-      minLength: 1
-      description: Parameter to search for email inboxes or messages
     FoundEmailMessageDTO:
       type: object
       description: 'Represents a received email message retrieved from a search operation. Email messages can be searched by the following properties:
@@ -150,6 +122,34 @@ components:
           type: string
         validationReport:
           type: object
+    FoundEmailInboxDTO:
+      type: object
+      description: 'Represents an email inbox retrieved from a search operation. Email inboxes can be searched by the following properties:
+
+        - `id`
+
+        - `name`
+
+        '
+      required:
+      - id
+      - name
+      - accountId
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        accountId:
+          type: integer
+          format: int64
+        mostRecentMessageId:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: ID of the most recently received message in this inbox, or null if the inbox has no messages
   securitySchemes:
     API_Key:
       type: apiKey

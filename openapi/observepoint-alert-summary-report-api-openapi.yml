@@ -116,6 +116,101 @@ paths:
       description: GET /v3/web-audits/{auditId}/runs/{runId}/reports/alert-summary/alerts/{alertId}
 components:
   schemas:
+    AuditRun_AuditSummary_AlertsResponseDTO:
+      type: object
+      required:
+      - metadata
+      - alerts
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItem'
+    AlertName:
+      type: string
+      minLength: 1
+      description: User-defined name of the alert
+    AlertResultsHistoryArray:
+      type: array
+      description: Returns up to 20 runs with alert results
+      minItems: 0
+      maxItems: 20
+      items:
+        $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsItem_HistoryItem'
+    AuditRun_AlertSummary_AlertsOverviewResponseDTO:
+      type: object
+      required:
+      - alerts
+      properties:
+        alerts:
+          type: array
+          minItems: 0
+          items:
+            title: AuditRun_AlertSummary_AlertsOverviewItem
+            type: object
+            required:
+            - id
+            - name
+            - metricType
+            - status
+            - isSubscribed
+            - alertConfigExists
+            properties:
+              id:
+                $ref: '#/components/schemas/AlertId'
+              name:
+                $ref: '#/components/schemas/AlertName'
+              metricType:
+                $ref: '#/components/schemas/AlertMetricTypeEnum'
+              status:
+                $ref: '#/components/schemas/AlertResultStatusEnum'
+              isSubscribed:
+                type: boolean
+              alertConfigExists:
+                $ref: '#/components/schemas/AlertConfigExistsFlag'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun_AuditSummary_AlertsSortColumn:
+      type: string
+      enum:
+      - ALERT_NAME
+      - ALERT_LOGIC
+      - ACTUAL_VALUE
+      - SUBSCRIBERS
+    AlertConfigTrait:
+      description: Core parts of alert definition
+      type: object
+      required:
+      - name
+      - metricType
+      - targetValueComparator
+      - filtersV0
+      properties:
+        name:
+          $ref: '#/components/schemas/AlertName'
+        metricType:
+          $ref: '#/components/schemas/AlertMetricTypeEnum'
+        metricChangeType:
+          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
+        targetValueComparator:
+          $ref: '#/components/schemas/AlertMetricValueComparator'
+        filtersV0:
+          type: object
+          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
+
+            '
     AuditRun_AuditSummary_AlertsResponseItemConfig:
       allOf:
       - $ref: '#/components/schemas/AlertConfigTrait'
@@ -128,26 +223,84 @@ components:
             type: integer
           isUserSubscribed:
             type: boolean
-    AuditRun_AuditSummary_AlertsItem_HistoryItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+    AlertId:
+      type: integer
+      format: int64
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    AlertResultDetails:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          $ref: '#/components/schemas/AlertResultStatusEnum'
+        actualValue:
+          description: Value of the computed metric or its change.
+          type: number
+          format: double
+        currentRunValue:
+          description: Value of computed metric for current run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+        previousRunValue:
+          description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+    AuditRun_AuditSummary_AlertResult:
       allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
       - $ref: '#/components/schemas/AlertResultDetails'
     AuditId:
       type: integer
       format: int64
       example: 107239
-    AuditRun_AuditSummary_AlertResult:
-      allOf:
-      - $ref: '#/components/schemas/AlertResultDetails'
-    AlertResultsHistoryArray:
-      type: array
-      description: Returns up to 20 runs with alert results
-      minItems: 0
-      maxItems: 20
-      items:
-        $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsItem_HistoryItem'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AlertMetricValueComparisonOperatorEnum:
+      type: string
+      enum:
+      - GREATER
+      - GREATER_OR_EQUAL
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_OR_EQUAL
+      - LESS
+      - BETWEEN
+      - NOT_BETWEEN
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
     AlertMetricTypeEnum:
       type: string
       description: "Deprecated metric types:\n  - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT\n  - PAGE_SUMMARY_FAILED_RULE_COUNT\n"
@@ -241,10 +394,53 @@ components:
       - RULE_RESULTS_FAILED_RULE_PAGE_COUNT
       - RULE_RESULTS_PASSED_RULE_PAGE_COUNT
       - RULE_RESULTS_NOT_APPLIED_RULE_PAGE_COUNT
-    AlertName:
-      type: string
-      minLength: 1
-      description: User-defined name of the alert
+    AlertConfigExistsFlag:
+      type: boolean
+      description: when `true` then alert config exists and can be edited, otherwise it is deleted
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    AuditRun_AlertSummary_SummaryRequestDTO:
+      description: Request body with filters for Alert Summary report
+      type: object
+      properties:
+        alertName:
+          type: string
+          description: when populated works as "alert `name` contains given substring" filter
+        metricTypes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AlertMetricTypeEnum'
+        status:
+          $ref: '#/components/schemas/AlertResultSimplifiedStatusEnum'
+        subscribedOnly:
+          type: boolean
+          description: when `false` or `null` then all alerts are returned, otherwise only alerts user is subscribed to are returned
+    AuditRun_AuditSummary_AlertsResponseItem:
+      type: object
+      required:
+      - id
+      - config
+      - result
+      - history
+      - alertConfigExists
+      properties:
+        id:
+          $ref: '#/components/schemas/AlertId'
+        config:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
+        result:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
+        history:
+          $ref: '#/components/schemas/AlertResultsHistoryArray'
+        alertConfigExists:
+          $ref: '#/components/schemas/AlertConfigExistsFlag'
     DateAndTime:
       type: string
       format: date-time
@@ -263,97 +459,12 @@ components:
 
         '
       example: '2016-08-18T17:33:00Z'
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    AuditRun_AlertSummary_SummaryRequestDTO:
-      description: Request body with filters for Alert Summary report
-      type: object
-      properties:
-        alertName:
-          type: string
-          description: when populated works as "alert `name` contains given substring" filter
-        metricTypes:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/AlertMetricTypeEnum'
-        status:
-          $ref: '#/components/schemas/AlertResultSimplifiedStatusEnum'
-        subscribedOnly:
-          type: boolean
-          description: when `false` or `null` then all alerts are returned, otherwise only alerts user is subscribed to are returned
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AlertConfigTrait:
-      description: Core parts of alert definition
-      type: object
-      required:
-      - name
-      - metricType
-      - targetValueComparator
-      - filtersV0
-      properties:
-        name:
-          $ref: '#/components/schemas/AlertName'
-        metricType:
-          $ref: '#/components/schemas/AlertMetricTypeEnum'
-        metricChangeType:
-          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
-        targetValueComparator:
-          $ref: '#/components/schemas/AlertMetricValueComparator'
-        filtersV0:
-          type: object
-          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
-
-            '
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    AuditRun_AuditSummary_SpecificAlertResponseDTO:
-      type: object
-      required:
-      - id
-      - config
-      - result
-      - alertConfigExists
-      properties:
-        id:
-          $ref: '#/components/schemas/AlertId'
-        config:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
-        result:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
-        alertConfigExists:
-          $ref: '#/components/schemas/AlertConfigExistsFlag'
-    AuditRun_AuditSummary_AlertsResponseDTO:
-      type: object
-      required:
-      - metadata
-      - alerts
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        alerts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItem'
+    AlertResultSimplifiedStatusEnum:
+      type: string
+      description: Simplified version of `#/components/schemas/AlertResultStatusEnum` for UI filters
+      enum:
+      - TRIGGERED
+      - NOT_TRIGGERED
     AlertMetricValueComparator:
       type: object
       description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
@@ -375,28 +486,28 @@ components:
           LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
           BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
           NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
-    AlertResultDetails:
+    AuditRun_AuditSummary_AlertsItem_HistoryItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - $ref: '#/components/schemas/AlertResultDetails'
+    AuditRun_AuditSummary_SpecificAlertResponseDTO:
       type: object
       required:
-      - status
+      - id
+      - config
+      - result
+      - alertConfigExists
       properties:
-        status:
-          $ref: '#/components/schemas/AlertResultStatusEnum'
-        actualValue:
-          description: Value of the computed metric or its change.
-          type: number
-          format: double
-        currentRunValue:
-          description: Value of computed metric for current run. Present when alert is configured on metric change, not on single run metric value
-          type: number
-          format: double
-        previousRunValue:
-          description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
-          type: number
-          format: double
-    AlertConfigExistsFlag:
-      type: boolean
-      description: when `true` then alert config exists and can be edited, otherwise it is deleted
+        id:
+          $ref: '#/components/schemas/AlertId'
+        config:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
+        result:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
+        alertConfigExists:
+          $ref: '#/components/schemas/AlertConfigExistsFlag'
     AlertMetricChangeTypeEnum:
       type: string
       description: 'Behaviour per type:
@@ -455,118 +566,15 @@ components:
       - NO_VALUE
       - PREVIOUS_RUN_NOT_FOUND
       - PREVIOUS_RUN_NO_VALUE
-    AuditRun_AlertSummary_AlertsOverviewResponseDTO:
-      type: object
-      required:
-      - alerts
-      properties:
-        alerts:
-          type: array
-          minItems: 0
-          items:
-            title: AuditRun_AlertSummary_AlertsOverviewItem
-            type: object
-            required:
-            - id
-            - name
-            - metricType
-            - status
-            - isSubscribed
-            - alertConfigExists
-            properties:
-              id:
-                $ref: '#/components/schemas/AlertId'
-              name:
-                $ref: '#/components/schemas/AlertName'
-              metricType:
-                $ref: '#/components/schemas/AlertMetricTypeEnum'
-              status:
-                $ref: '#/components/schemas/AlertResultStatusEnum'
-              isSubscribed:
-                type: boolean
-              alertConfigExists:
-                $ref: '#/components/schemas/AlertConfigExistsFlag'
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    AuditRun_AuditSummary_AlertsResponseItem:
-      type: object
-      required:
-      - id
-      - config
-      - result
-      - history
-      - alertConfigExists
-      properties:
-        id:
-          $ref: '#/components/schemas/AlertId'
-        config:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
-        result:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
-        history:
-          $ref: '#/components/schemas/AlertResultsHistoryArray'
-        alertConfigExists:
-          $ref: '#/components/schemas/AlertConfigExistsFlag'
-    AlertMetricValueComparisonOperatorEnum:
-      type: string
-      enum:
-      - GREATER
-      - GREATER_OR_EQUAL
-      - EQUAL
-      - NOT_EQUAL
-      - LESS_OR_EQUAL
-      - LESS
-      - BETWEEN
-      - NOT_BETWEEN
-    ItemRunTrendsItemTrait:
-      type: object
-      required:
-      - runId
-      - completedAt
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          $ref: '#/components/schemas/DateAndTime'
-    AlertId:
-      type: integer
-      format: int64
-    AuditRun_AuditSummary_AlertsSortColumn:
-      type: string
-      enum:
-      - ALERT_NAME
-      - ALERT_LOGIC
-      - ACTUAL_VALUE
-      - SUBSCRIBERS
-    AlertResultSimplifiedStatusEnum:
-      type: string
-      description: Simplified version of `#/components/schemas/AlertResultStatusEnum` for UI filters
-      enum:
-      - TRIGGERED
-      - NOT_TRIGGERED
   parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
     pageParam:
       name: page
       in: query
@@ -576,14 +584,15 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
       schema:
-        type: boolean
-        default: false
+        $ref: '#/components/schemas/RunId'
     AuditId:
       name: auditId
       in: path
@@ -600,24 +609,15 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/AlertId'
-    RunId:
-      name: runId
-      in: path
-      required: true
-      description: Unique identification number for web audit or journey run
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/RunId'
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    NotFound:
+      description: The object you are looking is not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

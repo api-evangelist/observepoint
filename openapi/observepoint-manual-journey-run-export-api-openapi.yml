@@ -52,12 +52,6 @@ paths:
       description: POST /v3/manual-journeys/{manualJourneyId}/runs/{runId}/exports/{exportType}
 components:
   responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     NotFound:
       description: The object you are looking is not found
       content:
@@ -70,31 +64,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-  parameters:
-    ManualJourneyId:
-      name: manualJourneyId
-      in: path
-      required: true
-      description: Unique identification number for manual journey
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/ManualJourneyId'
-    RunId:
-      name: runId
-      in: path
-      required: true
-      description: Unique identification number for web audit or journey run
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/RunId'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    ManualJourneyRun_ExportTypeEnum:
-      type: string
-      description: All supported manual journey run export types
-      enum:
-      - FULL
     ManualJourneyRun_ExportRequestDTO:
       type: object
       properties:
@@ -108,6 +84,10 @@ components:
           type: boolean
         includeTagDetails:
           type: boolean
+    ManualJourneyId:
+      type: integer
+      format: int64
+      example: 107239
     ExportResultDTO:
       type: object
       required:
@@ -123,10 +103,11 @@ components:
       type: integer
       format: int64
       description: Unique ID of an export
-    ManualJourneyId:
-      type: integer
-      format: int64
-      example: 107239
+    ManualJourneyRun_ExportTypeEnum:
+      type: string
+      description: All supported manual journey run export types
+      enum:
+      - FULL
     ErrorModel:
       type: object
       properties:
@@ -139,6 +120,25 @@ components:
           type: string
         validationReport:
           type: object
+  parameters:
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    ManualJourneyId:
+      name: manualJourneyId
+      in: path
+      required: true
+      description: Unique identification number for manual journey
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/ManualJourneyId'
   securitySchemes:
     API_Key:
       type: apiKey

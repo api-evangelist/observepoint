@@ -354,34 +354,9 @@ paths:
       description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/variable-inventory/tag-account-variable-value-pages
 components:
   schemas:
-    IntegerRangeFilterTrait:
-      type: object
-      description: Common trait for integer min max filter
-      properties:
-        min:
-          type: integer
-          minimum: 0
-        max:
-          type: integer
-    AuditRun_VariableInventory_TagAccountVariableValueRequestDTO:
-      allOf:
-      - $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountVariableRequestDTO'
-      - type: object
-        required:
-        - variableValue
-        properties:
-          variableValue:
-            $ref: '#/components/schemas/VariableValue'
-    CombinedPageStatusCodeEnum:
+    TagAccount:
       type: string
-      description: '- `broken` - initial or final URL are `broken`,
-
-        - `good` - initial URL is `good` or `redirect` and final URL is `good`
-
-        '
-      enum:
-      - broken
-      - good
+      description: Tag account
     AuditRun_VariableInventory_PagesDTO:
       description: Tag Inventory pages list data
       type: object
@@ -395,6 +370,28 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditRun_VariableInventory_PagesItem'
+    AuditRun_VariableInventory_TagAccountVariableValueRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountVariableRequestDTO'
+      - type: object
+        required:
+        - variableValue
+        properties:
+          variableValue:
+            $ref: '#/components/schemas/VariableValue'
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
     AuditRun_VariableInventory_TagAccountVariablesDTO:
       description: Variable Inventory report tag account variables list. This list will include the top 500 variables with the highest variableSetPageCount.
       type: object
@@ -405,6 +402,74 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditRun_VariableInventory_VariableItem'
+    VariableName:
+      type: string
+      description: Variable name (key)
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    AuditRun_VariableInventory_TrendsEnum:
+      type: string
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      enum:
+      - unique_tags
+      - tag_requests
+      - unique_variables
+      - unique_values
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    TagName:
+      type: string
+      description: Tag name
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
+      properties:
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    TagId:
+      type: integer
+      description: Tag ID
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
     TagInfoTrait:
       type: object
       description: Common tag info
@@ -422,18 +487,6 @@ components:
           $ref: '#/components/schemas/TagCategoryId'
         tagCategoryName:
           $ref: '#/components/schemas/TagCategoryName'
-    IntegerFilterTypeEnum:
-      type: string
-      enum:
-      - specific
-      - range
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    TagCategoryId:
-      type: integer
-      description: Tag category ID
     PageUrlFilter:
       type: object
       required:
@@ -449,37 +502,30 @@ components:
           type: boolean
           description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
           default: false
-    ItemRun_SpecificTrendValueItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        required:
-        - trendValue
-        properties:
-          trendValue:
-            type: number
-    AuditRun_VariableInventory_VariableValuePageItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
-      - type: object
-        required:
-        - tagWithVariableValueCount
-        properties:
-          tagWithVariableValueCount:
-            type: integer
-            default: Number of tag requests with the variable value
-    AuditRun_VariableInventory_PagesItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
-      - type: object
-        required:
-        - variableCount
-        properties:
-          variableCount:
-            type: integer
-            description: Number of unique tag (account) variables on a page
+    PageFiltersTrait:
+      type: object
+      description: Common trait for page filters
+      properties:
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
     AuditRun_VariableInventory_VariableValuePagesDTO:
       description: Variable Inventory - variable values pages list data
       type: object
@@ -493,127 +539,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditRun_VariableInventory_VariableValuePageItem'
-    PageUrl:
-      type: string
-      format: url
-      example: https://example.com/about
-    AuditRun_VariableInventory_VariableNotSetPagesItem:
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
       allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
-    AuditRun_VariableInventory_UniqueVariableValuesItem:
-      type: object
-      properties:
-        variableValue:
-          $ref: '#/components/schemas/VariableValue'
-        pageCount:
-          type: integer
-          description: Number of pages containing specific variable value and passing all filters
-        tagWithVariableValueCount:
-          type: integer
-          description: Number of tag requests containing this specific variable value and passing all filters
-    AuditRun_VariableInventory_PagesSortColumn:
-      type: string
-      enum:
-      - page_url
-      - final_page_url
-      - page_load_time
-      - page_status_code
-      - final_page_status_code
-      - variable_count
-    PageStatusCode:
-      type: integer
-      description: Page HTTP status code
-    AuditRun_VariableInventory_TagAccountItem:
-      type: object
-      properties:
-        tagAccount:
-          $ref: '#/components/schemas/TagAccount'
-        totalPageCount:
-          type: integer
-          description: Total number of pages
-        totalVariableCount:
-          type: integer
-          description: Total number of variables in tag account
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    StringInclusionFilterTypeEnum:
-      type: string
-      enum:
-      - contains
-      - not_contains
-    AuditRun_VariableInventory_TrendsDTO:
-      description: Variable Inventory trends overview (a.k.a. trendlines a.k.a. sparklines)
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    ItemRunTrendsItemTrait:
       type: object
       required:
-      - runs
+      - runId
+      - completedAt
       properties:
-        runs:
-          type: array
-          maxItems: 5
-          items:
-            $ref: '#/components/schemas/AuditRun_VariableInventory_TrendsItem'
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    TagId:
-      type: integer
-      description: Tag ID
-    TagVendorId:
-      type: integer
-      description: Tag vendor ID
-    AuditRunPageTrait:
-      description: Common trait for audit page with mandatory page properties
-      type: object
-      required:
-      - pageId
-      - pageUrl
-      properties:
-        pageId:
-          $ref: '#/components/schemas/PageId'
-        pageUrl:
-          $ref: '#/components/schemas/PageUrl'
-    PageTitleFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          description: Page title as displayed by browser
-          minLength: 1
-          example: ObserveP
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
     AuditRun_VariableInventory_TagsDTO:
       description: Variable Inventory report tag accounts list
       type: object
@@ -627,43 +566,53 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditRun_VariableInventory_TagItem'
-    TagName:
-      type: string
-      description: Tag name
-    AuditRun_VariableInventory_VariableValuesSortColumn:
-      type: string
-      enum:
-      - variable_value
-      - page_count
-    AuditRun_VariableInventory_TrendsEnum:
-      type: string
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
-      enum:
-      - unique_tags
-      - tag_requests
-      - unique_variables
-      - unique_values
-    TagAccount:
-      type: string
-      description: Tag account
-    AuditRun_VariableInventory_TagItem:
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
       allOf:
-      - $ref: '#/components/schemas/TagInfoTrait'
-      - type: object
-        properties:
-          tagAccounts:
-            type: array
-            items:
-              $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountItem'
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    IntegerFilter:
       type: object
       required:
-      - pagination
+      - filterType
+      - negated
       properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    AuditRun_VariableInventory_PagesItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - variableCount
+        properties:
+          variableCount:
+            type: integer
+            description: Number of unique tag (account) variables on a page
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRun_VariableInventory_TagAccountVariableRequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountRequestDTO'
+      - type: object
+        required:
+        - variableName
+        properties:
+          variableName:
+            $ref: '#/components/schemas/VariableName'
     AuditRun_VariableInventory_RequestDTO:
       description: Request body with filters for Variable Inventory report
       allOf:
@@ -681,90 +630,27 @@ components:
             $ref: '#/components/schemas/TagVendorId'
           tagAccount:
             $ref: '#/components/schemas/TagAccount'
-    PageUrlFilterEnum:
+    AuditRun_VariableInventory_VariableValuesSortColumn:
       type: string
       enum:
-      - contains
-      - regex
-    AuditRun_VariableInventory_UniqueVariableValuesDTO:
-      description: Variable Inventory - unique variable values list data
-      type: object
+      - variable_value
+      - page_count
+    AuditRun_VariableInventory_TagAccountRequestDTO:
+      description: Request body for Variable Inventory report
       required:
-      - metadata
-      - variableValues
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        variableValues:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_VariableInventory_UniqueVariableValuesItem'
-    AuditRun_VariableInventory_SummaryDTO:
-      description: Variable Inventory report summary
-      type: object
-      required:
-      - totalPageCount
-      - filteredPageCount
-      - filteredUniqueTagCount
-      - totalTagInstanceCount
-      - filteredTagInstanceCount
-      - totalUniqueVariableNameCount
-      - filteredUniqueVariableNameCount
-      - totalUniqueVariableValueCount
-      - filteredUniqueVariableValueCount
-      properties:
-        totalPageCount:
-          type: integer
-          description: Total number of pages audited
-        filteredPageCount:
-          type: integer
-          description: Number of pages passing all applied filters
-        filteredUniqueTagCount:
-          type: integer
-          description: Number of unique tag vendors passing all applied filters
-        totalTagInstanceCount:
-          type: integer
-          description: Total number of tag requests discovered
-        filteredTagInstanceCount:
-          type: integer
-          description: Number of tag requests passing all applied filters
-        totalUniqueVariableNameCount:
-          type: integer
-          description: Total number of unique variable names across all tags
-        filteredUniqueVariableNameCount:
-          type: integer
-          description: Number of unique variable names across all tags passing all applied filters
-        totalUniqueVariableValueCount:
-          type: integer
-          description: Total number of unique variable names across all tags
-        filteredUniqueVariableValueCount:
-          type: integer
-          description: Number of unique variable names across all tags passing all applied filters
-    AuditRun_VariableInventory_TagAccountVariableRequestDTO:
+      - tagId
+      - tagAccount
       allOf:
-      - $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountRequestDTO'
+      - $ref: '#/components/schemas/PageFiltersTrait'
       - type: object
-        required:
-        - variableName
         properties:
-          variableName:
-            $ref: '#/components/schemas/VariableName'
-    ItemRun_SpecificTrendValuesDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
-    TagCategoryName:
-      type: string
-      description: Name of a category of a tag
-    PageRedirectCountFilter:
-      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagAccount:
+            $ref: '#/components/schemas/TagAccount'
+    AuditRun_VariableInventory_VariableNotSetPagesItem:
       allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
     PaginationMetadata:
       type: object
       required:
@@ -813,6 +699,115 @@ components:
           totalUniqueVariableValueCount:
             type: integer
             description: Total number of unique variable names across all tags
+    AuditRun_VariableInventory_VariableNotSetPagesDTO:
+      description: Tag Inventory pages list data
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_VariableNotSetPagesItem'
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    AuditRun_VariableInventory_SummaryDTO:
+      description: Variable Inventory report summary
+      type: object
+      required:
+      - totalPageCount
+      - filteredPageCount
+      - filteredUniqueTagCount
+      - totalTagInstanceCount
+      - filteredTagInstanceCount
+      - totalUniqueVariableNameCount
+      - filteredUniqueVariableNameCount
+      - totalUniqueVariableValueCount
+      - filteredUniqueVariableValueCount
+      properties:
+        totalPageCount:
+          type: integer
+          description: Total number of pages audited
+        filteredPageCount:
+          type: integer
+          description: Number of pages passing all applied filters
+        filteredUniqueTagCount:
+          type: integer
+          description: Number of unique tag vendors passing all applied filters
+        totalTagInstanceCount:
+          type: integer
+          description: Total number of tag requests discovered
+        filteredTagInstanceCount:
+          type: integer
+          description: Number of tag requests passing all applied filters
+        totalUniqueVariableNameCount:
+          type: integer
+          description: Total number of unique variable names across all tags
+        filteredUniqueVariableNameCount:
+          type: integer
+          description: Number of unique variable names across all tags passing all applied filters
+        totalUniqueVariableValueCount:
+          type: integer
+          description: Total number of unique variable names across all tags
+        filteredUniqueVariableValueCount:
+          type: integer
+          description: Number of unique variable names across all tags passing all applied filters
+    AuditRun_VariableInventory_UniqueVariableValuesDTO:
+      description: Variable Inventory - unique variable values list data
+      type: object
+      required:
+      - metadata
+      - variableValues
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        variableValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_UniqueVariableValuesItem'
+    AuditRun_VariableInventory_UniqueVariableValuesItem:
+      type: object
+      properties:
+        variableValue:
+          $ref: '#/components/schemas/VariableValue'
+        pageCount:
+          type: integer
+          description: Number of pages containing specific variable value and passing all filters
+        tagWithVariableValueCount:
+          type: integer
+          description: Number of tag requests containing this specific variable value and passing all filters
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
     AuditRun_VariableInventory_VariableItem:
       type: object
       required:
@@ -835,143 +830,150 @@ components:
         variableSetPageCount:
           type: integer
           description: Number of pages where variable is set
-    PageLoadTimeFilter:
-      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    PageFiltersTrait:
-      type: object
-      description: Common trait for page filters
-      properties:
-        pageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        finalPageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        pageTitle:
-          $ref: '#/components/schemas/PageTitleFilter'
-        initialPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        finalPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        combinedPageStatusCode:
-          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
-        pageLoadTime:
-          $ref: '#/components/schemas/PageLoadTimeFilter'
-        pageSize:
-          $ref: '#/components/schemas/PageSizeFilter'
-        redirectCount:
-          $ref: '#/components/schemas/PageRedirectCountFilter'
-        hasBrokenLinks:
-          type: boolean
-    LongIntegerRangeFilterTrait:
-      type: object
-      description: Common trait for long integer min max filter
-      properties:
-        min:
-          type: integer
-          format: int64
-          minimum: 0
-        max:
-          type: integer
-          format: int64
-    PageSizeFilter:
-      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
-    AuditRun_VariableInventory_VariableNotSetPagesDTO:
-      description: Tag Inventory pages list data
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
       type: object
       required:
-      - metadata
-      - pages
+      - pagination
       properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_VariableInventory_VariableNotSetPagesItem'
-    PageId:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    StringInclusionFilterTypeEnum:
       type: string
-      example: f9d32cc7cc2046d6decb145a80289287f5226323
-    AuditRunPageCommonColumnsWithFinalValuesTrait:
-      description: Trait for audit page with final URL and final status code
+      enum:
+      - contains
+      - not_contains
+    AuditRunPageTrait:
+      description: Common trait for audit page with mandatory page properties
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+    AuditRun_VariableInventory_TagItem:
       allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - $ref: '#/components/schemas/TagInfoTrait'
       - type: object
         properties:
-          finalPageUrl:
-            $ref: '#/components/schemas/PageUrl'
-          finalPageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    VariableName:
+          tagAccounts:
+            type: array
+            items:
+              $ref: '#/components/schemas/AuditRun_VariableInventory_TagAccountItem'
+    CombinedPageStatusCodeEnum:
       type: string
-      description: Variable name (key)
-    ItemRunTrendsItemTrait:
-      type: object
-      required:
-      - runId
-      - completedAt
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          $ref: '#/components/schemas/DateAndTime'
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    AuditRun_VariableInventory_VariableValuePageItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - tagWithVariableValueCount
+        properties:
+          tagWithVariableValueCount:
+            type: integer
+            default: Number of tag requests with the variable value
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    AuditRun_VariableInventory_PagesSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_load_time
+      - page_status_code
+      - final_page_status_code
+      - variable_count
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    TagCategoryName:
+      type: string
+      description: Name of a category of a tag
     VariableValue:
       type: string
       description: Variable value
+    AuditRun_VariableInventory_TagAccountItem:
+      type: object
+      properties:
+        tagAccount:
+          $ref: '#/components/schemas/TagAccount'
+        totalPageCount:
+          type: integer
+          description: Total number of pages
+        totalVariableCount:
+          type: integer
+          description: Total number of variables in tag account
     PageLoadTime:
       type: integer
       description: Time page took to load, in milliseconds
-    AuditRunPageCommonColumnsTrait:
-      description: Trait for audit page with common page properties
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
       allOf:
-      - $ref: '#/components/schemas/AuditRunPageTrait'
-      - type: object
-        required:
-        - pageLoadTime
-        - pageStatusCode
-        properties:
-          pageLoadTime:
-            $ref: '#/components/schemas/PageLoadTime'
-          pageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    AuditRun_VariableInventory_TagAccountRequestDTO:
-      description: Request body for Variable Inventory report
-      required:
-      - tagId
-      - tagAccount
-      allOf:
-      - $ref: '#/components/schemas/PageFiltersTrait'
-      - type: object
-        properties:
-          tagId:
-            $ref: '#/components/schemas/TagId'
-          tagAccount:
-            $ref: '#/components/schemas/TagAccount'
-    IntegerFilter:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRun_VariableInventory_TrendsDTO:
+      description: Variable Inventory trends overview (a.k.a. trendlines a.k.a. sparklines)
       type: object
       required:
-      - filterType
-      - negated
+      - runs
       properties:
-        filterType:
-          $ref: '#/components/schemas/IntegerFilterTypeEnum'
-        negated:
-          type: boolean
-          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
-      discriminator:
-        propertyName: filterType
-        mapping:
-          specific: '#/components/schemas/SpecificIntegerFilter'
-          range: '#/components/schemas/IntegerRangeFilter'
+        runs:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/AuditRun_VariableInventory_TrendsItem'
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
   parameters:
-    AuditRun_VariableInventory_PagesSortParam:
+    SortDescendingParam:
+      name: sortDesc
       in: query
-      name: sortBy
+      description: Controls sorting order
       required: false
       schema:
-        $ref: '#/components/schemas/AuditRun_VariableInventory_PagesSortColumn'
+        type: boolean
+        default: false
     pageParam:
       name: page
       in: query
@@ -981,59 +983,6 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
-    AuditRun_TagAccountVariableValueList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 100
-        minimum: 100
-    AuditRun_TagAccountList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 100
-        minimum: 100
-    AuditRun_PagesList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 50
-        minimum: 50
-    AuditRun_Trends_DaysParam:
-      name: days
-      in: query
-      required: true
-      schema:
-        type: integer
-        description: Number of days to get trend values for, relative to current time
-        maximum: 390
-        minimum: 1
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
     RunId:
       name: runId
       in: path
@@ -1043,15 +992,66 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    AuditRun_VariableInventory_PagesSortParam:
+      in: query
+      name: sortBy
+      required: false
+      schema:
+        $ref: '#/components/schemas/AuditRun_VariableInventory_PagesSortColumn'
+    AuditRun_TagAccountVariableValueList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+    AuditRun_TagAccountList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    AuditRun_Trends_DaysParam:
+      name: days
+      in: query
+      required: true
+      schema:
+        type: integer
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    NotFound:
+      description: The object you are looking is not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

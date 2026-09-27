@@ -182,7 +182,55 @@ paths:
       - API_Key: []
       description: POST /v3/email-inboxes/{emailInboxId}/messages/statuses
 components:
+  parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    EmailInboxId:
+      name: emailInboxId
+      in: path
+      required: true
+      description: Unique identification number for email inbox
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/EmailInboxId'
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    PageSize:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
+    QueryParamPageSize:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
   schemas:
+    EmailInboxLinkExclusionFilters:
+      description: A regex to be used to exclude links in email scans.
+      type: string
     EmailInboxLibraryRequestDTO:
       type: object
       properties:
@@ -208,14 +256,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserId'
-    AuditId:
+    LabelId:
       type: integer
       format: int64
-      example: 107239
-    UserId:
-      type: integer
-      description: ID of a user
-      example: 123
+      description: Label identifier
+      example: 223
+      minimum: 1
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    EmailInboxSubscribersDTO:
+      type: object
+      properties:
+        onReceived:
+          type: array
+          items:
+            type: string
+            description: Email address subscribers to be alerted on email message received.
+        onProcessed:
+          type: array
+          items:
+            type: string
+            description: Email address subscribers to be alerted on email message processed.
     ReceivedEmailMessageDTO:
       type: object
       required:
@@ -230,6 +301,72 @@ components:
             allOf:
             - $ref: '#/components/schemas/ReceivedEmailMessageBaseDTO'
             - $ref: '#/components/schemas/ReceivedEmailMessageEntryDTO'
+    EmailInboxConfigurationDTO:
+      type: object
+      required:
+      - auditId
+      - auditName
+      - auditLastRunAt
+      - auditLabels
+      properties:
+        auditId:
+          $ref: '#/components/schemas/AuditId'
+        auditName:
+          type: string
+          description: Name of audit/WJ etc
+        auditLastRunAt:
+          $ref: '#/components/schemas/DateAndTime'
+        auditLabels:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/LabelId'
+    ReceivedEmailMessageAuditInfo:
+      type: object
+      required:
+      - auditName
+      - auditId
+      - runId
+      properties:
+        auditName:
+          type: string
+          example: Audit Name
+        auditId:
+          type: integer
+          example: 123
+        runId:
+          type: integer
+          example: 123
+        isCompleted:
+          type: boolean
+          description: TRUE if the audit run is completed, otherwise FALSE
+    EmailInboxLibraryResponseDTO:
+      type: object
+      required:
+      - metadata
+      - emailInboxes
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        emailInboxes:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailInboxLibraryDTO'
+    EmailInboxLibrarySortByEnum:
+      type: string
+      default: name
+      enum:
+      - name
+      - emailAddress
+      - messagesReceived
+      - lastMessageReceived
+      - testScenariosCount
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    EmailInboxId:
+      type: integer
     EmailInboxResponseDTO:
       type: object
       required:
@@ -267,36 +404,30 @@ components:
             $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
         omitSocialLinks:
           type: boolean
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    ErrorModel:
+    PaginationMetadata:
       type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
       properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
     ReceivedEmailMessageBaseDTO:
       type: object
       required:
@@ -333,37 +464,6 @@ components:
           - ABORTED
           - UNKNOWN
           example: NO_AUDITS_ASSIGNED
-    ReceivedEmailMessageAuditInfo:
-      type: object
-      required:
-      - auditName
-      - auditId
-      - runId
-      properties:
-        auditName:
-          type: string
-          example: Audit Name
-        auditId:
-          type: integer
-          example: 123
-        runId:
-          type: integer
-          example: 123
-        isCompleted:
-          type: boolean
-          description: TRUE if the audit run is completed, otherwise FALSE
-    EmailInboxLibraryResponseDTO:
-      type: object
-      required:
-      - metadata
-      - emailInboxes
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        emailInboxes:
-          type: array
-          items:
-            $ref: '#/components/schemas/EmailInboxLibraryDTO'
     CommonIterableResponseMetadata:
       description: Common metadata for iterable
       type: object
@@ -372,46 +472,6 @@ components:
       properties:
         pagination:
           $ref: '#/components/schemas/PaginationMetadata'
-    EmailInboxLibraryDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
-        labelIds:
-          description: The ids of the labels associated to the Email Inbox
-          type: array
-          uniqueItems: true
-          items:
-            $ref: '#/components/schemas/LabelId'
-        name:
-          type: string
-          example: Christmas Marketing Campaign
-        emailAddress:
-          description: The email address that has been assigned to the inbox
-          type: string
-          example: scanTest+<8^[a-z0-9]>@email.observepoint.com
-        notes:
-          type: string
-        messagesReceived:
-          description: The number of messages received by the Email Inbox
-          type: integer
-          default: 0
-        lastMessageReceived:
-          $ref: '#/components/schemas/DateAndTime'
-        testScenariosCount:
-          description: The number of test scenarios performed against the email landing pages.
-          type: integer
-    EmailInboxLinkExclusionFilters:
-      description: A regex to be used to exclude links in email scans.
-      type: string
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
     ReceivedEmailMessageEntryDTO:
       type: object
       required:
@@ -447,126 +507,60 @@ components:
           type: string
           description: Provides a smaller resolution screenshot than the screenshot property.
           example: /v2/screenshots?token=a.b.c
-    PaginationMetadata:
+    EmailInboxLibraryDTO:
       type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
       properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
+        id:
           type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    EmailInboxLibrarySortByEnum:
-      type: string
-      default: name
-      enum:
-      - name
-      - emailAddress
-      - messagesReceived
-      - lastMessageReceived
-      - testScenariosCount
-    EmailInboxConfigurationDTO:
-      type: object
-      required:
-      - auditId
-      - auditName
-      - auditLastRunAt
-      - auditLabels
-      properties:
-        auditId:
-          $ref: '#/components/schemas/AuditId'
-        auditName:
-          type: string
-          description: Name of audit/WJ etc
-        auditLastRunAt:
-          $ref: '#/components/schemas/DateAndTime'
-        auditLabels:
+          format: int64
+          example: 10
+        labelIds:
+          description: The ids of the labels associated to the Email Inbox
           type: array
-          minItems: 0
+          uniqueItems: true
           items:
             $ref: '#/components/schemas/LabelId'
-    EmailInboxId:
+        name:
+          type: string
+          example: Christmas Marketing Campaign
+        emailAddress:
+          description: The email address that has been assigned to the inbox
+          type: string
+          example: scanTest+<8^[a-z0-9]>@email.observepoint.com
+        notes:
+          type: string
+        messagesReceived:
+          description: The number of messages received by the Email Inbox
+          type: integer
+          default: 0
+        lastMessageReceived:
+          $ref: '#/components/schemas/DateAndTime'
+        testScenariosCount:
+          description: The number of test scenarios performed against the email landing pages.
+          type: integer
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    UserId:
       type: integer
-    EmailInboxSubscribersDTO:
-      type: object
-      properties:
-        onReceived:
-          type: array
-          items:
-            type: string
-            description: Email address subscribers to be alerted on email message received.
-        onProcessed:
-          type: array
-          items:
-            type: string
-            description: Email address subscribers to be alerted on email message processed.
-  parameters:
-    PageParam:
-      in: query
-      name: page
-      description: Number of results page of an endpoint with paginated results
-      required: false
-      schema:
-        type: integer
-        default: 0
-        minimum: 0
-    QueryParamPageSize:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 50
-        minimum: 50
-    EmailInboxId:
-      name: emailInboxId
-      in: path
-      required: true
-      description: Unique identification number for email inbox
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/EmailInboxId'
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    PageSize:
-      in: query
-      name: pageSize
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 100
-        minimum: 100
+      description: ID of a user
+      example: 123
   responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     Forbidden:
       description: You don't have enough rights to access this resource
       content:
@@ -575,6 +569,12 @@ components:
             $ref: '#/components/schemas/ErrorModel'
     NotFound:
       description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

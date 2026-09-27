@@ -950,70 +950,30 @@ paths:
       - Manual Journeys
 components:
   schemas:
-    Tag:
+    RequestLogProperty:
       type: object
       required:
-      - category
-      - duplicateScoring
-      - icon
+      - propName
+      - propValue
+      properties:
+        propName:
+          type: string
+        propValue:
+          type: string
+    TagType:
+      type: object
+    TagCategory:
+      type: object
+      required:
       - id
       - name
       properties:
-        category:
-          $ref: '#/components/schemas/TagCategory'
-        duplicateScoring:
-          type: boolean
-        icon:
-          description: Tag icon URI
-          type: string
         id:
           format: int32
           type: integer
         name:
           type: string
-        numSignatures:
-          type: number
-        numVariables:
-          type: number
-        type:
-          $ref: '#/components/schemas/TagType'
-        vendor:
-          $ref: '#/components/schemas/TagVendor'
-      description: Tag data
-    TagType:
-      type: object
-    Value:
-      type: object
-    InitializedJourney:
-      type: object
-      required:
-      - journeyId
-      - name
-      - proxyInfo
-      - runId
-      properties:
-        certificate:
-          $ref: '#/components/schemas/Certificate'
-        journeyId:
-          format: int32
-          type: integer
-        name:
-          type: string
-        proxyInfo:
-          $ref: '#/components/schemas/ProxyInfo'
-        runId:
-          format: int32
-          type: integer
-    SeqValue:
-      type: object
-      required:
-      - empty
-      - traversableAgain
-      properties:
-        empty:
-          type: boolean
-        traversableAgain:
-          type: boolean
+      description: Tag category data
     SeqString:
       type: object
       required:
@@ -1024,142 +984,6 @@ components:
           type: boolean
         traversableAgain:
           type: boolean
-    Certificate:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-    RuleResultOverview:
-      type: object
-      required:
-      - broken
-      - failed
-      - notApplied
-      - passed
-      properties:
-        broken:
-          format: int32
-          type: integer
-        failed:
-          format: int32
-          type: integer
-        notApplied:
-          format: int32
-          type: integer
-        passed:
-          format: int32
-          type: integer
-    RequestLog:
-      type: object
-      required:
-      - enabledSsl
-      - id
-      - journeyTagIds
-      - requestInfo
-      - requestLog
-      - responseInfo
-      - stepId
-      - timestamp
-      properties:
-        enabledSsl:
-          type: boolean
-        id:
-          type: string
-        journeyTagIds:
-          items:
-            type: string
-          type: array
-        requestInfo:
-          items:
-            $ref: '#/components/schemas/RequestLogProperty'
-          type: array
-        requestLog:
-          type: string
-        responseInfo:
-          items:
-            $ref: '#/components/schemas/RequestLogProperty'
-          type: array
-        stepId:
-          format: int32
-          type: integer
-        timestamp:
-          format: int64
-          type: integer
-    JourneyRequest:
-      type: object
-      required:
-      - emails
-      - folderId
-      - name
-      - osOfDevice
-      - versionOfOs
-      properties:
-        emails:
-          items:
-            type: string
-          type: array
-        folderId:
-          format: int32
-          type: integer
-        journeyType:
-          format: int32
-          type: integer
-        name:
-          type: string
-        osOfDevice:
-          type: string
-        versionOfOs:
-          type: string
-    ProxyInfo:
-      type: object
-      required:
-      - interface
-      - port
-      properties:
-        authorization:
-          $ref: '#/components/schemas/Authorization'
-        interface:
-          type: string
-        port:
-          format: int32
-          type: integer
-    Label:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-    RunRuleDetails:
-      type: object
-      required:
-      - actionRuleOverview
-      - globalRuleOverview
-      properties:
-        actionRuleOverview:
-          $ref: '#/components/schemas/RuleResultOverview'
-        globalRuleOverview:
-          $ref: '#/components/schemas/RuleResultOverview'
-    TagVendor:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
     HarJourneyRunCreateRequest:
       type: object
       required:
@@ -1174,6 +998,65 @@ components:
         webhookUrl:
           type: string
       description: Model for creation of live connect run based on har files
+    Action:
+      type: object
+      required:
+      - actionType
+      - id
+      - name
+      - runId
+      - sequence
+      properties:
+        actionType:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        note:
+          type: string
+        runId:
+          format: int32
+          type: integer
+        sequence:
+          format: int32
+          type: integer
+    Value:
+      type: object
+    Certificate:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    Pagination:
+      type: object
+      required:
+      - limit
+      - offset
+      properties:
+        limit:
+          format: int32
+          type: integer
+        offset:
+          format: int32
+          type: integer
+    Authorization:
+      type: object
+      required:
+      - login
+      - password
+      properties:
+        login:
+          type: string
+        password:
+          type: string
     JourneyRun:
       type: object
       required:
@@ -1221,15 +1104,29 @@ components:
           $ref: '#/components/schemas/Value'
         versionOfOs:
           type: string
-    UploadedHarFile:
+    SeqValue:
       type: object
       required:
-      - s3Key
+      - empty
+      - traversableAgain
       properties:
-        name:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    ProxyInfo:
+      type: object
+      required:
+      - interface
+      - port
+      properties:
+        authorization:
+          $ref: '#/components/schemas/Authorization'
+        interface:
           type: string
-        s3Key:
-          type: string
+        port:
+          format: int32
+          type: integer
     Journey:
       type: object
       required:
@@ -1275,15 +1172,16 @@ components:
           type: integer
         versionOfOs:
           type: string
-    Authorization:
+    Label:
       type: object
       required:
-      - login
-      - password
+      - id
+      - name
       properties:
-        login:
-          type: string
-        password:
+        id:
+          format: int32
+          type: integer
+        name:
           type: string
     ItemIsRunningApiError:
       type: object
@@ -1300,42 +1198,72 @@ components:
         runId:
           format: int64
           type: integer
-    RequestLogProperty:
+    InitializedJourney:
       type: object
       required:
-      - propName
-      - propValue
-      properties:
-        propName:
-          type: string
-        propValue:
-          type: string
-    Action:
-      type: object
-      required:
-      - actionType
-      - id
+      - journeyId
       - name
+      - proxyInfo
       - runId
-      - sequence
       properties:
-        actionType:
-          format: int32
-          type: integer
-        id:
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        journeyId:
           format: int32
           type: integer
         name:
           type: string
-        note:
-          type: string
+        proxyInfo:
+          $ref: '#/components/schemas/ProxyInfo'
         runId:
           format: int32
           type: integer
-        sequence:
+    RuleResultOverview:
+      type: object
+      required:
+      - broken
+      - failed
+      - notApplied
+      - passed
+      properties:
+        broken:
           format: int32
           type: integer
-    TagCategory:
+        failed:
+          format: int32
+          type: integer
+        notApplied:
+          format: int32
+          type: integer
+        passed:
+          format: int32
+          type: integer
+    JourneyRequest:
+      type: object
+      required:
+      - emails
+      - folderId
+      - name
+      - osOfDevice
+      - versionOfOs
+      properties:
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int32
+          type: integer
+        journeyType:
+          format: int32
+          type: integer
+        name:
+          type: string
+        osOfDevice:
+          type: string
+        versionOfOs:
+          type: string
+    TagVendor:
       type: object
       required:
       - id
@@ -1346,27 +1274,104 @@ components:
           type: integer
         name:
           type: string
-      description: Tag category data
-    Pagination:
+    Tag:
       type: object
       required:
-      - limit
-      - offset
+      - category
+      - duplicateScoring
+      - icon
+      - id
+      - name
       properties:
-        limit:
+        category:
+          $ref: '#/components/schemas/TagCategory'
+        duplicateScoring:
+          type: boolean
+        icon:
+          description: Tag icon URI
+          type: string
+        id:
           format: int32
           type: integer
-        offset:
-          format: int32
-          type: integer
+        name:
+          type: string
+        numSignatures:
+          type: number
+        numVariables:
+          type: number
+        type:
+          $ref: '#/components/schemas/TagType'
+        vendor:
+          $ref: '#/components/schemas/TagVendor'
+      description: Tag data
     Function1RequestContextFutureRouteResult:
       type: object
+    UploadedHarFile:
+      type: object
+      required:
+      - s3Key
+      properties:
+        name:
+          type: string
+        s3Key:
+          type: string
+    RunRuleDetails:
+      type: object
+      required:
+      - actionRuleOverview
+      - globalRuleOverview
+      properties:
+        actionRuleOverview:
+          $ref: '#/components/schemas/RuleResultOverview'
+        globalRuleOverview:
+          $ref: '#/components/schemas/RuleResultOverview'
+    RequestLog:
+      type: object
+      required:
+      - enabledSsl
+      - id
+      - journeyTagIds
+      - requestInfo
+      - requestLog
+      - responseInfo
+      - stepId
+      - timestamp
+      properties:
+        enabledSsl:
+          type: boolean
+        id:
+          type: string
+        journeyTagIds:
+          items:
+            type: string
+          type: array
+        requestInfo:
+          items:
+            $ref: '#/components/schemas/RequestLogProperty'
+          type: array
+        requestLog:
+          type: string
+        responseInfo:
+          items:
+            $ref: '#/components/schemas/RequestLogProperty'
+          type: array
+        stepId:
+          format: int32
+          type: integer
+        timestamp:
+          format: int64
+          type: integer
   requestBodies:
     Pagination:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Pagination'
+    SeqValue:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SeqValue'
     LabelArray:
       content:
         application/json:
@@ -1374,11 +1379,6 @@ components:
             items:
               $ref: '#/components/schemas/Label'
             type: array
-    SeqValue:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SeqValue'
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

@@ -188,113 +188,15 @@ paths:
       description: POST /v3/data-sources/target-items/{itemType}/search
 components:
   schemas:
-    FolderDomainFilter:
+    DataSourcesTargetItemsSearchResponse:
       type: object
-      description: non-empty array of folders with domains (subfolders), items from which will be included in response
-      required:
-      - folders
-      properties:
-        folders:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/FolderDomainFilterItem'
-    DataSourceItemTypeCap:
-      description: Type of data source item.
-      type: string
-      enum:
-      - AUDIT
-      - WEB_JOURNEY
-    DataSource:
-      type: object
-      required:
-      - itemType
-      - itemId
-      - labels
-      properties:
-        itemType:
-          $ref: '#/components/schemas/DataSourceItemType'
-        itemId:
-          type: integer
-        itemName:
-          type: string
-        lastCompletedRun:
-          $ref: '#/components/schemas/AuditRun'
-        consentCategoryType:
-          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
-        labels:
-          type: array
-          items:
-            $ref: '#/components/schemas/Label'
-    DataSourcesResult:
-      type: object
-      required:
-      - metadata
-      - dataSources
       properties:
         metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        dataSources:
+          $ref: '#/components/schemas/PaginationMetadata'
+        items:
           type: array
           items:
-            $ref: '#/components/schemas/DataSource'
-    AssignedLabel:
-      type: object
-      required:
-      - id
-      properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-    ConsentCategory_TypeEnum:
-      type: string
-      enum:
-      - approved
-      - unapproved
-    DataSourceTargetItemSortByEnum:
-      type: string
-      default: ITEM_NAME
-      enum:
-      - ITEM_NAME
-      - RUN_DATE
-    FolderDomainFilterItem:
-      type: object
-      required:
-      - folderId
-      properties:
-        folderId:
-          $ref: '#/components/schemas/FolderId'
-        domains:
-          type: array
-          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
-          items:
-            $ref: '#/components/schemas/DomainId'
-    Label:
-      description: DTO for Labels
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-        name:
-          type: string
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
+            $ref: '#/components/schemas/DataSourcesTargetItem'
     DataSourceSortByEnum:
       type: string
       default: lastRun
@@ -302,6 +204,12 @@ components:
       - itemName
       - itemType
       - lastRun
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
     DataSourcesTargetItem:
       type: object
       properties:
@@ -325,19 +233,79 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AssignedLabel'
+    DataSource:
+      type: object
+      required:
+      - itemType
+      - itemId
+      - labels
+      properties:
+        itemType:
+          $ref: '#/components/schemas/DataSourceItemType'
+        itemId:
+          type: integer
+        itemName:
+          type: string
+        lastCompletedRun:
+          $ref: '#/components/schemas/AuditRun'
+        consentCategoryType:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+    ConsentCategory_TypeEnum:
+      type: string
+      enum:
+      - approved
+      - unapproved
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun:
+      type: object
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          type: string
+          format: date-time
     DomainId:
       type: integer
       format: int32
       description: ID of a domain
       example: 123
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
+    DataSourceItemTypeCap:
+      description: Type of data source item.
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    FolderDomainFilterItem:
       type: object
       required:
-      - pagination
+      - folderId
       properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
+        folderId:
+          $ref: '#/components/schemas/FolderId'
+        domains:
+          type: array
+          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
+          items:
+            $ref: '#/components/schemas/DomainId'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
     DataSourcesTargetItemsSearchRequest:
       type: object
       description: Filters supported by Unified Data Sources Target Items Search.
@@ -365,34 +333,6 @@ components:
             $ref: '#/components/schemas/LabelId'
         folders:
           $ref: '#/components/schemas/FolderDomainFilter'
-    AuditRun:
-      type: object
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          type: string
-          format: date-time
-    FolderId:
-      type: integer
-      format: int32
-      description: ID of a folder
-      example: 123
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
-    DataSourcesTargetItemsSearchResponse:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/PaginationMetadata'
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/DataSourcesTargetItem'
     PaginationMetadata:
       type: object
       required:
@@ -417,13 +357,81 @@ components:
         currentPageNumber:
           description: Current page number/ordinal
           type: integer
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    DataSourcesResult:
+      type: object
+      required:
+      - metadata
+      - dataSources
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        dataSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataSource'
+    AssignedLabel:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+    FolderDomainFilter:
+      type: object
+      description: non-empty array of folders with domains (subfolders), items from which will be included in response
+      required:
+      - folders
+      properties:
+        folders:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/FolderDomainFilterItem'
+    DataSourceTargetItemSortByEnum:
+      type: string
+      default: ITEM_NAME
+      enum:
+      - ITEM_NAME
+      - RUN_DATE
     DataSourceItemType:
       description: Type of data source item.
       type: string
       enum:
       - audit
       - web-journey
+    FolderId:
+      type: integer
+      format: int32
+      description: ID of a folder
+      example: 123
   parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
     PageParam:
       in: query
       name: page
@@ -433,20 +441,6 @@ components:
         type: integer
         default: 0
         minimum: 0
-    DataSourceTargetItemSortByParam:
-      name: sortBy
-      in: query
-      required: false
-      schema:
-        $ref: '#/components/schemas/DataSourceTargetItemSortByEnum'
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
     PageSize:
       in: query
       name: pageSize
@@ -456,15 +450,21 @@ components:
         maximum: 1000
         default: 100
         minimum: 100
+    DataSourceTargetItemSortByParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/DataSourceTargetItemSortByEnum'
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    Forbidden:
+      description: You don't have enough rights to access this resource
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:

@@ -625,6 +625,41 @@ paths:
       - Audits
 components:
   schemas:
+    UserAgent:
+      type: object
+      required:
+      - label
+      - name
+      properties:
+        label:
+          type: string
+        name:
+          type: string
+    FeatureWhichCanBeSupportedByAuditRun:
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: string
+    RuleResultTag:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    DurationFieldType:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
     PageRuleResultTag:
       type: object
       required:
@@ -655,128 +690,88 @@ components:
           items:
             $ref: '#/components/schemas/TagVariableResult'
           type: array
-    RuleDescription:
+    PageRuleResultsSummary:
       type: object
       required:
-      - accountId
-      - checkTimes
-      - createdAt
-      - id
-      - matchAllFilters
-      - name
-      - updatedAt
+      - totalNoOfRulesApplied
+      - totalNoOfRulesFailed
+      - totalNoOfRulesNotApplied
+      - totalNoOfRulesPassed
       properties:
-        accountId:
+        totalNoOfRulesApplied:
           format: int32
           type: integer
-        checkTimes:
+        totalNoOfRulesFailed:
           format: int32
           type: integer
-        createdAt:
-          format: date-time
-          type: string
+        totalNoOfRulesNotApplied:
+          format: int32
+          type: integer
+        totalNoOfRulesPassed:
+          format: int32
+          type: integer
+    TokenType:
+      type: object
+    WritableItemSchedule:
+      type: object
+      required:
+      - dtStart
+      - isPaused
+      - recurrenceRule
+      - tzId
+      properties:
+        dtStart:
+          $ref: '#/components/schemas/LocalDateTime'
         id:
-          format: int32
-          type: integer
-        matchAllFilters:
+          type: number
+        isPaused:
           type: boolean
-        name:
+        recurrenceRule:
           type: string
-        recipients:
+        tzId:
+          type: string
+    SeqObject:
+      type: object
+      required:
+      - empty
+      - traversableAgain
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    AuditFilters:
+      type: object
+      required:
+      - exclude
+      - include
+      properties:
+        exclude:
           items:
             type: string
           type: array
-        updatedAt:
-          format: date-time
-          type: string
-    TagVariableResult:
-      type: object
-      required:
-      - expectedValues
-      - snapshotId
-      properties:
-        actualValue:
-          type: string
-        expectedParamName:
-          type: string
-        expectedValues:
+        include:
           items:
-            type: string
+            $ref: '#/components/schemas/IncludeFilter'
           type: array
-          uniqueItems: true
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-        name:
-          type: string
-        resultType:
-          enum:
-          - Passed
-          - MissingVariable
-          - BadValue
-          type: string
-        selectorType:
-          enum:
-          - String
-          - UrlParameter
-          - DataLayer
-          - Tag
-          - FinalUrlParameter
-          type: string
-        snapshotId:
-          format: int64
-          type: integer
-        variableTag:
-          $ref: '#/components/schemas/RuleResultTag'
-    DurationField:
+    IncludeFilter:
       type: object
       required:
-      - name
-      - precise
-      - supported
-      - type
-      - unitMillis
-      properties:
-        name:
-          type: string
-        precise:
-          type: boolean
-        supported:
-          type: boolean
-        type:
-          $ref: '#/components/schemas/DurationFieldType'
-        unitMillis:
-          format: int64
-          type: integer
-    FeatureWhichCanBeSupportedByAuditRun:
-      type: object
-      required:
+      - includeLimit
       - value
       properties:
+        includeLimit:
+          format: int32
+          type: integer
         value:
           type: string
-    Value:
-      type: object
-    AuditRunWithRuleFailurePresence:
+    AuditRunSwaggerReference:
       type: object
       required:
       - adobeAuditor
       - id
-      - isRuleFailurePresent
       - limit
-      - score
       - silentMode
-      - started
-      - supportedFeatures
       - taggedUrl
       - totalUrl
       - userId
@@ -787,18 +782,14 @@ components:
         completed:
           format: date-time
           type: string
-        completedAt:
-          format: date-time
-          type: string
         id:
           format: int32
           type: integer
-        isRuleFailurePresent:
-          type: boolean
         limit:
           format: int32
           type: integer
         score:
+          description: Deprecated. Use `/v3/web-audits/{auditId}/runs/{runId}/scores` instead
           format: int32
           type: integer
         silentMode:
@@ -807,8 +798,9 @@ components:
           format: date-time
           type: string
         supportedFeatures:
+          example: '[TagLoadtimeReport, ConsoleLogsReport]'
           items:
-            $ref: '#/components/schemas/FeatureWhichCanBeSupportedByAuditRun'
+            type: string
           type: array
         taggedUrl:
           format: int32
@@ -822,137 +814,37 @@ components:
         webAuditId:
           format: int32
           type: integer
-    PageRuleResults:
+    SnowflakeUsage:
       type: object
       required:
-      - results
-      - summary
+      - useForAdobeAuditor
+      - useForAppJourneyRuleResults
+      - useForAppJourneys
+      - useForAudits
+      - useForLiveConnect
+      - useForLiveConnectRuleResults
+      - useForWebJourneyRuleResults
+      - useForWebJourneys
+      - used
       properties:
-        results:
-          items:
-            $ref: '#/components/schemas/PageRuleResult'
-          type: array
-        summary:
-          $ref: '#/components/schemas/PageRuleResultsSummary'
-    CustomHttpHeaderAssignment:
-      type: object
-      required:
-      - groupId
-      - isApplyToAll
-      properties:
-        groupId:
-          format: int64
-          type: integer
-        isApplyToAll:
+        useForAdobeAuditor:
           type: boolean
-    CheckTimesResult:
-      type: object
-      required:
-      - actual
-      - expected
-      properties:
-        actual:
-          format: int32
-          type: integer
-        expected:
-          format: int32
-          type: integer
-    DurationFieldType:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-    AuditOptions:
-      type: object
-      required:
-      - fireTags
-      - loadFlash
-      - location
-      - requestRate
-      - stripQueryString
-      - userAgent
-      properties:
-        adobeAuditor:
+        useForAppJourneyRuleResults:
           type: boolean
-        blockThirdPartyCookies:
+        useForAppJourneys:
           type: boolean
-        browserHeight:
-          format: int32
-          type: integer
-        browserWidth:
-          format: int32
-          type: integer
-        customHttpHeaders:
-          items:
-            $ref: '#/components/schemas/CustomHttpHeaderAssignment'
-          type: array
-        customProxy:
-          type: string
-        discoverSitemap:
+        useForAudits:
           type: boolean
-        fireTags:
+        useForLiveConnect:
           type: boolean
-        gpcEnabled:
+        useForLiveConnectRuleResults:
           type: boolean
-        loadFlash:
+        useForWebJourneyRuleResults:
           type: boolean
-        location:
-          type: string
-        remoteFileMapConfig:
-          items:
-            $ref: '#/components/schemas/RemoteFileMapping'
-          type: array
-        requestRate:
-          format: int32
-          type: integer
-        sameUrlRunId:
-          type: number
-        stripQueryString:
+        useForWebJourneys:
           type: boolean
-        userAgent:
-          type: string
-        vpnEnabled:
+        used:
           type: boolean
-        webHookUrl:
-          type: string
-    AuthToken:
-      type: object
-      required:
-      - created
-      - decryptedToken
-      - token
-      - tokenType
-      - userId
-      properties:
-        created:
-          type: string
-        decryptedToken:
-          type: string
-        token:
-          type: string
-        tokenType:
-          $ref: '#/components/schemas/TokenType'
-        userId:
-          type: string
-    Location:
-      type: object
-      required:
-      - countryCode
-      - id
-      - label
-      - name
-      properties:
-        countryCode:
-          type: string
-        id:
-          format: int32
-          type: integer
-        label:
-          type: string
-        name:
-          type: string
     DateTimeField:
       type: object
       required:
@@ -986,197 +878,6 @@ components:
           type: boolean
         type:
           $ref: '#/components/schemas/DateTimeFieldType'
-    RuleResultTag:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-    RemoteFileMapping:
-      type: object
-      required:
-      - matchType
-      - matchValue
-      properties:
-        createdAt:
-          format: date-time
-          type: string
-        createdBy:
-          format: int32
-          type: integer
-        fileId:
-          format: int32
-          type: integer
-        fileUrl:
-          type: string
-        id:
-          format: int32
-          type: integer
-        matchType:
-          enum:
-          - '[equals'
-          - regex]
-          type: string
-        matchValue:
-          type: string
-        name:
-          type: string
-        updatedAt:
-          format: date-time
-          type: string
-        updatedBy:
-          format: int32
-          type: integer
-    Label:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-    SeqObject:
-      type: object
-      required:
-      - empty
-      - traversableAgain
-      properties:
-        empty:
-          type: boolean
-        traversableAgain:
-          type: boolean
-    AccountCapabilities:
-      type: object
-      required:
-      - customProxySupport
-      - strongPasswordPolicy
-      - vpnSupport
-      properties:
-        customProxySupport:
-          type: boolean
-        strongPasswordPolicy:
-          type: boolean
-        vpnSupport:
-          type: boolean
-    LocalDateTime:
-      type: object
-      required:
-      - centuryOfEra
-      - chronology
-      - dayOfMonth
-      - dayOfWeek
-      - dayOfYear
-      - era
-      - fieldTypes
-      - fields
-      - hourOfDay
-      - millisOfDay
-      - millisOfSecond
-      - minuteOfHour
-      - monthOfYear
-      - secondOfMinute
-      - values
-      - weekOfWeekyear
-      - weekyear
-      - year
-      - yearOfCentury
-      - yearOfEra
-      properties:
-        centuryOfEra:
-          format: int32
-          type: integer
-        chronology:
-          $ref: '#/components/schemas/Chronology'
-        dayOfMonth:
-          format: int32
-          type: integer
-        dayOfWeek:
-          format: int32
-          type: integer
-        dayOfYear:
-          format: int32
-          type: integer
-        era:
-          format: int32
-          type: integer
-        fieldTypes:
-          items:
-            $ref: '#/components/schemas/DateTimeFieldType'
-          type: array
-        fields:
-          items:
-            $ref: '#/components/schemas/DateTimeField'
-          type: array
-        hourOfDay:
-          format: int32
-          type: integer
-        millisOfDay:
-          format: int32
-          type: integer
-        millisOfSecond:
-          format: int32
-          type: integer
-        minuteOfHour:
-          format: int32
-          type: integer
-        monthOfYear:
-          format: int32
-          type: integer
-        secondOfMinute:
-          format: int32
-          type: integer
-        values:
-          items:
-            format: int32
-            type: integer
-          type: array
-        weekOfWeekyear:
-          format: int32
-          type: integer
-        weekyear:
-          format: int32
-          type: integer
-        year:
-          format: int32
-          type: integer
-        yearOfCentury:
-          format: int32
-          type: integer
-        yearOfEra:
-          format: int32
-          type: integer
-    IncludeFilter:
-      type: object
-      required:
-      - includeLimit
-      - value
-      properties:
-        includeLimit:
-          format: int32
-          type: integer
-        value:
-          type: string
-    DateTimeFieldType:
-      type: object
-      required:
-      - durationType
-      - name
-      - rangeDurationType
-      properties:
-        durationType:
-          $ref: '#/components/schemas/DurationFieldType'
-        name:
-          type: string
-        rangeDurationType:
-          $ref: '#/components/schemas/DurationFieldType'
     UserContext:
       type: object
       required:
@@ -1270,6 +971,163 @@ components:
           $ref: '#/components/schemas/DateTimeZone'
         tokenType:
           $ref: '#/components/schemas/TokenType'
+    Permissions:
+      type: object
+      required:
+      - intValue
+      - stringValue
+      properties:
+        intValue:
+          format: int32
+          type: integer
+        stringValue:
+          type: string
+    DateTimeZone:
+      type: object
+      required:
+      - fixed
+      - id
+      properties:
+        fixed:
+          type: boolean
+        id:
+          type: string
+    AuditRunWithRuleFailurePresence:
+      type: object
+      required:
+      - adobeAuditor
+      - id
+      - isRuleFailurePresent
+      - limit
+      - score
+      - silentMode
+      - started
+      - supportedFeatures
+      - taggedUrl
+      - totalUrl
+      - userId
+      - webAuditId
+      properties:
+        adobeAuditor:
+          type: boolean
+        completed:
+          format: date-time
+          type: string
+        completedAt:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        isRuleFailurePresent:
+          type: boolean
+        limit:
+          format: int32
+          type: integer
+        score:
+          format: int32
+          type: integer
+        silentMode:
+          type: boolean
+        started:
+          format: date-time
+          type: string
+        supportedFeatures:
+          items:
+            $ref: '#/components/schemas/FeatureWhichCanBeSupportedByAuditRun'
+          type: array
+        taggedUrl:
+          format: int32
+          type: integer
+        totalUrl:
+          format: int32
+          type: integer
+        userId:
+          format: int32
+          type: integer
+        webAuditId:
+          format: int32
+          type: integer
+    CustomHttpHeaderAssignment:
+      type: object
+      required:
+      - groupId
+      - isApplyToAll
+      properties:
+        groupId:
+          format: int64
+          type: integer
+        isApplyToAll:
+          type: boolean
+    RemoteFileMapping:
+      type: object
+      required:
+      - matchType
+      - matchValue
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        createdBy:
+          format: int32
+          type: integer
+        fileId:
+          format: int32
+          type: integer
+        fileUrl:
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchType:
+          enum:
+          - '[equals'
+          - regex]
+          type: string
+        matchValue:
+          type: string
+        name:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        updatedBy:
+          format: int32
+          type: integer
+    RuleDescription:
+      type: object
+      required:
+      - accountId
+      - checkTimes
+      - createdAt
+      - id
+      - matchAllFilters
+      - name
+      - updatedAt
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        checkTimes:
+          format: int32
+          type: integer
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchAllFilters:
+          type: boolean
+        name:
+          type: string
+        recipients:
+          items:
+            type: string
+          type: array
+        updatedAt:
+          format: date-time
+          type: string
     AuditUpdate:
       type: object
       required:
@@ -1313,217 +1171,6 @@ components:
           items:
             type: string
           type: array
-    PageFilterResult:
-      type: object
-      required:
-      - actual
-      - expected
-      properties:
-        actual:
-          type: string
-        expected:
-          type: string
-        filterType:
-          enum:
-          - Url
-          - StatusCode
-          - FinalUrl
-          - FinalStatusCode
-          type: string
-        matchType:
-          enum:
-          - Equals
-          - DoesNotEqual
-          - Contains
-          - DoesNotContain
-          - Regex
-          - IsSet
-          - IsNotSet
-          - GreaterThanOrEqualTo
-          - LessThanOrEqualTo
-          type: string
-    AuditFilters:
-      type: object
-      required:
-      - exclude
-      - include
-      properties:
-        exclude:
-          items:
-            type: string
-          type: array
-        include:
-          items:
-            $ref: '#/components/schemas/IncludeFilter'
-          type: array
-    NewAudit:
-      type: object
-      required:
-      - domainId
-      - limit
-      - name
-      - recipients
-      - startingUrls
-      properties:
-        domainId:
-          format: int32
-          type: integer
-        filters:
-          $ref: '#/components/schemas/AuditFilters'
-        frequency:
-          type: string
-        limit:
-          format: int32
-          type: integer
-        name:
-          type: string
-        nextRun:
-          format: date-time
-          type: string
-        options:
-          $ref: '#/components/schemas/AuditOptions'
-        recipients:
-          items:
-            type: string
-          type: array
-        schedule:
-          $ref: '#/components/schemas/WritableItemSchedule'
-        startingUrls:
-          items:
-            type: string
-          type: array
-    AuditRunSwaggerReference:
-      type: object
-      required:
-      - adobeAuditor
-      - id
-      - limit
-      - silentMode
-      - taggedUrl
-      - totalUrl
-      - userId
-      - webAuditId
-      properties:
-        adobeAuditor:
-          type: boolean
-        completed:
-          format: date-time
-          type: string
-        id:
-          format: int32
-          type: integer
-        limit:
-          format: int32
-          type: integer
-        score:
-          description: Deprecated. Use `/v3/web-audits/{auditId}/runs/{runId}/scores` instead
-          format: int32
-          type: integer
-        silentMode:
-          type: boolean
-        started:
-          format: date-time
-          type: string
-        supportedFeatures:
-          example: '[TagLoadtimeReport, ConsoleLogsReport]'
-          items:
-            type: string
-          type: array
-        taggedUrl:
-          format: int32
-          type: integer
-        totalUrl:
-          format: int32
-          type: integer
-        userId:
-          format: int32
-          type: integer
-        webAuditId:
-          format: int32
-          type: integer
-    ItemIsRunningApiError:
-      type: object
-      required:
-      - errorCode
-      - message
-      - runId
-      properties:
-        errorCode:
-          format: int32
-          type: integer
-        message:
-          type: string
-        runId:
-          format: int64
-          type: integer
-    PageRuleResult:
-      type: object
-      required:
-      - name
-      - noOfChecks
-      - pageFilterResults
-      - ruleId
-      - tagResults
-      properties:
-        name:
-          type: string
-        noOfChecks:
-          $ref: '#/components/schemas/CheckTimesResult'
-        pageFilterResults:
-          items:
-            $ref: '#/components/schemas/PageFilterResult'
-          type: array
-        resultType:
-          enum:
-          - Passed
-          - Failed
-          - NotApplied
-          - Broken
-          type: string
-        ruleId:
-          format: int32
-          type: integer
-        tagResults:
-          items:
-            $ref: '#/components/schemas/PageTagResult'
-          type: array
-    Chronology:
-      type: object
-      required:
-      - zone
-      properties:
-        zone:
-          $ref: '#/components/schemas/DateTimeZone'
-    TokenType:
-      type: object
-    DateTimeZone:
-      type: object
-      required:
-      - fixed
-      - id
-      properties:
-        fixed:
-          type: boolean
-        id:
-          type: string
-    WritableItemSchedule:
-      type: object
-      required:
-      - dtStart
-      - isPaused
-      - recurrenceRule
-      - tzId
-      properties:
-        dtStart:
-          $ref: '#/components/schemas/LocalDateTime'
-        id:
-          type: number
-        isPaused:
-          type: boolean
-        recurrenceRule:
-          type: string
-        tzId:
-          type: string
     Audit:
       type: object
       required:
@@ -1609,80 +1256,143 @@ components:
         webAuditRunning:
           type: number
       description: Web audit model
-    SnowflakeUsage:
+    Value:
+      type: object
+    Location:
       type: object
       required:
-      - useForAdobeAuditor
-      - useForAppJourneyRuleResults
-      - useForAppJourneys
-      - useForAudits
-      - useForLiveConnect
-      - useForLiveConnectRuleResults
-      - useForWebJourneyRuleResults
-      - useForWebJourneys
-      - used
-      properties:
-        useForAdobeAuditor:
-          type: boolean
-        useForAppJourneyRuleResults:
-          type: boolean
-        useForAppJourneys:
-          type: boolean
-        useForAudits:
-          type: boolean
-        useForLiveConnect:
-          type: boolean
-        useForLiveConnectRuleResults:
-          type: boolean
-        useForWebJourneyRuleResults:
-          type: boolean
-        useForWebJourneys:
-          type: boolean
-        used:
-          type: boolean
-    PageRuleResultsSummary:
-      type: object
-      required:
-      - totalNoOfRulesApplied
-      - totalNoOfRulesFailed
-      - totalNoOfRulesNotApplied
-      - totalNoOfRulesPassed
-      properties:
-        totalNoOfRulesApplied:
-          format: int32
-          type: integer
-        totalNoOfRulesFailed:
-          format: int32
-          type: integer
-        totalNoOfRulesNotApplied:
-          format: int32
-          type: integer
-        totalNoOfRulesPassed:
-          format: int32
-          type: integer
-    Permissions:
-      type: object
-      required:
-      - intValue
-      - stringValue
-      properties:
-        intValue:
-          format: int32
-          type: integer
-        stringValue:
-          type: string
-    Function1RequestContextFutureRouteResult:
-      type: object
-    UserAgent:
-      type: object
-      required:
+      - countryCode
+      - id
       - label
       - name
       properties:
+        countryCode:
+          type: string
+        id:
+          format: int32
+          type: integer
         label:
           type: string
         name:
           type: string
+    DateTimeFieldType:
+      type: object
+      required:
+      - durationType
+      - name
+      - rangeDurationType
+      properties:
+        durationType:
+          $ref: '#/components/schemas/DurationFieldType'
+        name:
+          type: string
+        rangeDurationType:
+          $ref: '#/components/schemas/DurationFieldType'
+    AuthToken:
+      type: object
+      required:
+      - created
+      - decryptedToken
+      - token
+      - tokenType
+      - userId
+      properties:
+        created:
+          type: string
+        decryptedToken:
+          type: string
+        token:
+          type: string
+        tokenType:
+          $ref: '#/components/schemas/TokenType'
+        userId:
+          type: string
+    PageFilterResult:
+      type: object
+      required:
+      - actual
+      - expected
+      properties:
+        actual:
+          type: string
+        expected:
+          type: string
+        filterType:
+          enum:
+          - Url
+          - StatusCode
+          - FinalUrl
+          - FinalStatusCode
+          type: string
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+    PageRuleResult:
+      type: object
+      required:
+      - name
+      - noOfChecks
+      - pageFilterResults
+      - ruleId
+      - tagResults
+      properties:
+        name:
+          type: string
+        noOfChecks:
+          $ref: '#/components/schemas/CheckTimesResult'
+        pageFilterResults:
+          items:
+            $ref: '#/components/schemas/PageFilterResult'
+          type: array
+        resultType:
+          enum:
+          - Passed
+          - Failed
+          - NotApplied
+          - Broken
+          type: string
+        ruleId:
+          format: int32
+          type: integer
+        tagResults:
+          items:
+            $ref: '#/components/schemas/PageTagResult'
+          type: array
+    Label:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    ItemIsRunningApiError:
+      type: object
+      required:
+      - errorCode
+      - message
+      - runId
+      properties:
+        errorCode:
+          format: int32
+          type: integer
+        message:
+          type: string
+        runId:
+          format: int64
+          type: integer
     PageTagResult:
       type: object
       required:
@@ -1700,18 +1410,308 @@ components:
           type: string
         tag:
           $ref: '#/components/schemas/PageRuleResultTag'
+    PageRuleResults:
+      type: object
+      required:
+      - results
+      - summary
+      properties:
+        results:
+          items:
+            $ref: '#/components/schemas/PageRuleResult'
+          type: array
+        summary:
+          $ref: '#/components/schemas/PageRuleResultsSummary'
+    AuditOptions:
+      type: object
+      required:
+      - fireTags
+      - loadFlash
+      - location
+      - requestRate
+      - stripQueryString
+      - userAgent
+      properties:
+        adobeAuditor:
+          type: boolean
+        blockThirdPartyCookies:
+          type: boolean
+        browserHeight:
+          format: int32
+          type: integer
+        browserWidth:
+          format: int32
+          type: integer
+        customHttpHeaders:
+          items:
+            $ref: '#/components/schemas/CustomHttpHeaderAssignment'
+          type: array
+        customProxy:
+          type: string
+        discoverSitemap:
+          type: boolean
+        fireTags:
+          type: boolean
+        gpcEnabled:
+          type: boolean
+        loadFlash:
+          type: boolean
+        location:
+          type: string
+        remoteFileMapConfig:
+          items:
+            $ref: '#/components/schemas/RemoteFileMapping'
+          type: array
+        requestRate:
+          format: int32
+          type: integer
+        sameUrlRunId:
+          type: number
+        stripQueryString:
+          type: boolean
+        userAgent:
+          type: string
+        vpnEnabled:
+          type: boolean
+        webHookUrl:
+          type: string
+    AccountCapabilities:
+      type: object
+      required:
+      - customProxySupport
+      - strongPasswordPolicy
+      - vpnSupport
+      properties:
+        customProxySupport:
+          type: boolean
+        strongPasswordPolicy:
+          type: boolean
+        vpnSupport:
+          type: boolean
+    Function1RequestContextFutureRouteResult:
+      type: object
+    CheckTimesResult:
+      type: object
+      required:
+      - actual
+      - expected
+      properties:
+        actual:
+          format: int32
+          type: integer
+        expected:
+          format: int32
+          type: integer
+    Chronology:
+      type: object
+      required:
+      - zone
+      properties:
+        zone:
+          $ref: '#/components/schemas/DateTimeZone'
+    NewAudit:
+      type: object
+      required:
+      - domainId
+      - limit
+      - name
+      - recipients
+      - startingUrls
+      properties:
+        domainId:
+          format: int32
+          type: integer
+        filters:
+          $ref: '#/components/schemas/AuditFilters'
+        frequency:
+          type: string
+        limit:
+          format: int32
+          type: integer
+        name:
+          type: string
+        nextRun:
+          format: date-time
+          type: string
+        options:
+          $ref: '#/components/schemas/AuditOptions'
+        recipients:
+          items:
+            type: string
+          type: array
+        schedule:
+          $ref: '#/components/schemas/WritableItemSchedule'
+        startingUrls:
+          items:
+            type: string
+          type: array
+    DurationField:
+      type: object
+      required:
+      - name
+      - precise
+      - supported
+      - type
+      - unitMillis
+      properties:
+        name:
+          type: string
+        precise:
+          type: boolean
+        supported:
+          type: boolean
+        type:
+          $ref: '#/components/schemas/DurationFieldType'
+        unitMillis:
+          format: int64
+          type: integer
+    TagVariableResult:
+      type: object
+      required:
+      - expectedValues
+      - snapshotId
+      properties:
+        actualValue:
+          type: string
+        expectedParamName:
+          type: string
+        expectedValues:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        matchType:
+          enum:
+          - Equals
+          - DoesNotEqual
+          - Contains
+          - DoesNotContain
+          - Regex
+          - IsSet
+          - IsNotSet
+          - GreaterThanOrEqualTo
+          - LessThanOrEqualTo
+          type: string
+        name:
+          type: string
+        resultType:
+          enum:
+          - Passed
+          - MissingVariable
+          - BadValue
+          type: string
+        selectorType:
+          enum:
+          - String
+          - UrlParameter
+          - DataLayer
+          - Tag
+          - FinalUrlParameter
+          type: string
+        snapshotId:
+          format: int64
+          type: integer
+        variableTag:
+          $ref: '#/components/schemas/RuleResultTag'
+    LocalDateTime:
+      type: object
+      required:
+      - centuryOfEra
+      - chronology
+      - dayOfMonth
+      - dayOfWeek
+      - dayOfYear
+      - era
+      - fieldTypes
+      - fields
+      - hourOfDay
+      - millisOfDay
+      - millisOfSecond
+      - minuteOfHour
+      - monthOfYear
+      - secondOfMinute
+      - values
+      - weekOfWeekyear
+      - weekyear
+      - year
+      - yearOfCentury
+      - yearOfEra
+      properties:
+        centuryOfEra:
+          format: int32
+          type: integer
+        chronology:
+          $ref: '#/components/schemas/Chronology'
+        dayOfMonth:
+          format: int32
+          type: integer
+        dayOfWeek:
+          format: int32
+          type: integer
+        dayOfYear:
+          format: int32
+          type: integer
+        era:
+          format: int32
+          type: integer
+        fieldTypes:
+          items:
+            $ref: '#/components/schemas/DateTimeFieldType'
+          type: array
+        fields:
+          items:
+            $ref: '#/components/schemas/DateTimeField'
+          type: array
+        hourOfDay:
+          format: int32
+          type: integer
+        millisOfDay:
+          format: int32
+          type: integer
+        millisOfSecond:
+          format: int32
+          type: integer
+        minuteOfHour:
+          format: int32
+          type: integer
+        monthOfYear:
+          format: int32
+          type: integer
+        secondOfMinute:
+          format: int32
+          type: integer
+        values:
+          items:
+            format: int32
+            type: integer
+          type: array
+        weekOfWeekyear:
+          format: int32
+          type: integer
+        weekyear:
+          format: int32
+          type: integer
+        year:
+          format: int32
+          type: integer
+        yearOfCentury:
+          format: int32
+          type: integer
+        yearOfEra:
+          format: int32
+          type: integer
   requestBodies:
-    UserContext:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UserContext'
     deleteWebAuditLabelsBody:
       content:
         application/json:
           schema:
             type: integer
             format: int32
+    UserContext:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserContext'
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

@@ -210,24 +210,6 @@ paths:
       - Folders
 components:
   schemas:
-    ItemWithActiveRun:
-      type: object
-      required:
-      - itemId
-      - itemName
-      - itemType
-      - runId
-      properties:
-        itemId:
-          format: int64
-          type: integer
-        itemName:
-          type: string
-        itemType:
-          type: string
-        runId:
-          format: int64
-          type: integer
     User:
       type: object
       required:
@@ -283,30 +265,6 @@ components:
         username:
           type: string
       description: User model
-    ItemsAreRunningApiError:
-      type: object
-      required:
-      - errorCode
-      - items
-      - message
-      properties:
-        errorCode:
-          format: int32
-          type: integer
-        items:
-          items:
-            $ref: '#/components/schemas/ItemWithActiveRun'
-          type: array
-        message:
-          type: string
-    NewFolder:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-      description: Folder create information
     Folder:
       type: object
       required:
@@ -378,6 +336,14 @@ components:
           format: int32
           type: integer
       description: Folder model
+    NewFolder:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+      description: Folder create information
     UpdateFolder:
       type: object
       required:
@@ -386,6 +352,40 @@ components:
         name:
           type: string
       description: Folder update information
+    ItemWithActiveRun:
+      type: object
+      required:
+      - itemId
+      - itemName
+      - itemType
+      - runId
+      properties:
+        itemId:
+          format: int64
+          type: integer
+        itemName:
+          type: string
+        itemType:
+          type: string
+        runId:
+          format: int64
+          type: integer
+    ItemsAreRunningApiError:
+      type: object
+      required:
+      - errorCode
+      - items
+      - message
+      properties:
+        errorCode:
+          format: int32
+          type: integer
+        items:
+          items:
+            $ref: '#/components/schemas/ItemWithActiveRun'
+          type: array
+        message:
+          type: string
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.
