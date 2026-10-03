@@ -116,140 +116,38 @@ paths:
       - API_Key: []
       description: POST /v3/notification-center/target-items/{itemType}/search
 components:
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    NotificationCenter_GetEmails_ResponseDTO:
-      type: object
-      description: All emails in an account
-      required:
-      - emails
-      properties:
-        emails:
-          type: array
-          minItems: 0
-          items:
-            title: NotificationCenter_EmailItem
-            type: object
-            required:
-            - email
-            - usage
-            properties:
-              email:
-                type: string
-              usage:
-                $ref: '#/components/schemas/NotificationCenter_EmailUsage'
-    ItemId:
-      type: integer
-      format: int64
-      description: ID of a data collector, see ItemType
-      example: 107239
-    NotificationCenter_SearchForAssignments_RequestDTO:
-      type: object
-      description: Filters for searching for items that may have specific email assigned or not assigned
-      required:
-      - email
-      properties:
-        email:
-          type: string
-          minLength: 1
-          description: email to search for
-        itemName:
-          type: string
-          minLength: 1
-          description: optional "item name contains substring" filter
-        itemLabels:
-          type: array
-          description: non-empty array of labels present on an item. When multiple labels specified, target item is expected to have all of them (condition works as "AND" for all labels specified)
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/LabelId'
-        isAssigned:
-          type: boolean
-          description: '- when TRUE - only target items with the specified `email` currently assigned will be returned;
-
-            - when FALSE - only target items with the specified `email` currently NOT assigned will be returned;
-
-            - when UNDEFINED or NULL - flag is ignored.
-
-            '
     LabelId:
       type: integer
       format: int64
       description: Label identifier
       example: 223
       minimum: 1
-    NotificationCenter_EmailUsage:
-      type: object
-      required:
-      - auditCount
-      - webJourneyCount
-      - ruleCount
-      - alertCount
-      - emailInboxMessageReceivedCount
-      - emailInboxMessageProcessedCount
-      properties:
-        auditCount:
-          type: integer
-        webJourneyCount:
-          type: integer
-        ruleCount:
-          type: integer
-        alertCount:
-          type: integer
-          description: Number of alerts excluding usage alerts
-        usageAlertCount:
-          type: integer
-        emailInboxMessageReceivedCount:
-          type: integer
-        emailInboxMessageProcessedCount:
-          type: integer
-        scheduledExportCount:
-          type: integer
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    NotificationCenter_EmailSubscriptionItemTypeEnum:
-      type: string
-      enum:
-      - AUDIT
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    NotificationCenter_AssignmentsSortColumn:
-      type: string
-      enum:
-      - IS_ASSIGNED
-      - ITEM_NAME
-      - RUN_DATE
     CommonIterableResponseMetadata:
       description: Common metadata for iterable
       type: object
@@ -258,32 +156,6 @@ components:
       properties:
         pagination:
           $ref: '#/components/schemas/PaginationMetadata'
-    NotificationCenter_GetEmails_RequestDTO:
-      type: object
-      description: Filters for searching for emails
-      required:
-      - itemType
-      - itemIds
-      properties:
-        itemType:
-          $ref: '#/components/schemas/NotificationCenter_EmailSubscriptionItemTypeEnum'
-        itemIds:
-          type: array
-          description: Non-empty array of item IDs. Emails for selected items only will be shown
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/ItemId'
-    NotificationCenter_AssignmentItemTypeEnum:
-      type: string
-      enum:
-      - AUDIT
-      - WEB_JOURNEY
-      - RULE
-      - ALERT
-      - USAGE_ALERT
-      - EMAIL_INBOX_MESSAGE_RECEIVED
-      - EMAIL_INBOX_MESSAGE_PROCESSED
-      - SCHEDULED_EXPORT
     NotificationCenter_SearchForAssignments_ResponseDTO:
       type: object
       required:
@@ -328,6 +200,139 @@ components:
                 minItems: 0
                 items:
                   $ref: '#/components/schemas/LabelId'
+    NotificationCenter_EmailUsage:
+      type: object
+      required:
+      - auditCount
+      - webJourneyCount
+      - ruleCount
+      - alertCount
+      - emailInboxMessageReceivedCount
+      - emailInboxMessageProcessedCount
+      properties:
+        auditCount:
+          type: integer
+        webJourneyCount:
+          type: integer
+        ruleCount:
+          type: integer
+        alertCount:
+          type: integer
+          description: Number of alerts excluding usage alerts
+        usageAlertCount:
+          type: integer
+        emailInboxMessageReceivedCount:
+          type: integer
+        emailInboxMessageProcessedCount:
+          type: integer
+        scheduledExportCount:
+          type: integer
+    NotificationCenter_GetEmails_RequestDTO:
+      type: object
+      description: Filters for searching for emails
+      required:
+      - itemType
+      - itemIds
+      properties:
+        itemType:
+          $ref: '#/components/schemas/NotificationCenter_EmailSubscriptionItemTypeEnum'
+        itemIds:
+          type: array
+          description: Non-empty array of item IDs. Emails for selected items only will be shown
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ItemId'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    NotificationCenter_AssignmentItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+      - RULE
+      - ALERT
+      - USAGE_ALERT
+      - EMAIL_INBOX_MESSAGE_RECEIVED
+      - EMAIL_INBOX_MESSAGE_PROCESSED
+      - SCHEDULED_EXPORT
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    NotificationCenter_EmailSubscriptionItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
+    ItemId:
+      type: integer
+      format: int64
+      description: ID of a data collector, see ItemType
+      example: 107239
+    NotificationCenter_AssignmentsSortColumn:
+      type: string
+      enum:
+      - IS_ASSIGNED
+      - ITEM_NAME
+      - RUN_DATE
+    NotificationCenter_SearchForAssignments_RequestDTO:
+      type: object
+      description: Filters for searching for items that may have specific email assigned or not assigned
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          minLength: 1
+          description: email to search for
+        itemName:
+          type: string
+          minLength: 1
+          description: optional "item name contains substring" filter
+        itemLabels:
+          type: array
+          description: non-empty array of labels present on an item. When multiple labels specified, target item is expected to have all of them (condition works as "AND" for all labels specified)
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        isAssigned:
+          type: boolean
+          description: '- when TRUE - only target items with the specified `email` currently assigned will be returned;
+
+            - when FALSE - only target items with the specified `email` currently NOT assigned will be returned;
+
+            - when UNDEFINED or NULL - flag is ignored.
+
+            '
     DateAndTime:
       type: string
       format: date-time
@@ -346,6 +351,26 @@ components:
 
         '
       example: '2016-08-18T17:33:00Z'
+    NotificationCenter_GetEmails_ResponseDTO:
+      type: object
+      description: All emails in an account
+      required:
+      - emails
+      properties:
+        emails:
+          type: array
+          minItems: 0
+          items:
+            title: NotificationCenter_EmailItem
+            type: object
+            required:
+            - email
+            - usage
+            properties:
+              email:
+                type: string
+              usage:
+                $ref: '#/components/schemas/NotificationCenter_EmailUsage'
   parameters:
     SortDescendingParam:
       name: sortDesc
@@ -364,31 +389,6 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
-  responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

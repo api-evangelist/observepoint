@@ -177,18 +177,6 @@ paths:
       - API_Key: []
 components:
   responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
@@ -197,6 +185,18 @@ components:
             $ref: '#/components/schemas/ErrorModel'
     BadRequest:
       description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
       content:
         application/json:
           schema:

@@ -261,37 +261,139 @@ paths:
       description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/rule-summary/page-rule-results/{ruleSnapshotId}
 components:
   schemas:
-    TagAccount:
-      type: string
-      description: Tag account
-    PageUrlFilterEnum:
-      type: string
-      enum:
-      - contains
-      - regex
-    PageUrl:
-      type: string
-      format: url
-      example: https://example.com/about
-    AuditRunPageCommonColumnsTrait:
-      description: Trait for audit page with common page properties
+    AuditRun_AllRuleResultsItem:
       allOf:
-      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - $ref: '#/components/schemas/AuditRunRulePageCountTrait'
       - type: object
         required:
-        - pageLoadTime
-        - pageStatusCode
+        - ruleSnapshotId
+        - name
+        - tags
+        - hasEmailNotification
+        - emailRecipients
         properties:
-          pageLoadTime:
-            $ref: '#/components/schemas/PageLoadTime'
-          pageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    AuditRunRuleResultsPageCountTrendItem:
+          ruleSnapshotId:
+            $ref: '#/components/schemas/RuleSnapshotId'
+          originalRuleId:
+            $ref: '#/components/schemas/RuleId'
+          ruleConfigExists:
+            type: boolean
+            description: If false, the rule config doesn't exist anymore
+          name:
+            type: string
+            description: Rule name
+          tags:
+            type: array
+            description: List of tags checked in the rule
+            items:
+              $ref: '#/components/schemas/TagInfoTrait'
+          hasEmailNotification:
+            type: boolean
+          emailRecipients:
+            type: array
+            items:
+              type: string
+              format: email
+    AuditRun_RuleSummary_SpecificRuleResultsRequestDTO:
+      description: Request to get rule results list
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.RuleSummaryFilters
+      allOf:
+      - $ref: '#/components/schemas/AuditRun_RuleSummary_BaseRequestTrait'
+    RuleTagSnapshotId:
+      type: integer
+      format: int64
+    AuditRunRulePageCountTrait:
+      description: Common trait for page count per rule result type attributes
+      type: object
+      required:
+      - failedRulePageCount
+      - passedRulePageCount
+      - notAppliedRulePageCount
+      properties:
+        failedRulePageCount:
+          type: integer
+          description: Number of pages with at least 1 rule failed
+          default: 0
+        passedRulePageCount:
+          type: integer
+          description: Number of pages with at least 1 rule passed
+          default: 0
+        notAppliedRulePageCount:
+          type: integer
+          description: Number of pages with at least 1 rule not applied
+          default: 0
+    AuditRunRuleResultsTrendItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - $ref: '#/components/schemas/AuditRunRuleCountTrait'
+    AuditRun_RuleResults_AllTrendsItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
       allOf:
       - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
       - $ref: '#/components/schemas/AuditRunRulePageCountTrait'
+      - $ref: '#/components/schemas/AuditRunRuleCountTrait'
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    RuleStatus:
+      type: string
+      enum:
+      - failed
+      - passed
+      - not_applied
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+    AuditRun_RuleSummary_PageRuleResultsRuleFilter:
+      type: object
+      required:
+      - filterType
+      properties:
+        filterType:
+          $ref: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRuleFilterEnum'
+      description: 'Optionally filters by a specific component within the rule''s logic (e.g., a tag or variable condition).
+
+        When used with `filterType` = `tag_filter` or `tag_variable_filter`, it overrides the default behavior
+
+        of the `ruleResultType` filter, applying it to this specific component''s outcome
+
+        '
+      discriminator:
+        propertyName: filterType
+        mapping:
+          page_filter: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRulePageFilter'
+          tag_filter: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRuleTagFilter'
+          tag_variable_filter: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRuleTagVariableFilter'
     LongIntegerRangeFilterTrait:
       type: object
       description: Common trait for long integer min max filter
@@ -303,6 +405,188 @@ components:
         max:
           type: integer
           format: int64
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    TagAccount:
+      type: string
+      description: Tag account
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    AuditRun_RuleSummary_RuleConditionResult:
+      description: Only tag variable condition has parent - tag condition
+      type: object
+      required:
+      - id
+      - idType
+      - name
+      - matcher
+      - expected
+      properties:
+        id:
+          description: 'condition snapshot ID. One of: `RulePageFilterSnapshotId`, `RuleTagSnapshotId`, `RuleTagVariableSnapshotId`
+
+            '
+          type: integer
+          format: int64
+        idType:
+          type: string
+        parentId:
+          $ref: '#/components/schemas/RuleTagSnapshotId'
+        parentType:
+          type: string
+        name:
+          type: string
+        matcher:
+          type: string
+        actual:
+          type: string
+        expected:
+          $ref: '#/components/schemas/ConditionExpectedResult'
+    StatusCodeEnum:
+      description: good - 2xx, redirects - 3xx, broken - all others
+      deprecated: true
+      type: string
+      enum:
+      - good
+      - redirects
+      - broken
+    AuditRun_RuleSummary_PageRuleResultsDTO:
+      description: Pages list with rule failures (when no specific rule condition/outcome selected)
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsItem'
+    AuditRun_RuleSummary_AllRules_PagesSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_status_code
+      - final_page_status_code
+      - page_load_time
+      - rule_failures
+    AuditRun_RuleSummary_SpecificRule_PagesSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_status_code
+      - final_page_status_code
+      - page_load_time
+    AuditRun_RuleSummary_AllRuleResultsOverviewDTO:
+      description: '`Rule Details by Page` - all rules overview'
+      type: object
+      required:
+      - rules
+      properties:
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AllRuleResultsItem'
+    MatchType:
+      type: string
+      enum:
+      - Unknown
+      - TagPresent
+      - Equals
+      - NotEqual
+      - Contains
+      - DoesNotContain
+      - Regex
+      - IsSet
+      - NotSet
+      - GreaterThanOrEquals
+      - LessThanOrEquals
+      - EqualIgnoreCase
+      - NotEqualIgnoreCase
+      - ContainsIgnoreCase
+      - DoesNotContainIgnoreCase
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    AuditRun_RuleSummary_RuleResults_PageCountTrendDTO:
+      description: Audit rule results page count trend values
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRunRuleResultsPageCountTrendItem'
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    RuleTagStatusCode:
+      type: object
+      required:
+      - matchType
+      - valueType
+      properties:
+        matchType:
+          $ref: '#/components/schemas/MatchType'
+        valueType:
+          $ref: '#/components/schemas/StatusCodeValueType'
+        value:
+          type: integer
+          format: int32
     TagInfoTrait:
       type: object
       description: Common tag info
@@ -320,29 +604,86 @@ components:
           $ref: '#/components/schemas/TagCategoryId'
         tagCategoryName:
           $ref: '#/components/schemas/TagCategoryName'
-    PageUrlFilter:
+    RuleTagVariableSnapshotId:
+      type: integer
+      format: int64
+    RuleId:
+      type: integer
+      format: int64
+      description: Rule ID
+      example: 12
+    AuditRun_RuleSummary_SpecificRulePageRuleResultsDTO:
+      description: 'Pages list with rule condition details (when specific rule condition/outcome is selected)
+
+        The `ruleResultType` filter applies to the specific condition outcome when `ruleFilter.filterType`
+
+        is `tag_filter` or `tag_variable_filter`; otherwise, it applies to the overall rule result for the page
+
+        '
       type: object
       required:
-      - filterType
-      - filterValue
+      - metadata
+      - pages
       properties:
-        filterType:
-          $ref: '#/components/schemas/PageUrlFilterEnum'
-        filterValue:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_RuleSummary_SpecificRulePageRuleResultsItem'
+    StatusCodeValueType:
+      type: string
+      enum:
+      - Specific
+      - SuccessAndRedirect
+      - Broken
+    AuditRun_RuleSummary_BaseRequestTrait:
+      description: Common request body with filters applicable to rule summary report If `initialPageStatusCode` and `pageStatusCode` filters provided, `pageStatusCode` will be ignored
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        properties:
+          pageStatusCode:
+            $ref: '#/components/schemas/StatusCodeEnum'
+          primaryTagsOnly:
+            description: if true then return only rules/pages with primary tags else return all rules/pages
+            type: boolean
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagCategoryId:
+            $ref: '#/components/schemas/TagCategoryId'
+          tagVendorId:
+            $ref: '#/components/schemas/TagVendorId'
+          tagAccount:
+            $ref: '#/components/schemas/TagAccount'
+          ruleFailuresOnly:
+            description: Use `ruleStatus` instead
+            type: boolean
+            deprecated: true
+          ruleStatus:
+            $ref: '#/components/schemas/RuleStatus'
+    ConditionExpectedResult:
+      description: The rule condition expected values
+      type: object
+      required:
+      - expected
+      properties:
+        expected:
+          type: array
+          items:
+            type: string
+        name:
           type: string
-          minLength: 1
-        negated:
-          type: boolean
-          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
-          default: false
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
+        selectorType:
+          type: string
+          enum:
+          - String
+          - UrlParameter
+          - DataLayer
+          - Tag
+          - FinalUrlParam
+          - Empty
     AuditRun_RuleResultsSummaryDTO:
       description: '`Total Pages` + `Rules Applied` + `Rule Instances by Status` + `Pages by Rule Status`'
       allOf:
@@ -375,12 +716,25 @@ components:
           filteredRuleFailureCount:
             type: integer
             description: Number of rule failures (counted for every rule on every page) passing all applied filters
-    RulePageFilterSnapshotId:
+    AuditRun_RuleSummary_PageRuleResultsRuleFilterEnum:
+      type: string
+      enum:
+      - page_filter
+      - tag_filter
+      - tag_variable_filter
+    RuleSnapshotId:
       type: integer
       format: int64
-    PageStatusCode:
-      type: integer
-      description: Page HTTP status code
+    AuditRun_RuleSummary_PageRuleResultsItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - ruleFailureCount
+        properties:
+          ruleFailureCount:
+            type: integer
+            description: Number of rules failed on the page
     PageFilterSnapshot:
       allOf:
       - $ref: '#/components/schemas/AuditRunRulePageCountTrait'
@@ -407,6 +761,49 @@ components:
             - 4
           matchType:
             $ref: '#/components/schemas/MatchType'
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    AuditRunRuleResultsPageCountTrendItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - $ref: '#/components/schemas/AuditRunRulePageCountTrait'
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
     IntegerRangeFilterTrait:
       type: object
       description: Common trait for integer min max filter
@@ -416,45 +813,42 @@ components:
           minimum: 0
         max:
           type: integer
-    AuditRun_RuleSummary_RequestDTO:
-      description: Request to get rule summary
+    AuditRun_RuleSummary_SpecificRulePagesRequestDTO:
+      description: Request to get pages list with rule condition details (when specific rule condition/outcome is selected)
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.RuleSummaryFilters
       allOf:
       - $ref: '#/components/schemas/AuditRun_RuleSummary_BaseRequestTrait'
       - type: object
         properties:
-          ruleId:
-            $ref: '#/components/schemas/RuleId'
-    ConditionExpectedResult:
-      description: The rule condition expected values
+          ruleFilter:
+            $ref: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRuleFilter'
+          ruleResultType:
+            $ref: '#/components/schemas/AuditRun_RuleSummary_RuleResultEnum'
+    PageFiltersTrait:
       type: object
-      required:
-      - expected
+      description: Common trait for page filters
       properties:
-        expected:
-          type: array
-          items:
-            type: string
-        name:
-          type: string
-        selectorType:
-          type: string
-          enum:
-          - String
-          - UrlParameter
-          - DataLayer
-          - Tag
-          - FinalUrlParam
-          - Empty
-    AuditRun_RuleSummary_SpecificRule_PagesSortColumn:
-      type: string
-      enum:
-      - page_url
-      - final_page_url
-      - page_status_code
-      - final_page_status_code
-      - page_load_time
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
     CommonIterableResponseMetadata:
       description: Common metadata for iterable
       type: object
@@ -463,6 +857,26 @@ components:
       properties:
         pagination:
           $ref: '#/components/schemas/PaginationMetadata'
+    AuditRunRuleCountTrait:
+      description: Common trait for rule count per rule result type attributes
+      type: object
+      required:
+      - failedRuleCount
+      - passedRuleCount
+      - notAppliedRuleCount
+      properties:
+        failedRuleCount:
+          type: integer
+          description: Number of rules failed on at least 1 page
+          default: 0
+        passedRuleCount:
+          type: integer
+          description: Number of rules passed on at least 1 page
+          default: 0
+        notAppliedRuleCount:
+          type: integer
+          description: Number of rules not applied on at least 1 page
+          default: 0
     AuditRunPageTrait:
       description: Common trait for audit page with mandatory page properties
       type: object
@@ -474,30 +888,119 @@ components:
           $ref: '#/components/schemas/PageId'
         pageUrl:
           $ref: '#/components/schemas/PageUrl'
-    StatusCodeValueType:
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    TagName:
+      type: string
+      description: Tag name
+    AuditRun_RuleSummary_RuleResultEnum:
       type: string
       enum:
-      - Specific
-      - SuccessAndRedirect
-      - Broken
-    StatusCodeEnum:
-      description: good - 2xx, redirects - 3xx, broken - all others
-      deprecated: true
-      type: string
-      enum:
-      - good
-      - redirects
+      - passed
+      - failed
+      - not_applied
       - broken
-    AuditRun_RuleSummary_AllRuleResultsOverviewDTO:
-      description: '`Rule Details by Page` - all rules overview'
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    RulePageFilterSnapshotId:
+      type: integer
+      format: int64
+    RuleTagVariableSnapshot:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunRulePageCountTrait'
+      - type: object
+        description: same as v2 `RuleTagVariable` but with snapshot ID and page count per rule outcome
+        required:
+        - ruleTagVariableSnapshotId
+        - ruleTagSnapshotId
+        - variable
+        - isRegexVariableName
+        properties:
+          ruleTagVariableSnapshotId:
+            $ref: '#/components/schemas/RuleTagVariableSnapshotId'
+          ruleTagSnapshotId:
+            $ref: '#/components/schemas/RuleTagSnapshotId'
+          variable:
+            type: string
+          isRegexVariableName:
+            type: boolean
+            description: Indicates whether the variable name represents a regex pattern (i.e., originally had 'regex:' prefix in storage)
+          value:
+            type: string
+          validationDescription:
+            type: string
+          matchType:
+            $ref: '#/components/schemas/MatchType'
+          valueTagId:
+            type: integer
+            format: int32
+          selectorType:
+            type: string
+            enum:
+            - String
+            - UrlParameter
+            - DataLayer
+            - Tag
+            - FinalUrlParam
+    AuditRun_RuleSummary_RuleResults_AllTrendsDTO:
+      description: Audit rule results trends overview (a.k.a. trendlines a.k.a. sparklines) for both `Rule Instances by Status` + `Pages by Rule Status`
       type: object
       required:
-      - rules
+      - runs
       properties:
-        rules:
+        runs:
           type: array
+          maxItems: 5
           items:
-            $ref: '#/components/schemas/AuditRun_AllRuleResultsItem'
+            $ref: '#/components/schemas/AuditRun_RuleResults_AllTrendsItem'
+    AuditRun_RuleSummary_SpecificRulePageRuleResultsItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - conditionResult
+        properties:
+          conditionResult:
+            $ref: '#/components/schemas/AuditRun_RuleSummary_RuleConditionResult'
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
     RuleTagSnapshot:
       allOf:
       - $ref: '#/components/schemas/AuditRunRulePageCountTrait'
@@ -540,349 +1043,6 @@ components:
               $ref: '#/components/schemas/RuleTagVariableSnapshot'
           statusCode:
             $ref: '#/components/schemas/RuleTagStatusCode'
-    AuditRunRuleResultsTrendItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - $ref: '#/components/schemas/AuditRunRuleCountTrait'
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    TagName:
-      type: string
-      description: Tag name
-    AuditRun_RuleSummary_BaseRequestTrait:
-      description: Common request body with filters applicable to rule summary report If `initialPageStatusCode` and `pageStatusCode` filters provided, `pageStatusCode` will be ignored
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/PageFiltersTrait'
-      - type: object
-        properties:
-          pageStatusCode:
-            $ref: '#/components/schemas/StatusCodeEnum'
-          primaryTagsOnly:
-            description: if true then return only rules/pages with primary tags else return all rules/pages
-            type: boolean
-          tagId:
-            $ref: '#/components/schemas/TagId'
-          tagCategoryId:
-            $ref: '#/components/schemas/TagCategoryId'
-          tagVendorId:
-            $ref: '#/components/schemas/TagVendorId'
-          tagAccount:
-            $ref: '#/components/schemas/TagAccount'
-          ruleFailuresOnly:
-            description: Use `ruleStatus` instead
-            type: boolean
-            deprecated: true
-          ruleStatus:
-            $ref: '#/components/schemas/RuleStatus'
-    PageSizeFilter:
-      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
-    StringInclusionFilterTypeEnum:
-      type: string
-      enum:
-      - contains
-      - not_contains
-    AuditRun_RuleSummary_PageRuleResultsRuleFilterEnum:
-      type: string
-      enum:
-      - page_filter
-      - tag_filter
-      - tag_variable_filter
-    CombinedPageStatusCodeEnum:
-      type: string
-      description: '- `broken` - initial or final URL are `broken`,
-
-        - `good` - initial URL is `good` or `redirect` and final URL is `good`
-
-        '
-      enum:
-      - broken
-      - good
-    AuditRun_RuleSummary_SpecificRulePageRuleResultsItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
-      - type: object
-        required:
-        - conditionResult
-        properties:
-          conditionResult:
-            $ref: '#/components/schemas/AuditRun_RuleSummary_RuleConditionResult'
-    TagCategoryName:
-      type: string
-      description: Name of a category of a tag
-    TagCategoryId:
-      type: integer
-      description: Tag category ID
-    RuleSnapshotId:
-      type: integer
-      format: int64
-    RuleId:
-      type: integer
-      format: int64
-      description: Rule ID
-      example: 12
-    AuditRun_RuleSummary_RuleResultEnum:
-      type: string
-      enum:
-      - passed
-      - failed
-      - not_applied
-      - broken
-    AuditRun_RuleSummary_PageRuleResultsDTO:
-      description: Pages list with rule failures (when no specific rule condition/outcome selected)
-      type: object
-      required:
-      - metadata
-      - pages
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsItem'
-    PageTitleFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          description: Page title as displayed by browser
-          minLength: 1
-          example: ObserveP
-    AuditRun_RuleSummary_PageRuleResultsRuleFilter:
-      type: object
-      required:
-      - filterType
-      properties:
-        filterType:
-          $ref: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRuleFilterEnum'
-      description: 'Optionally filters by a specific component within the rule''s logic (e.g., a tag or variable condition).
-
-        When used with `filterType` = `tag_filter` or `tag_variable_filter`, it overrides the default behavior
-
-        of the `ruleResultType` filter, applying it to this specific component''s outcome
-
-        '
-      discriminator:
-        propertyName: filterType
-        mapping:
-          page_filter: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRulePageFilter'
-          tag_filter: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRuleTagFilter'
-          tag_variable_filter: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRuleTagVariableFilter'
-    RuleTagVariableSnapshotId:
-      type: integer
-      format: int64
-    IntegerFilter:
-      type: object
-      required:
-      - filterType
-      - negated
-      properties:
-        filterType:
-          $ref: '#/components/schemas/IntegerFilterTypeEnum'
-        negated:
-          type: boolean
-          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
-      discriminator:
-        propertyName: filterType
-        mapping:
-          specific: '#/components/schemas/SpecificIntegerFilter'
-          range: '#/components/schemas/IntegerRangeFilter'
-    AuditRun_RuleSummary_RuleResults_AllTrendsDTO:
-      description: Audit rule results trends overview (a.k.a. trendlines a.k.a. sparklines) for both `Rule Instances by Status` + `Pages by Rule Status`
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          maxItems: 5
-          items:
-            $ref: '#/components/schemas/AuditRun_RuleResults_AllTrendsItem'
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    AuditRun_RuleSummary_SpecificRuleResultsRequestDTO:
-      description: Request to get rule results list
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.RuleSummaryFilters
-      allOf:
-      - $ref: '#/components/schemas/AuditRun_RuleSummary_BaseRequestTrait'
-    MatchType:
-      type: string
-      enum:
-      - Unknown
-      - TagPresent
-      - Equals
-      - NotEqual
-      - Contains
-      - DoesNotContain
-      - Regex
-      - IsSet
-      - NotSet
-      - GreaterThanOrEquals
-      - LessThanOrEquals
-      - EqualIgnoreCase
-      - NotEqualIgnoreCase
-      - ContainsIgnoreCase
-      - DoesNotContainIgnoreCase
-    AuditRunPageCommonColumnsWithFinalValuesTrait:
-      description: Trait for audit page with final URL and final status code
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
-      - type: object
-        properties:
-          finalPageUrl:
-            $ref: '#/components/schemas/PageUrl'
-          finalPageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    TagVendorId:
-      type: integer
-      description: Tag vendor ID
-    AuditRun_RuleSummary_AllRules_PagesSortColumn:
-      type: string
-      enum:
-      - page_url
-      - final_page_url
-      - page_status_code
-      - final_page_status_code
-      - page_load_time
-      - rule_failures
-    PageLoadTime:
-      type: integer
-      description: Time page took to load, in milliseconds
-    AuditRun_RuleResults_AllTrendsItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - $ref: '#/components/schemas/AuditRunRulePageCountTrait'
-      - $ref: '#/components/schemas/AuditRunRuleCountTrait'
-    PageId:
-      type: string
-      example: f9d32cc7cc2046d6decb145a80289287f5226323
-    RuleTagVariableSnapshot:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunRulePageCountTrait'
-      - type: object
-        description: same as v2 `RuleTagVariable` but with snapshot ID and page count per rule outcome
-        required:
-        - ruleTagVariableSnapshotId
-        - ruleTagSnapshotId
-        - variable
-        - isRegexVariableName
-        properties:
-          ruleTagVariableSnapshotId:
-            $ref: '#/components/schemas/RuleTagVariableSnapshotId'
-          ruleTagSnapshotId:
-            $ref: '#/components/schemas/RuleTagSnapshotId'
-          variable:
-            type: string
-          isRegexVariableName:
-            type: boolean
-            description: Indicates whether the variable name represents a regex pattern (i.e., originally had 'regex:' prefix in storage)
-          value:
-            type: string
-          validationDescription:
-            type: string
-          matchType:
-            $ref: '#/components/schemas/MatchType'
-          valueTagId:
-            type: integer
-            format: int32
-          selectorType:
-            type: string
-            enum:
-            - String
-            - UrlParameter
-            - DataLayer
-            - Tag
-            - FinalUrlParam
-    IntegerFilterTypeEnum:
-      type: string
-      enum:
-      - specific
-      - range
-    TagId:
-      type: integer
-      description: Tag ID
-    AuditRun_RuleSummary_SpecificRulePageRuleResultsDTO:
-      description: 'Pages list with rule condition details (when specific rule condition/outcome is selected)
-
-        The `ruleResultType` filter applies to the specific condition outcome when `ruleFilter.filterType`
-
-        is `tag_filter` or `tag_variable_filter`; otherwise, it applies to the overall rule result for the page
-
-        '
-      type: object
-      required:
-      - metadata
-      - pages
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_RuleSummary_SpecificRulePageRuleResultsItem'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     AuditRun_RuleSummary_SpecificRuleResultsDTO:
       description: '`Rule Details by Page` - single rule details'
       allOf:
@@ -904,44 +1064,22 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/RuleTagSnapshot'
-    AuditRun_RuleSummary_RuleResults_PageCountTrendDTO:
-      description: Audit rule results page count trend values
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRunRuleResultsPageCountTrendItem'
-    PageFiltersTrait:
-      type: object
-      description: Common trait for page filters
-      properties:
-        pageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        finalPageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        pageTitle:
-          $ref: '#/components/schemas/PageTitleFilter'
-        initialPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        finalPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        combinedPageStatusCode:
-          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
-        pageLoadTime:
-          $ref: '#/components/schemas/PageLoadTimeFilter'
-        pageSize:
-          $ref: '#/components/schemas/PageSizeFilter'
-        redirectCount:
-          $ref: '#/components/schemas/PageRedirectCountFilter'
-        hasBrokenLinks:
-          type: boolean
-    PageLoadTimeFilter:
-      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    AuditRun_RuleSummary_AllRuleResultsRequestDTO:
+      description: Request to get all rules/pages results
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.RuleSummaryFilters
       allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+      - $ref: '#/components/schemas/AuditRun_RuleSummary_RequestDTO'
     ItemRunTrendsItemTrait:
       type: object
       required:
@@ -952,126 +1090,22 @@ components:
           $ref: '#/components/schemas/RunId'
         completedAt:
           $ref: '#/components/schemas/DateAndTime'
-    AuditRun_RuleSummary_AllRuleResultsRequestDTO:
-      description: Request to get all rules/pages results
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.RuleSummaryFilters
-      allOf:
-      - $ref: '#/components/schemas/AuditRun_RuleSummary_RequestDTO'
-    AuditRun_RuleSummary_PageRuleResultsItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
-      - type: object
-        required:
-        - ruleFailureCount
-        properties:
-          ruleFailureCount:
-            type: integer
-            description: Number of rules failed on the page
-    AuditRunRulePageCountTrait:
-      description: Common trait for page count per rule result type attributes
-      type: object
-      required:
-      - failedRulePageCount
-      - passedRulePageCount
-      - notAppliedRulePageCount
-      properties:
-        failedRulePageCount:
-          type: integer
-          description: Number of pages with at least 1 rule failed
-          default: 0
-        passedRulePageCount:
-          type: integer
-          description: Number of pages with at least 1 rule passed
-          default: 0
-        notAppliedRulePageCount:
-          type: integer
-          description: Number of pages with at least 1 rule not applied
-          default: 0
-    RuleTagStatusCode:
-      type: object
-      required:
-      - matchType
-      - valueType
-      properties:
-        matchType:
-          $ref: '#/components/schemas/MatchType'
-        valueType:
-          $ref: '#/components/schemas/StatusCodeValueType'
-        value:
-          type: integer
-          format: int32
-    AuditRun_RuleSummary_RuleConditionResult:
-      description: Only tag variable condition has parent - tag condition
-      type: object
-      required:
-      - id
-      - idType
-      - name
-      - matcher
-      - expected
-      properties:
-        id:
-          description: 'condition snapshot ID. One of: `RulePageFilterSnapshotId`, `RuleTagSnapshotId`, `RuleTagVariableSnapshotId`
-
-            '
-          type: integer
-          format: int64
-        idType:
-          type: string
-        parentId:
-          $ref: '#/components/schemas/RuleTagSnapshotId'
-        parentType:
-          type: string
-        name:
-          type: string
-        matcher:
-          type: string
-        actual:
-          type: string
-        expected:
-          $ref: '#/components/schemas/ConditionExpectedResult'
-    RuleStatus:
+    TagCategoryName:
       type: string
-      enum:
-      - failed
-      - passed
-      - not_applied
-    RuleTagSnapshotId:
+      description: Name of a category of a tag
+    TagId:
       type: integer
-      format: int64
-    AuditRunRuleCountTrait:
-      description: Common trait for rule count per rule result type attributes
-      type: object
-      required:
-      - failedRuleCount
-      - passedRuleCount
-      - notAppliedRuleCount
-      properties:
-        failedRuleCount:
-          type: integer
-          description: Number of rules failed on at least 1 page
-          default: 0
-        passedRuleCount:
-          type: integer
-          description: Number of rules passed on at least 1 page
-          default: 0
-        notAppliedRuleCount:
-          type: integer
-          description: Number of rules not applied on at least 1 page
-          default: 0
-    AuditRun_RuleSummary_SpecificRulePagesRequestDTO:
-      description: Request to get pages list with rule condition details (when specific rule condition/outcome is selected)
+      description: Tag ID
+    AuditRun_RuleSummary_RequestDTO:
+      description: Request to get rule summary
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.RuleSummaryFilters
       allOf:
       - $ref: '#/components/schemas/AuditRun_RuleSummary_BaseRequestTrait'
       - type: object
         properties:
-          ruleFilter:
-            $ref: '#/components/schemas/AuditRun_RuleSummary_PageRuleResultsRuleFilter'
-          ruleResultType:
-            $ref: '#/components/schemas/AuditRun_RuleSummary_RuleResultEnum'
+          ruleId:
+            $ref: '#/components/schemas/RuleId'
     AuditRun_RuleSummary_RuleResultsTrendDTO:
       description: Audit rule results trend values
       type: object
@@ -1082,43 +1116,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditRunRuleResultsTrendItem'
-    PageRedirectCountFilter:
-      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    AuditRun_AllRuleResultsItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunRulePageCountTrait'
-      - type: object
-        required:
-        - ruleSnapshotId
-        - name
-        - tags
-        - hasEmailNotification
-        - emailRecipients
-        properties:
-          ruleSnapshotId:
-            $ref: '#/components/schemas/RuleSnapshotId'
-          originalRuleId:
-            $ref: '#/components/schemas/RuleId'
-          ruleConfigExists:
-            type: boolean
-            description: If false, the rule config doesn't exist anymore
-          name:
-            type: string
-            description: Rule name
-          tags:
-            type: array
-            description: List of tags checked in the rule
-            items:
-              $ref: '#/components/schemas/TagInfoTrait'
-          hasEmailNotification:
-            type: boolean
-          emailRecipients:
-            type: array
-            items:
-              type: string
-              format: email
+    PageStatusCode:
+      type: integer
+      description: Page HTTP status code
   parameters:
     AuditRun_Trends_DaysQP:
       name: days
@@ -1127,15 +1127,14 @@ components:
       schema:
         type: integer
         description: Number of days to get trend values for, relative to current time
-    pageParam:
-      name: page
+    SortDescendingParam:
+      name: sortDesc
       in: query
+      description: Controls sorting order
       required: false
       schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
+        type: boolean
+        default: false
     RunId:
       name: runId
       in: path
@@ -1145,23 +1144,6 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
-    AuditRun_PagesList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 50
-        minimum: 50
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
     AuditId:
       name: auditId
       in: path
@@ -1171,6 +1153,15 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/AuditId'
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
     RuleSnapshotId:
       name: ruleSnapshotId
       in: path
@@ -1178,7 +1169,22 @@ components:
       description: Rule snapshot ID
       schema:
         $ref: '#/components/schemas/RuleSnapshotId'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
   responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
@@ -1187,12 +1193,6 @@ components:
             $ref: '#/components/schemas/ErrorModel'
     NotFound:
       description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
       content:
         application/json:
           schema:

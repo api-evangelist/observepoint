@@ -43,52 +43,30 @@ paths:
       - API_Key: []
       description: POST /v3/email-inbox-message-alerts
 components:
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    EmailInboxMessageAlertsResponseDTO:
-      type: object
-      required:
-      - messages
-      properties:
-        messages:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/EmailInboxMessageAlertsResponse_MessageItem'
-    EmailInboxMessageAlertsResponse_MessageItem:
-      type: object
-      required:
-      - messageId
-      - audits
-      properties:
-        messageId:
-          $ref: '#/components/schemas/ReceivedEmailMessageId'
-        audits:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/EmailInboxMessageAlertsResponse_AuditItem'
-    ReceivedEmailMessageId:
-      type: integer
     AuditId:
       type: integer
       format: int64
       example: 107239
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     EmailInboxMessageAlertsRequestDTO:
       type: object
       required:
@@ -104,6 +82,12 @@ components:
           maxItems: 200
           items:
             $ref: '#/components/schemas/ReceivedEmailMessageId'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ReceivedEmailMessageId:
+      type: integer
     EmailInboxMessageAlertsResponse_AuditItem:
       type: object
       description: '`assignedAlertCount` is the number of alerts computed for completed run,
@@ -132,25 +116,41 @@ components:
           type: integer
         triggeredAlertCount:
           type: integer
-  responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
+    EmailInboxMessageAlertsResponse_MessageItem:
+      type: object
+      required:
+      - messageId
+      - audits
+      properties:
+        messageId:
+          $ref: '#/components/schemas/ReceivedEmailMessageId'
+        audits:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/EmailInboxMessageAlertsResponse_AuditItem'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    EmailInboxMessageAlertsResponseDTO:
+      type: object
+      required:
+      - messages
+      properties:
+        messages:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/EmailInboxMessageAlertsResponse_MessageItem'
   securitySchemes:
     API_Key:
       type: apiKey

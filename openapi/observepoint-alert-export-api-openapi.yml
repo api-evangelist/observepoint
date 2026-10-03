@@ -72,12 +72,6 @@ paths:
       description: POST /v3/alerts/exports/{exportType}
 components:
   responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
@@ -90,32 +84,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-  parameters:
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    pageParam:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
-    Export_AllDataParam:
-      in: query
-      name: allData
-      schema:
-        type: boolean
-        default: false
-      required: false
-      description: IF `false` THEN only one results page will be exported ELSE all data will be exported
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
     ExportResultDTO:
       type: object
@@ -145,6 +119,32 @@ components:
           type: string
         validationReport:
           type: object
+  parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    Export_AllDataParam:
+      in: query
+      name: allData
+      schema:
+        type: boolean
+        default: false
+      required: false
+      description: IF `false` THEN only one results page will be exported ELSE all data will be exported
   securitySchemes:
     API_Key:
       type: apiKey

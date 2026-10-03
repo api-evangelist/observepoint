@@ -41,27 +41,7 @@ paths:
       - API_Key: []
       description: GET /v3/email-inbox-messages/{messageId}
 components:
-  parameters:
-    EmailInboxMessageId:
-      in: path
-      name: messageId
-      required: true
-      allowEmptyValue: false
-      schema:
-        type: number
   responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
@@ -70,6 +50,18 @@ components:
             $ref: '#/components/schemas/ErrorModel'
     BadRequest:
       description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
       content:
         application/json:
           schema:
@@ -144,6 +136,14 @@ components:
           type: string
         validationReport:
           type: object
+  parameters:
+    EmailInboxMessageId:
+      in: path
+      name: messageId
+      required: true
+      allowEmptyValue: false
+      schema:
+        type: number
   securitySchemes:
     API_Key:
       type: apiKey

@@ -74,12 +74,6 @@ paths:
       description: POST /v3/web-audits/{auditId}/runs/{runId}/exports/{exportType}
 components:
   responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
@@ -92,7 +86,93 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  schemas:
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    ExportResultDTO:
+      type: object
+      required:
+      - exportId
+      properties:
+        exportId:
+          $ref: '#/components/schemas/ExportId'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
+    AuditRun_ExportTypeEnum:
+      type: string
+      description: All supported audit run export types
+      enum:
+      - AUDIT_SUMMARY_DETECTED_TAGS
+      - RULE_SUMMARY_PAGE_RESULTS
+      - RULE_SUMMARY_PAGE_RULE_RESULTS
+      - PAGE_SUMMARY_PAGES
+      - PAGE_SUMMARY_BROKEN_SCANNED_LINKS
+      - TAG_INVENTORY_PAGES
+      - TAG_HEALTH_PAGES
+      - TAG_DUPLICATES_AND_MULTIPLES_PAGES
+      - VARIABLE_INVENTORY_TAG_ACCOUNT_PAGES
+      - VARIABLE_INVENTORY_TAG_ACCOUNT_VARIABLE_PAGES
+      - VARIABLE_INVENTORY_TAG_ACCOUNT_VARIABLE_NOT_SET_PAGES
+      - VARIABLE_INVENTORY_TAG_ACCOUNT_VARIABLE_VALUE_PAGES
+      - COOKIE_INVENTORY_PAGES
+      - COOKIE_INVENTORY_COOKIE_PAGES
+      - COOKIE_INVENTORY_COOKIES_AGGREGATED
+      - BROWSER_LOGS_PAGES
+      - TAG_PRIVACY_COMPLIANCE
+      - TAG_PRIVACY_PAGES
+      - TAG_PRIVACY_TAG_PAGES
+      - COOKIE_PRIVACY_COMPLIANCE
+      - COOKIE_PRIVACY_PAGES
+      - COOKIE_PRIVACY_COOKIE_PAGES
+      - REQUEST_PRIVACY_COMPLIANCE
+      - REQUEST_PRIVACY_PAGES
+      - REQUEST_PRIVACY_REQUEST_PAGES
+      - FILE_CHANGES_PAGES
+      - FILE_CHANGES_FILE_PAGES
+      - TAG_METADATA
+      - TAG_INVENTORY_PAGE_TAGS
+      - COOKIE_INVENTORY_COOKIES
+      - BROWSER_LOGS_PAGE_LOGS
+      - NETWORK_REQUEST_LOG_PAGE_REQUESTS
+      - RULE_SUMMARY_RULES
+      - VARIABLE_INVENTORY_TAG_VARIABLES
+      - ALERT_SUMMARY_ALERTS
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
   parameters:
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
     SortDescendingParam:
       name: sortDesc
       in: query
@@ -135,86 +215,6 @@ components:
         default: false
       required: false
       description: IF `false` THEN only one results page will be exported ELSE all data will be exported
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
-  schemas:
-    ExportResultDTO:
-      type: object
-      required:
-      - exportId
-      properties:
-        exportId:
-          $ref: '#/components/schemas/ExportId'
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    ExportId:
-      type: integer
-      format: int64
-      description: Unique ID of an export
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AuditRun_ExportTypeEnum:
-      type: string
-      description: All supported audit run export types
-      enum:
-      - AUDIT_SUMMARY_DETECTED_TAGS
-      - RULE_SUMMARY_PAGE_RESULTS
-      - RULE_SUMMARY_PAGE_RULE_RESULTS
-      - PAGE_SUMMARY_PAGES
-      - PAGE_SUMMARY_BROKEN_SCANNED_LINKS
-      - TAG_INVENTORY_PAGES
-      - TAG_HEALTH_PAGES
-      - TAG_DUPLICATES_AND_MULTIPLES_PAGES
-      - VARIABLE_INVENTORY_TAG_ACCOUNT_PAGES
-      - VARIABLE_INVENTORY_TAG_ACCOUNT_VARIABLE_PAGES
-      - VARIABLE_INVENTORY_TAG_ACCOUNT_VARIABLE_NOT_SET_PAGES
-      - VARIABLE_INVENTORY_TAG_ACCOUNT_VARIABLE_VALUE_PAGES
-      - COOKIE_INVENTORY_PAGES
-      - COOKIE_INVENTORY_COOKIE_PAGES
-      - COOKIE_INVENTORY_COOKIES_AGGREGATED
-      - BROWSER_LOGS_PAGES
-      - TAG_PRIVACY_COMPLIANCE
-      - TAG_PRIVACY_PAGES
-      - TAG_PRIVACY_TAG_PAGES
-      - COOKIE_PRIVACY_COMPLIANCE
-      - COOKIE_PRIVACY_PAGES
-      - COOKIE_PRIVACY_COOKIE_PAGES
-      - REQUEST_PRIVACY_COMPLIANCE
-      - REQUEST_PRIVACY_PAGES
-      - REQUEST_PRIVACY_REQUEST_PAGES
-      - FILE_CHANGES_PAGES
-      - FILE_CHANGES_FILE_PAGES
-      - TAG_METADATA
-      - TAG_INVENTORY_PAGE_TAGS
-      - COOKIE_INVENTORY_COOKIES
-      - BROWSER_LOGS_PAGE_LOGS
-      - NETWORK_REQUEST_LOG_PAGE_REQUESTS
-      - RULE_SUMMARY_RULES
-      - VARIABLE_INVENTORY_TAG_VARIABLES
-      - ALERT_SUMMARY_ALERTS
   securitySchemes:
     API_Key:
       type: apiKey

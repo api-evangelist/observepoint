@@ -210,61 +210,14 @@ paths:
       - Folders
 components:
   schemas:
-    User:
+    NewFolder:
       type: object
       required:
-      - accountId
-      - created
-      - email
-      - firstName
-      - fullUsageDashboardAccess
-      - id
-      - lastName
-      - maxPagesPerAudit
-      - timezone
-      - updated
-      - username
+      - name
       properties:
-        accountId:
-          format: int32
-          type: integer
-        created:
-          format: date-time
+        name:
           type: string
-        deleted:
-          description: ISO 8601 date time string with offset when user was deleted, null if not deleted
-          type: string
-        email:
-          type: string
-        firstName:
-          type: string
-        fullUsageDashboardAccess:
-          type: boolean
-        id:
-          format: int32
-          type: integer
-        lastLogin:
-          format: date-time
-          type: string
-        lastName:
-          type: string
-        maxPagesPerAudit:
-          format: int32
-          type: integer
-        permissions:
-          enum:
-          - guest
-          - user
-          - admin
-          type: string
-        timezone:
-          type: string
-        updated:
-          format: date-time
-          type: string
-        username:
-          type: string
-      description: User model
+      description: Folder create information
     Folder:
       type: object
       required:
@@ -336,14 +289,61 @@ components:
           format: int32
           type: integer
       description: Folder model
-    NewFolder:
+    User:
       type: object
       required:
-      - name
+      - accountId
+      - created
+      - email
+      - firstName
+      - fullUsageDashboardAccess
+      - id
+      - lastName
+      - maxPagesPerAudit
+      - timezone
+      - updated
+      - username
       properties:
-        name:
+        accountId:
+          format: int32
+          type: integer
+        created:
+          format: date-time
           type: string
-      description: Folder create information
+        deleted:
+          description: ISO 8601 date time string with offset when user was deleted, null if not deleted
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: boolean
+        id:
+          format: int32
+          type: integer
+        lastLogin:
+          format: date-time
+          type: string
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          format: int32
+          type: integer
+        permissions:
+          enum:
+          - guest
+          - user
+          - admin
+          type: string
+        timezone:
+          type: string
+        updated:
+          format: date-time
+          type: string
+        username:
+          type: string
+      description: User model
     UpdateFolder:
       type: object
       required:

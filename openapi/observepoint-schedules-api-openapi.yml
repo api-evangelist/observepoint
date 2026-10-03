@@ -113,14 +113,14 @@ paths:
       description: PUT /v3/schedules/calendar
 components:
   responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
+    Forbidden:
+      description: You don't have enough rights to access this resource
       content:
         application/json:
           schema:
@@ -132,131 +132,16 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorModel'
   schemas:
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
     LabelId:
       type: integer
       format: int64
       description: Label identifier
       example: 223
       minimum: 1
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    SubFolderId:
-      type: integer
-      description: 'The ID of the subfolder under which the WebJourney/Audit is within.
-
-        '
-    ScheduleWithExceptionsAndDescription:
-      required:
-      - description
-      type: object
-      description: Schedule object with exception dates for the calendar endpoint.
-      allOf:
-      - $ref: '#/components/schemas/ScheduleWithExceptions'
-      - type: object
-        properties:
-          description:
-            type: string
-            description: A description of the schedule.
-    CurrentlyRunningItem:
-      type: object
-      description: Run of data source item that is in progress.
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        startedAt:
-          $ref: '#/components/schemas/StartedAt'
-    ScheduleRuleDescriptionRequest:
-      type: object
-      required:
-      - recurrenceRule
-      properties:
-        recurrenceRule:
-          type: string
-          description: An RFC-5545 (https://www.rfc-editor.org/rfc/rfc5545#appendix-A) compliant recurrence rule string.
-    SchedulePreset:
-      type: object
-      required:
-      - freqId
-      - friendlyName
-      - rule
-      - groupId
-      properties:
-        freqId:
-          type: string
-          description: The preset's frequency ID
-          example: 15_MIN
-        friendlyName:
-          type: string
-          description: The preset's user-friendly name
-          example: Every 15 Minutes
-        rule:
-          type: string
-          description: The preset's recurrence rule
-          example: FREQ=MINUTELY;INTERVAL=15
-        groupId:
-          type: string
-          description: The membership ID for the group
-    DataSourceItemTypeCap:
-      description: Type of data source item.
-      type: string
-      enum:
-      - AUDIT
-      - WEB_JOURNEY
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ScheduleWithExceptions:
-      required:
-      - dtStart
-      - tzId
-      - recurrenceRule
-      - isPaused
-      - exceptions
-      type: object
-      description: Schedule object with exception dates for the calendar endpoint.
-      allOf:
-      - $ref: '#/components/schemas/BaseScheduleForCreation'
-      - type: object
-        properties:
-          exceptions:
-            description: List of dates to skip when scheduling.
-            type: array
-            items:
-              $ref: '#/components/schemas/ISO8601LocalDateTime'
-    CalendarUpdateItem:
-      description: Item in a calendar update (PUT) request.
-      type: object
-      required:
-      - itemType
-      - itemId
-      - schedule
-      properties:
-        itemType:
-          $ref: '#/components/schemas/DataSourceItemTypeCap'
-        itemId:
-          description: Item id of scheduled item.
-          type: number
-        schedule:
-          $ref: '#/components/schemas/ScheduleWithExceptions'
-    ScheduleRuleDescriptionResponse:
-      type: object
-      required:
-      - description
-      properties:
-        description:
-          type: string
-          description: A description of the schedule.
     ScheduledItem:
       type: object
       description: Base scheduled item which includes data source specific information.
@@ -293,9 +178,73 @@ components:
           description: Whether the journey is monitored by script services.
         schedule:
           $ref: '#/components/schemas/ScheduleWithExceptionsAndDescription'
-    ISO8601LocalDateTime:
+    DataSourceItemTypeCap:
+      description: Type of data source item.
       type: string
-      description: 'ISO-8601 Formatted date time implicitly in the user''s local timezone (ex: YYYY-MM-DDTHH:MM:SS/2020-10-30T12:00:00)'
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    CalendarUpdateItem:
+      description: Item in a calendar update (PUT) request.
+      type: object
+      required:
+      - itemType
+      - itemId
+      - schedule
+      properties:
+        itemType:
+          $ref: '#/components/schemas/DataSourceItemTypeCap'
+        itemId:
+          description: Item id of scheduled item.
+          type: number
+        schedule:
+          $ref: '#/components/schemas/ScheduleWithExceptions'
+    ScheduleWithExceptionsAndDescription:
+      required:
+      - description
+      type: object
+      description: Schedule object with exception dates for the calendar endpoint.
+      allOf:
+      - $ref: '#/components/schemas/ScheduleWithExceptions'
+      - type: object
+        properties:
+          description:
+            type: string
+            description: A description of the schedule.
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    ScheduleRuleDescriptionRequest:
+      type: object
+      required:
+      - recurrenceRule
+      properties:
+        recurrenceRule:
+          type: string
+          description: An RFC-5545 (https://www.rfc-editor.org/rfc/rfc5545#appendix-A) compliant recurrence rule string.
+    CalendarUpdateRequestBody:
+      description: The body for calendar item updates using the bulk PUT endpoint.
+      type: object
+      required:
+      - updateItems
+      properties:
+        updateItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarUpdateItem'
     BaseScheduleForCreation:
       required:
       - dtStart
@@ -315,24 +264,75 @@ components:
         isPaused:
           type: boolean
           description: Whether the schedule is paused or not.
-    CalendarUpdateRequestBody:
-      description: The body for calendar item updates using the bulk PUT endpoint.
+    ScheduleWithExceptions:
+      required:
+      - dtStart
+      - tzId
+      - recurrenceRule
+      - isPaused
+      - exceptions
+      type: object
+      description: Schedule object with exception dates for the calendar endpoint.
+      allOf:
+      - $ref: '#/components/schemas/BaseScheduleForCreation'
+      - type: object
+        properties:
+          exceptions:
+            description: List of dates to skip when scheduling.
+            type: array
+            items:
+              $ref: '#/components/schemas/ISO8601LocalDateTime'
+    SchedulePreset:
       type: object
       required:
-      - updateItems
+      - freqId
+      - friendlyName
+      - rule
+      - groupId
       properties:
-        updateItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/CalendarUpdateItem'
+        freqId:
+          type: string
+          description: The preset's frequency ID
+          example: 15_MIN
+        friendlyName:
+          type: string
+          description: The preset's user-friendly name
+          example: Every 15 Minutes
+        rule:
+          type: string
+          description: The preset's recurrence rule
+          example: FREQ=MINUTELY;INTERVAL=15
+        groupId:
+          type: string
+          description: The membership ID for the group
+    ScheduleRuleDescriptionResponse:
+      type: object
+      required:
+      - description
+      properties:
+        description:
+          type: string
+          description: A description of the schedule.
+    SubFolderId:
+      type: integer
+      description: 'The ID of the subfolder under which the WebJourney/Audit is within.
+
+        '
+    CurrentlyRunningItem:
+      type: object
+      description: Run of data source item that is in progress.
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        startedAt:
+          $ref: '#/components/schemas/StartedAt'
     StartedAt:
       type: string
       format: datetime
       description: Date/time of when an item was started
-    UserId:
-      type: integer
-      description: ID of a user
-      example: 123
+    ISO8601LocalDateTime:
+      type: string
+      description: 'ISO-8601 Formatted date time implicitly in the user''s local timezone (ex: YYYY-MM-DDTHH:MM:SS/2020-10-30T12:00:00)'
     FolderId:
       type: integer
       format: int32

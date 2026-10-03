@@ -214,6 +214,36 @@ paths:
       - Users
 components:
   schemas:
+    UserDocument:
+      type: object
+      required:
+      - email
+      - firstName
+      - lastName
+      - timezone
+      - username
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: number
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          type: number
+        permissions:
+          enum:
+          - guest
+          - user
+          - admin
+          type: string
+        timezone:
+          type: string
+        username:
+          type: string
+      description: User create/update model
     User:
       type: object
       required:
@@ -285,36 +315,6 @@ components:
         name:
           type: string
       description: User folder model
-    UserDocument:
-      type: object
-      required:
-      - email
-      - firstName
-      - lastName
-      - timezone
-      - username
-      properties:
-        email:
-          type: string
-        firstName:
-          type: string
-        fullUsageDashboardAccess:
-          type: number
-        lastName:
-          type: string
-        maxPagesPerAudit:
-          type: number
-        permissions:
-          enum:
-          - guest
-          - user
-          - admin
-          type: string
-        timezone:
-          type: string
-        username:
-          type: string
-      description: User create/update model
   requestBodies:
     addUserFoldersBody:
       content:

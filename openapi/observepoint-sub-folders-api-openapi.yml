@@ -207,6 +207,103 @@ paths:
       - Sub Folders
 components:
   schemas:
+    RuleDescription:
+      type: object
+      required:
+      - accountId
+      - checkTimes
+      - createdAt
+      - id
+      - matchAllFilters
+      - name
+      - updatedAt
+      properties:
+        accountId:
+          format: int32
+          type: integer
+        checkTimes:
+          format: int32
+          type: integer
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: int32
+          type: integer
+        matchAllFilters:
+          type: boolean
+        name:
+          type: string
+        recipients:
+          items:
+            type: string
+          type: array
+        updatedAt:
+          format: date-time
+          type: string
+    WebJourney:
+      type: object
+      required:
+      - actions
+      - domainId
+      - emails
+      - folderId
+      - id
+      - name
+      - options
+      - queued
+      - userId
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/SequencedActionSwaggerReference'
+          type: array
+        createdAt:
+          format: date-time
+          type: string
+        domainId:
+          format: int64
+          type: integer
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        lastCheck:
+          format: date-time
+          type: string
+        name:
+          type: string
+        nextCheck:
+          format: date-time
+          type: string
+        options:
+          $ref: '#/components/schemas/WebJourneyOptions'
+        queued:
+          type: boolean
+        screenshot:
+          type: string
+        status:
+          enum:
+          - Ok
+          - Failed
+          - NotChecked
+          - RulesFailed
+          - ActionFailed
+          - PageFailed
+          - DataCollectionFailure
+          type: string
+        userId:
+          format: int64
+          type: integer
+        webJourneyRunning:
+          type: boolean
+      description: Web journey model
     AuditFilters:
       type: object
       required:
@@ -221,17 +318,6 @@ components:
           items:
             $ref: '#/components/schemas/IncludeFilter'
           type: array
-    IncludeFilter:
-      type: object
-      required:
-      - includeLimit
-      - value
-      properties:
-        includeLimit:
-          format: int32
-          type: integer
-        value:
-          type: string
     AuditRunSwaggerReference:
       type: object
       required:
@@ -281,40 +367,6 @@ components:
         webAuditId:
           format: int32
           type: integer
-    ItemWithActiveRun:
-      type: object
-      required:
-      - itemId
-      - itemName
-      - itemType
-      - runId
-      properties:
-        itemId:
-          format: int64
-          type: integer
-        itemName:
-          type: string
-        itemType:
-          type: string
-        runId:
-          format: int64
-          type: integer
-    ItemsAreRunningApiError:
-      type: object
-      required:
-      - errorCode
-      - items
-      - message
-      properties:
-        errorCode:
-          format: int32
-          type: integer
-        items:
-          items:
-            $ref: '#/components/schemas/ItemWithActiveRun'
-          type: array
-        message:
-          type: string
     NewDomain:
       type: object
       required:
@@ -332,6 +384,114 @@ components:
         name:
           type: string
       description: Domain creation information
+    Label:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    SequencedActionSwaggerReference:
+      type: object
+      required:
+      - preventNav
+      - selectors
+      - sequence
+      properties:
+        action:
+          enum:
+          - navto
+          - click
+          - input
+          - select
+          - check
+          - uncheck
+          - execute
+          - watch
+          - maskedInput
+          - enterIframe
+          - exitIframe
+          type: string
+        actionId:
+          type: number
+        js:
+          type: string
+        label:
+          type: string
+        maskedValue:
+          type: string
+        preventNav:
+          type: boolean
+        rules:
+          items:
+            type: number
+          type: array
+        seconds:
+          format: int32
+          type: integer
+        selectors:
+          items:
+            $ref: '#/components/schemas/WebActionSelectorSwaggerReference'
+          type: array
+        sequence:
+          format: int32
+          type: integer
+        url:
+          type: string
+        value:
+          type: string
+        waitDuration:
+          format: int32
+          maximum: 1800
+          minimum: 0
+          type: integer
+    DomainTotals:
+      type: object
+      required:
+      - auditsRunning
+      - automatedJourneys
+      - averageScore
+      - errors
+      - guidedJourneys
+      - pages
+      - simulationsRunning
+      properties:
+        auditsRunning:
+          format: int32
+          type: integer
+        automatedJourneys:
+          format: int32
+          type: integer
+        averageScore:
+          format: int32
+          type: integer
+        errors:
+          format: int32
+          type: integer
+        guidedJourneys:
+          format: int32
+          type: integer
+        pages:
+          format: int32
+          type: integer
+        simulationsRunning:
+          format: int32
+          type: integer
+    IncludeFilter:
+      type: object
+      required:
+      - includeLimit
+      - value
+      properties:
+        includeLimit:
+          format: int32
+          type: integer
+        value:
+          type: string
     Audit:
       type: object
       required:
@@ -417,6 +577,58 @@ components:
         webAuditRunning:
           type: number
       description: Web audit model
+    WebJourneyOptions:
+      type: object
+      required:
+      - alerts
+      - browserWidth
+      - loadFlash
+      - location
+      - userAgent
+      properties:
+        alerts:
+          type: boolean
+        browserWidth:
+          format: int32
+          type: integer
+        customProxy:
+          type: string
+        flashLiveVideoEnabled:
+          type: boolean
+        frequency:
+          type: string
+        loadFlash:
+          type: boolean
+        location:
+          type: string
+        monitoredByScriptServices:
+          type: number
+        nextRun:
+          format: date-time
+          type: string
+        remoteFileMapConfig:
+          items:
+            $ref: '#/components/schemas/RemoteFileMapping'
+          type: array
+        userAgent:
+          type: string
+        userAgentDescription:
+          type: string
+        vpnEnabled:
+          type: boolean
+        webHookUrl:
+          type: string
+    CustomHttpHeaderAssignment:
+      type: object
+      required:
+      - groupId
+      - isApplyToAll
+      properties:
+        groupId:
+          format: int64
+          type: integer
+        isApplyToAll:
+          type: boolean
     RemoteFileMapping:
       type: object
       required:
@@ -452,94 +664,57 @@ components:
         updatedBy:
           format: int32
           type: integer
-    RuleDescription:
+    ItemWithActiveRun:
+      type: object
+      required:
+      - itemId
+      - itemName
+      - itemType
+      - runId
+      properties:
+        itemId:
+          format: int64
+          type: integer
+        itemName:
+          type: string
+        itemType:
+          type: string
+        runId:
+          format: int64
+          type: integer
+    Domain:
       type: object
       required:
       - accountId
-      - checkTimes
       - createdAt
+      - domain
+      - folderId
       - id
-      - matchAllFilters
       - name
-      - updatedAt
+      - userId
       properties:
         accountId:
-          format: int32
-          type: integer
-        checkTimes:
           format: int32
           type: integer
         createdAt:
           format: date-time
           type: string
-        id:
-          format: int32
-          type: integer
-        matchAllFilters:
-          type: boolean
-        name:
+        domain:
           type: string
-        recipients:
-          items:
-            type: string
-          type: array
-        updatedAt:
-          format: date-time
-          type: string
-    CustomHttpHeaderAssignment:
-      type: object
-      required:
-      - groupId
-      - isApplyToAll
-      properties:
-        groupId:
-          format: int64
-          type: integer
-        isApplyToAll:
-          type: boolean
-    DomainTotals:
-      type: object
-      required:
-      - auditsRunning
-      - automatedJourneys
-      - averageScore
-      - errors
-      - guidedJourneys
-      - pages
-      - simulationsRunning
-      properties:
-        auditsRunning:
+        folderId:
           format: int32
           type: integer
-        automatedJourneys:
-          format: int32
-          type: integer
-        averageScore:
-          format: int32
-          type: integer
-        errors:
-          format: int32
-          type: integer
-        guidedJourneys:
-          format: int32
-          type: integer
-        pages:
-          format: int32
-          type: integer
-        simulationsRunning:
-          format: int32
-          type: integer
-    Label:
-      type: object
-      required:
-      - id
-      - name
-      properties:
         id:
           format: int32
           type: integer
         name:
           type: string
+        totals:
+          $ref: '#/components/schemas/DomainTotals'
+        userId:
+          format: int32
+          type: integer
+      description: Domain model
     WebActionSelectorSwaggerReference:
       type: object
       discriminator:
@@ -549,23 +724,6 @@ components:
           format: int32
           type: integer
       description: 'Children: AttributesSelector, SimpleSelector'
-    DomainUpdate:
-      type: object
-      required:
-      - domain
-      - folderId
-      - name
-      properties:
-        dataLayer:
-          type: string
-        domain:
-          type: string
-        folderId:
-          format: int32
-          type: integer
-        name:
-          type: string
-      description: Domain update information
     AuditOptions:
       type: object
       required:
@@ -619,197 +777,39 @@ components:
           type: boolean
         webHookUrl:
           type: string
-    WebJourneyOptions:
+    DomainUpdate:
       type: object
       required:
-      - alerts
-      - browserWidth
-      - loadFlash
-      - location
-      - userAgent
-      properties:
-        alerts:
-          type: boolean
-        browserWidth:
-          format: int32
-          type: integer
-        customProxy:
-          type: string
-        flashLiveVideoEnabled:
-          type: boolean
-        frequency:
-          type: string
-        loadFlash:
-          type: boolean
-        location:
-          type: string
-        monitoredByScriptServices:
-          type: number
-        nextRun:
-          format: date-time
-          type: string
-        remoteFileMapConfig:
-          items:
-            $ref: '#/components/schemas/RemoteFileMapping'
-          type: array
-        userAgent:
-          type: string
-        userAgentDescription:
-          type: string
-        vpnEnabled:
-          type: boolean
-        webHookUrl:
-          type: string
-    WebJourney:
-      type: object
-      required:
-      - actions
-      - domainId
-      - emails
-      - folderId
-      - id
-      - name
-      - options
-      - queued
-      - userId
-      properties:
-        actions:
-          items:
-            $ref: '#/components/schemas/SequencedActionSwaggerReference'
-          type: array
-        createdAt:
-          format: date-time
-          type: string
-        domainId:
-          format: int64
-          type: integer
-        emails:
-          items:
-            type: string
-          type: array
-        folderId:
-          format: int64
-          type: integer
-        id:
-          format: int64
-          type: integer
-        lastCheck:
-          format: date-time
-          type: string
-        name:
-          type: string
-        nextCheck:
-          format: date-time
-          type: string
-        options:
-          $ref: '#/components/schemas/WebJourneyOptions'
-        queued:
-          type: boolean
-        screenshot:
-          type: string
-        status:
-          enum:
-          - Ok
-          - Failed
-          - NotChecked
-          - RulesFailed
-          - ActionFailed
-          - PageFailed
-          - DataCollectionFailure
-          type: string
-        userId:
-          format: int64
-          type: integer
-        webJourneyRunning:
-          type: boolean
-      description: Web journey model
-    SequencedActionSwaggerReference:
-      type: object
-      required:
-      - preventNav
-      - selectors
-      - sequence
-      properties:
-        action:
-          enum:
-          - navto
-          - click
-          - input
-          - select
-          - check
-          - uncheck
-          - execute
-          - watch
-          - maskedInput
-          - enterIframe
-          - exitIframe
-          type: string
-        actionId:
-          type: number
-        js:
-          type: string
-        label:
-          type: string
-        maskedValue:
-          type: string
-        preventNav:
-          type: boolean
-        rules:
-          items:
-            type: number
-          type: array
-        seconds:
-          format: int32
-          type: integer
-        selectors:
-          items:
-            $ref: '#/components/schemas/WebActionSelectorSwaggerReference'
-          type: array
-        sequence:
-          format: int32
-          type: integer
-        url:
-          type: string
-        value:
-          type: string
-        waitDuration:
-          format: int32
-          maximum: 1800
-          minimum: 0
-          type: integer
-    Domain:
-      type: object
-      required:
-      - accountId
-      - createdAt
       - domain
       - folderId
-      - id
       - name
-      - userId
       properties:
-        accountId:
-          format: int32
-          type: integer
-        createdAt:
-          format: date-time
+        dataLayer:
           type: string
         domain:
           type: string
         folderId:
           format: int32
           type: integer
-        id:
-          format: int32
-          type: integer
         name:
           type: string
-        totals:
-          $ref: '#/components/schemas/DomainTotals'
-        userId:
+      description: Domain update information
+    ItemsAreRunningApiError:
+      type: object
+      required:
+      - errorCode
+      - items
+      - message
+      properties:
+        errorCode:
           format: int32
           type: integer
-      description: Domain model
+        items:
+          items:
+            $ref: '#/components/schemas/ItemWithActiveRun'
+          type: array
+        message:
+          type: string
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

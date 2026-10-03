@@ -105,46 +105,73 @@ paths:
       - API_Key: []
       description: GET /v3/exports/{exportUuid}
 components:
-  parameters:
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    pageParam:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    ItemId:
+    RunId:
       type: integer
       format: int64
-      description: ID of a data collector, see ItemType
-      example: 107239
-    ExportCenter_ExportsDTO:
+      example: 33010
+    ExportUuid:
+      type: string
+      format: uuid
+      description: Unique ID of an export link
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
       type: object
       required:
-      - metadata
-      - exports
+      - pagination
       properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        exports:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExportCenter_ExportsItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    ExportCenter_ExportStatus:
+      type: string
+      enum:
+      - queued
+      - in_progress
+      - completed
+      - failed
+      - no_data
     ExportId:
       type: integer
       format: int64
       description: Unique ID of an export
+    ExportCenter_ExportedItemTypeEnum:
+      type: string
+      enum:
+      - audit
+      - web_journey
+      - live_connect
+      - consent_categories
+      - alert
+      - account_usage
+      - grid_data
+    ExportTypeEnum:
+      type: string
+      description: Enumeration of all high-level export types
+      enum:
+      - AUDIT_RUN_EXPORT
+      - WEB_JOURNEY_RUN_EXPORT
+      - MANUAL_JOURNEY_RUN_EXPORT
+      - CONSENT_CATEGORY_EXPORT
+      - ALERT_EXPORT
+      - ACCOUNT_USAGE_EXPORT
+      - GRID_DATA_EXPORT
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
     ErrorModel:
       type: object
       properties:
@@ -157,16 +184,9 @@ components:
           type: string
         validationReport:
           type: object
-    ExportCenter_ExportedItemTypeEnum:
-      type: string
-      enum:
-      - audit
-      - web_journey
-      - live_connect
-      - consent_categories
-      - alert
-      - account_usage
-      - grid_data
+    ScheduledExportId:
+      type: integer
+      format: int64
     ExportCenter_ExportsItem:
       type: object
       description: 'Not all exports are related to a particular audit/web-journey/manual-journey item or its run, e.g. consent category configs export. Such exports do not have `itemType`, `itemId`, `itemName`, `runId`, `runDate`
@@ -219,10 +239,6 @@ components:
           type: boolean
           description: Whether the export is scheduled or not
           default: false
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
     PaginationMetadata:
       type: object
       required:
@@ -247,26 +263,6 @@ components:
         currentPageNumber:
           description: Current page number/ordinal
           type: integer
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    ExportCenter_ExportStatus:
-      type: string
-      enum:
-      - queued
-      - in_progress
-      - completed
-      - failed
-      - no_data
-    ExportUuid:
-      type: string
-      format: uuid
-      description: Unique ID of an export link
     ExportCenter_ExportsSortColumn:
       type: string
       enum:
@@ -279,17 +275,23 @@ components:
       - status
       - is_scheduled
       default: date_exported
-    ExportTypeEnum:
-      type: string
-      description: Enumeration of all high-level export types
-      enum:
-      - AUDIT_RUN_EXPORT
-      - WEB_JOURNEY_RUN_EXPORT
-      - MANUAL_JOURNEY_RUN_EXPORT
-      - CONSENT_CATEGORY_EXPORT
-      - ALERT_EXPORT
-      - ACCOUNT_USAGE_EXPORT
-      - GRID_DATA_EXPORT
+    ItemId:
+      type: integer
+      format: int64
+      description: ID of a data collector, see ItemType
+      example: 107239
+    ExportCenter_ExportsDTO:
+      type: object
+      required:
+      - metadata
+      - exports
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        exports:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportCenter_ExportsItem'
     DateAndTime:
       type: string
       format: date-time
@@ -308,26 +310,24 @@ components:
 
         '
       example: '2016-08-18T17:33:00Z'
-    ScheduledExportId:
-      type: integer
-      format: int64
-    UserId:
-      type: integer
-      description: ID of a user
-      example: 123
-  responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
   securitySchemes:
     API_Key:
       type: apiKey

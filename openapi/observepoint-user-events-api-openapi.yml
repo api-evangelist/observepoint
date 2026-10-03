@@ -96,8 +96,8 @@ paths:
       - API_Key: []
 components:
   responses:
-    NotFound:
-      description: The object you are looking is not found
+    UnAuthorized:
+      description: Your token is invalid.
       content:
         application/json:
           schema:
@@ -108,13 +108,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
+    NotFound:
+      description: The object you are looking is not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
   parameters:
+    PageParam:
+      in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
     SortDescendingParam:
       name: sortDesc
       in: query
@@ -132,46 +141,7 @@ components:
         maximum: 1000
         default: 100
         minimum: 100
-    PageParam:
-      in: query
-      name: page
-      description: Number of results page of an endpoint with paginated results
-      required: false
-      schema:
-        type: integer
-        default: 0
-        minimum: 0
   schemas:
-    UserEventTypeApi:
-      type: string
-      enum:
-      - created
-      - deleted
-      - run-requested
-      - uploaded
-      - edited
-      - overage-enabled
-      - overage-disabled
-      - undeleted
-    UserEvents_ResponseDTO:
-      type: object
-      properties:
-        nextPage:
-          type: boolean
-          description: true if there are more pages of data to return
-        userEvents:
-          items:
-            $ref: '#/components/schemas/UserEvent_ItemDTO'
-    UserEventSortByEnum:
-      type: string
-      enum:
-      - userId
-      - userName
-      - eventType
-      - itemId
-      - itemName
-      - eventTimeStamp
-      default: eventTimeStamp
     UserEvent_ItemDTO:
       description: event log by user
       type: object
@@ -191,6 +161,52 @@ components:
         eventTimeStamp:
           type: string
           format: date-time
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    UserEventSortByEnum:
+      type: string
+      enum:
+      - userId
+      - userName
+      - eventType
+      - itemId
+      - itemName
+      - eventTimeStamp
+      default: eventTimeStamp
+    UserEventTypeApi:
+      type: string
+      enum:
+      - created
+      - deleted
+      - run-requested
+      - uploaded
+      - edited
+      - overage-enabled
+      - overage-disabled
+      - undeleted
+    UserId:
+      type: integer
+      description: ID of a user
+      example: 123
+    UserEvents_ResponseDTO:
+      type: object
+      properties:
+        nextPage:
+          type: boolean
+          description: true if there are more pages of data to return
+        userEvents:
+          items:
+            $ref: '#/components/schemas/UserEvent_ItemDTO'
     UserEventItemTypeApi:
       type: string
       enum:
@@ -205,22 +221,6 @@ components:
       - email-inbox
       - grid-saved-report
       - custom-http-header-group
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    UserId:
-      type: integer
-      description: ID of a user
-      example: 123
   securitySchemes:
     API_Key:
       type: apiKey

@@ -271,18 +271,6 @@ paths:
       description: DELETE /v3/email-inboxes/{emailInboxId}/messages/{receivedEmailMessageId}/runs
 components:
   responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
@@ -295,20 +283,34 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
     EmailInboxId:
       type: integer
-    Label:
-      description: DTO for Labels
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-        name:
-          type: string
+    EmailInboxLinkExclusionFilters:
+      description: A regex to be used to exclude links in email scans.
+      type: string
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
     EmailInboxRequestDTO:
       type: object
       required:
@@ -333,31 +335,6 @@ components:
             $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
         omitSocialLinks:
           type: boolean
-    EmailInboxLinkExclusionFilters:
-      description: A regex to be used to exclude links in email scans.
-      type: string
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     EmailInboxSubscribersDTO:
       type: object
       properties:
@@ -408,16 +385,30 @@ components:
             $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
         omitSocialLinks:
           type: boolean
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
   parameters:
-    EmailInboxId:
-      name: emailInboxId
-      in: path
-      required: true
-      description: Unique identification number for email inbox
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/EmailInboxId'
     AuditId:
       name: auditId
       in: path
@@ -436,6 +427,15 @@ components:
       allowEmptyValue: false
       schema:
         type: integer
+    EmailInboxId:
+      name: emailInboxId
+      in: path
+      required: true
+      description: Unique identification number for email inbox
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/EmailInboxId'
   securitySchemes:
     API_Key:
       type: apiKey

@@ -68,18 +68,6 @@ paths:
       description: PUT /v3/web-journeys/{webJourneyId}/custom-headers
 components:
   responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
@@ -92,6 +80,28 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
   schemas:
     WebJourneyId:
       type: integer
@@ -126,16 +136,6 @@ components:
           type: string
         validationReport:
           type: object
-  parameters:
-    WebJourneyId:
-      name: webJourneyId
-      in: path
-      required: true
-      description: Unique identification number for web journey item
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/WebJourneyId'
   securitySchemes:
     API_Key:
       type: apiKey

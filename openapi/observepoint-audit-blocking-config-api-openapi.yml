@@ -68,6 +68,12 @@ paths:
       description: PUT /v3/web-audits/{auditId}/blocking-configuration
 components:
   responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
     NotFound:
       description: The object you are looking is not found
       content:
@@ -80,29 +86,11 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
     AuditId:
       type: integer
       format: int64
       example: 107239
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     BlockingConfig_DTO:
       type: object
       description: The blocking configuration to be applied to the Audit or Journey.
@@ -117,6 +105,18 @@ components:
           type: array
           items:
             type: integer
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
   parameters:
     AuditId:
       name: auditId

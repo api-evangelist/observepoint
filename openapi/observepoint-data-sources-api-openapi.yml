@@ -187,7 +187,87 @@ paths:
       - API_Key: []
       description: POST /v3/data-sources/target-items/{itemType}/search
 components:
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
+    DataSourceTargetItemSortByEnum:
+      type: string
+      default: ITEM_NAME
+      enum:
+      - ITEM_NAME
+      - RUN_DATE
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    DataSourceItemTypeCap:
+      description: Type of data source item.
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    AuditRun:
+      type: object
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          type: string
+          format: date-time
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
     DataSourcesTargetItemsSearchResponse:
       type: object
       properties:
@@ -197,19 +277,33 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DataSourcesTargetItem'
-    DataSourceSortByEnum:
-      type: string
-      default: lastRun
-      enum:
-      - itemName
+    DataSource:
+      type: object
+      required:
       - itemType
-      - lastRun
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
+      - itemId
+      - labels
+      properties:
+        itemType:
+          $ref: '#/components/schemas/DataSourceItemType'
+        itemId:
+          type: integer
+        itemName:
+          type: string
+        lastCompletedRun:
+          $ref: '#/components/schemas/AuditRun'
+        consentCategoryType:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+    DataSourceItemType:
+      description: Type of data source item.
+      type: string
+      enum:
+      - audit
+      - web-journey
     DataSourcesTargetItem:
       type: object
       properties:
@@ -233,63 +327,30 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AssignedLabel'
-    DataSource:
+    PaginationMetadata:
       type: object
       required:
-      - itemType
-      - itemId
-      - labels
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
       properties:
-        itemType:
-          $ref: '#/components/schemas/DataSourceItemType'
-        itemId:
+        totalCount:
+          description: Total number of items available from all result pages combined
           type: integer
-        itemName:
-          type: string
-        lastCompletedRun:
-          $ref: '#/components/schemas/AuditRun'
-        consentCategoryType:
-          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
-        labels:
-          type: array
-          items:
-            $ref: '#/components/schemas/Label'
-    ConsentCategory_TypeEnum:
-      type: string
-      enum:
-      - approved
-      - unapproved
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AuditRun:
-      type: object
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          type: string
-          format: date-time
-    DomainId:
-      type: integer
-      format: int32
-      description: ID of a domain
-      example: 123
-    DataSourceItemTypeCap:
-      description: Type of data source item.
-      type: string
-      enum:
-      - AUDIT
-      - WEB_JOURNEY
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
     FolderDomainFilterItem:
       type: object
       required:
@@ -302,10 +363,6 @@ components:
           description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
           items:
             $ref: '#/components/schemas/DomainId'
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
     DataSourcesTargetItemsSearchRequest:
       type: object
       description: Filters supported by Unified Data Sources Target Items Search.
@@ -333,49 +390,22 @@ components:
             $ref: '#/components/schemas/LabelId'
         folders:
           $ref: '#/components/schemas/FolderDomainFilter'
-    PaginationMetadata:
+    FolderDomainFilter:
       type: object
+      description: non-empty array of folders with domains (subfolders), items from which will be included in response
       required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
+      - folders
       properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    Label:
-      description: DTO for Labels
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-        name:
-          type: string
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
+        folders:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/FolderDomainFilterItem'
+    DomainId:
+      type: integer
+      format: int32
+      description: ID of a domain
+      example: 123
     DataSourcesResult:
       type: object
       required:
@@ -395,52 +425,30 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/LabelId'
-    FolderDomainFilter:
-      type: object
-      description: non-empty array of folders with domains (subfolders), items from which will be included in response
-      required:
-      - folders
-      properties:
-        folders:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/FolderDomainFilterItem'
-    DataSourceTargetItemSortByEnum:
-      type: string
-      default: ITEM_NAME
-      enum:
-      - ITEM_NAME
-      - RUN_DATE
-    DataSourceItemType:
-      description: Type of data source item.
-      type: string
-      enum:
-      - audit
-      - web-journey
     FolderId:
       type: integer
       format: int32
       description: ID of a folder
       example: 123
+    DataSourceSortByEnum:
+      type: string
+      default: lastRun
+      enum:
+      - itemName
+      - itemType
+      - lastRun
+    ConsentCategory_TypeEnum:
+      type: string
+      enum:
+      - approved
+      - unapproved
   parameters:
-    SortDescendingParam:
-      name: sortDesc
+    DataSourceTargetItemSortByParam:
+      name: sortBy
       in: query
-      description: Controls sorting order
       required: false
       schema:
-        type: boolean
-        default: false
-    PageParam:
-      in: query
-      name: page
-      description: Number of results page of an endpoint with paginated results
-      required: false
-      schema:
-        type: integer
-        default: 0
-        minimum: 0
+        $ref: '#/components/schemas/DataSourceTargetItemSortByEnum'
     PageSize:
       in: query
       name: pageSize
@@ -450,31 +458,23 @@ components:
         maximum: 1000
         default: 100
         minimum: 100
-    DataSourceTargetItemSortByParam:
-      name: sortBy
+    PageParam:
       in: query
+      name: page
+      description: Number of results page of an endpoint with paginated results
       required: false
       schema:
-        $ref: '#/components/schemas/DataSourceTargetItemSortByEnum'
-  responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
+        type: integer
+        default: 0
+        minimum: 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
   securitySchemes:
     API_Key:
       type: apiKey

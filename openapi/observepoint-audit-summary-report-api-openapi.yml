@@ -242,44 +242,32 @@ paths:
       - API_Key: []
       description: GET /v3/web-audits/{auditId}/reports/audit-summary/scores/trends/{trendName}
 components:
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    FailedDependency:
+      description: The method could not be performed on the resource because the requested action depended on another action and that action failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    AuditRun_AuditSummary_TrendsDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_AuditSummary_TrendItem'
-    AuditRun_AuditSummary_ScoresDTO:
-      type: object
-      required:
-      - total
-      - tagPresence
-      - tagPerformance
-      - rules
-      - pagePerformance
-      - cookies
-      properties:
-        total:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
-        tagPresence:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
-        tagPerformance:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
-        rules:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
-        pagePerformance:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
-        cookies:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
-    AuditRun_AuditSummary_TrendsEnum:
-      type: string
-      enum:
-      - unique_tags
-      - broken_tags
-      - broken_pages
     AuditRun_AuditSummary_AllScoresTrendValuesDTO:
       type: object
       required:
@@ -289,20 +277,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditRun_AuditSummary_AllScoresTrendValueItem'
-    TagName:
-      type: string
-      description: Tag name
-    AuditRun_AuditSummary_ScoreTrendValueItem:
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    ItemRun_SpecificTrendValueItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
       allOf:
       - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
       - type: object
         required:
-        - score
+        - trendValue
         properties:
-          score:
-            $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+          trendValue:
+            type: number
     AuditRun_AuditSummary_RequestDTO:
       description: Request body with filters for Audit Summary report
       type: object
@@ -316,30 +305,46 @@ components:
           $ref: '#/components/schemas/TagCategoryId'
         tagVendorId:
           $ref: '#/components/schemas/TagVendorId'
-    TagId:
+    TagCategoryId:
       type: integer
-      description: Tag ID
-    AuditRun_AuditSummary_DetectedTagsDTO:
+      description: Tag category ID
+    TagName:
+      type: string
+      description: Tag name
+    AuditRun_AuditSummary_ScoreTrendsEnum:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      type: string
+      enum:
+      - total
+      - tag_presence
+      - tag_performance
+      - rules
+      - page_performance
+      - cookies
+    TagLoadTime:
+      type: integer
+      description: Tag load time, in milliseconds
+      default: 0
+    AuditRun_AuditSummary_TrendsEnum:
+      type: string
+      enum:
+      - unique_tags
+      - broken_tags
+      - broken_pages
+    AuditRun_AuditSummary_SummaryDTO:
+      description: 'Audit Summary data. This endpoint will only provide unique primary tags data. the rest should be retrieved from tag-inventory : getAuditRunTagInventorySummary'
       type: object
       required:
-      - tags
+      - totalUniquePrimaryTagCount
+      - filteredUniquePrimaryTagCount
       properties:
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_AuditSummary_DetectedTagItem'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
+        totalUniquePrimaryTagCount:
+          type: integer
+          description: Total number of tag vendors selected as account primary tags discovered during an audit run
+        filteredUniquePrimaryTagCount:
+          type: integer
+          description: Number of tag vendors selected as account primary tags passing all applied filters
     AuditRun_AuditSummary_DetectedTagItem:
       allOf:
       - $ref: '#/components/schemas/TagInfoTrait'
@@ -365,116 +370,9 @@ components:
           uniqueVariableCount:
             type: integer
             description: Number of unique variables in the tag
-    TagInfoTrait:
-      type: object
-      description: Common tag info
-      required:
-      - tagId
-      - tagName
-      - tagCategoryId
-      - tagCategoryName
-      properties:
-        tagId:
-          $ref: '#/components/schemas/TagId'
-        tagName:
-          $ref: '#/components/schemas/TagName'
-        tagCategoryId:
-          $ref: '#/components/schemas/TagCategoryId'
-        tagCategoryName:
-          $ref: '#/components/schemas/TagCategoryName'
-    AuditRun_AuditSummary_PrimaryTagsDTO:
-      type: object
-      required:
-      - tags
-      properties:
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_AuditSummary_PrimaryTagItem'
-    AuditRun_AuditSummary_TagStatusCodeDistribution:
-      description: See `StatusCodeEnum`
-      type: object
-      required:
-      - good
-      - redirect
-      - broken
-      properties:
-        good:
-          type: integer
-          description: Number of tag requests with "good" status code
-          default: 0
-        redirect:
-          type: integer
-          description: Number of tag requests with "redirect" status code
-          default: 0
-        broken:
-          type: integer
-          description: Number of tag requests with "broken" status code
-          default: 0
-    ItemRunTrendsItemTrait:
-      type: object
-      required:
-      - runId
-      - completedAt
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          $ref: '#/components/schemas/DateAndTime'
-    AuditRun_AuditSummary_AllScoresTrendValueItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        required:
-        - scores
-        properties:
-          scores:
-            $ref: '#/components/schemas/AuditRun_AuditSummary_ScoresDTO'
-    AuditRun_AuditSummary_Score:
-      type: object
-      required:
-      - score
-      - max
-      properties:
-        score:
-          type: number
-          format: float
-          description: Amount of points obtained in given score category. Rounded to one digit after dot
-        max:
-          type: integer
-          description: Max points for given score category, inclusive
-    AuditId:
+    TagVendorId:
       type: integer
-      format: int64
-      example: 107239
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    TagLoadTime:
-      type: integer
-      description: Tag load time, in milliseconds
-      default: 0
-    AuditRun_AuditSummary_ScoreTrendValuesDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_AuditSummary_ScoreTrendValueItem'
-    ItemRun_SpecificTrendValuesDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+      description: Tag vendor ID
     AuditRun_AuditSummary_PrimaryTagItem:
       allOf:
       - $ref: '#/components/schemas/TagInfoTrait'
@@ -502,6 +400,64 @@ components:
             $ref: '#/components/schemas/TagLoadTime'
           statusCodeDistribution:
             $ref: '#/components/schemas/AuditRun_AuditSummary_TagStatusCodeDistribution'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun_AuditSummary_TagStatusCodeDistribution:
+      description: See `StatusCodeEnum`
+      type: object
+      required:
+      - good
+      - redirect
+      - broken
+      properties:
+        good:
+          type: integer
+          description: Number of tag requests with "good" status code
+          default: 0
+        redirect:
+          type: integer
+          description: Number of tag requests with "redirect" status code
+          default: 0
+        broken:
+          type: integer
+          description: Number of tag requests with "broken" status code
+          default: 0
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    TagInfoTrait:
+      type: object
+      description: Common tag info
+      required:
+      - tagId
+      - tagName
+      - tagCategoryId
+      - tagCategoryName
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagName:
+          $ref: '#/components/schemas/TagName'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        tagCategoryName:
+          $ref: '#/components/schemas/TagCategoryName'
     AuditRun_AuditSummary_TrendItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
@@ -522,39 +478,99 @@ components:
           totalBrokenTagCount:
             type: integer
             description: Total number of broken tag requests (0, 400+ or 500+ HTTP status code)
-    TagVendorId:
-      type: integer
-      description: Tag vendor ID
+    AuditRun_AuditSummary_ScoreTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - score
+        properties:
+          score:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+    AuditRun_AuditSummary_ScoresDTO:
+      type: object
+      required:
+      - total
+      - tagPresence
+      - tagPerformance
+      - rules
+      - pagePerformance
+      - cookies
+      properties:
+        total:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        tagPresence:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        tagPerformance:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        rules:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        pagePerformance:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
+        cookies:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
     TagCategoryName:
       type: string
       description: Name of a category of a tag
-    TagCategoryId:
-      type: integer
-      description: Tag category ID
-    AuditRun_AuditSummary_SummaryDTO:
-      description: 'Audit Summary data. This endpoint will only provide unique primary tags data. the rest should be retrieved from tag-inventory : getAuditRunTagInventorySummary'
+    AuditRun_AuditSummary_ScoreTrendValuesDTO:
       type: object
       required:
-      - totalUniquePrimaryTagCount
-      - filteredUniquePrimaryTagCount
+      - runs
       properties:
-        totalUniquePrimaryTagCount:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_ScoreTrendValueItem'
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    AuditRun_AuditSummary_Score:
+      type: object
+      required:
+      - score
+      - max
+      properties:
+        score:
+          type: number
+          format: float
+          description: Amount of points obtained in given score category. Rounded to one digit after dot
+        max:
           type: integer
-          description: Total number of tag vendors selected as account primary tags discovered during an audit run
-        filteredUniquePrimaryTagCount:
-          type: integer
-          description: Number of tag vendors selected as account primary tags passing all applied filters
-    AuditRun_AuditSummary_ScoreTrendsEnum:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
-      type: string
-      enum:
-      - total
-      - tag_presence
-      - tag_performance
-      - rules
-      - page_performance
-      - cookies
+          description: Max points for given score category, inclusive
+    TagId:
+      type: integer
+      description: Tag ID
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    AuditRun_AuditSummary_DetectedTagsDTO:
+      type: object
+      required:
+      - tags
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_DetectedTagItem'
+    AuditRun_AuditSummary_TrendsDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_TrendItem'
     DateAndTime:
       type: string
       format: date-time
@@ -573,52 +589,27 @@ components:
 
         '
       example: '2016-08-18T17:33:00Z'
-    ItemRun_SpecificTrendValueItem:
+    AuditRun_AuditSummary_AllScoresTrendValueItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
       allOf:
       - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
       - type: object
         required:
-        - trendValue
+        - scores
         properties:
-          trendValue:
-            type: number
-  responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    FailedDependency:
-      description: The method could not be performed on the resource because the requested action depended on another action and that action failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
+          scores:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_ScoresDTO'
+    AuditRun_AuditSummary_PrimaryTagsDTO:
+      type: object
+      required:
+      - tags
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_AuditSummary_PrimaryTagItem'
   parameters:
-    RunId:
-      name: runId
-      in: path
-      required: true
-      description: Unique identification number for web audit or journey run
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/RunId'
     AuditId:
       name: auditId
       in: path
@@ -637,6 +628,15 @@ components:
         description: Number of days to get trend values for, relative to current time
         maximum: 390
         minimum: 1
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
   securitySchemes:
     API_Key:
       type: apiKey

@@ -45,12 +45,6 @@ paths:
       description: POST /v3/consent-categories/exports/{exportType}
 components:
   responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
@@ -63,6 +57,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
     ExportResultDTO:
       type: object
@@ -71,15 +71,6 @@ components:
       properties:
         exportId:
           $ref: '#/components/schemas/ExportId'
-    ConsentCategory_ExportTypeEnum:
-      type: string
-      description: All supported consent category export types (non-related to runs)
-      enum:
-      - ACCOUNT_CONSENT_CATEGORY_CONFIGS_EXPORT
-    ExportId:
-      type: integer
-      format: int64
-      description: Unique ID of an export
     ErrorModel:
       type: object
       properties:
@@ -92,6 +83,15 @@ components:
           type: string
         validationReport:
           type: object
+    ConsentCategory_ExportTypeEnum:
+      type: string
+      description: All supported consent category export types (non-related to runs)
+      enum:
+      - ACCOUNT_CONSENT_CATEGORY_CONFIGS_EXPORT
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
   securitySchemes:
     API_Key:
       type: apiKey

@@ -81,7 +81,54 @@ paths:
       security:
       - API_Key: []
 components:
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   schemas:
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    WebActionSelector:
+      type: object
+      properties:
+        selectorType:
+          $ref: '#/components/schemas/WebActionSelectorType'
+        value:
+          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
+      required:
+      - selectorType
+      - value
+    WebActionSelectorType:
+      type: string
+      enum:
+      - id
+      - name
+      - css
+      - xpath
+      - htmlattributes
     SequencedAction:
       type: object
       properties:
@@ -147,14 +194,6 @@ components:
       required:
       - sequence
       - actionType
-    WebActionSelectorType:
-      type: string
-      enum:
-      - id
-      - name
-      - css
-      - xpath
-      - htmlattributes
     ActionSetActionDto:
       allOf:
       - $ref: '#/components/schemas/SequencedAction'
@@ -167,20 +206,6 @@ components:
           pageFilter:
             type: string
             description: Page filter pattern for the action
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    WebActionSelector:
-      type: object
-      properties:
-        selectorType:
-          $ref: '#/components/schemas/WebActionSelectorType'
-        value:
-          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
-      required:
-      - selectorType
-      - value
     ErrorModel:
       type: object
       properties:
@@ -193,31 +218,6 @@ components:
           type: string
         validationReport:
           type: object
-  responses:
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   parameters:
     AuditId:
       name: auditId
