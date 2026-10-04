@@ -1212,6 +1212,8 @@ apis:
   humanURL: https://api-docs.observepoint.com/sections/v3-index
   baseURL: https://api.observepoint.com
   tags:
+  - Scheduled Exports
+  tags_raw:
   - scheduled-exports
   properties:
   - type: OpenAPI
