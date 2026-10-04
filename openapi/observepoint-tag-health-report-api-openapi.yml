@@ -208,64 +208,133 @@ paths:
       - API_Key: []
       description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/tag-health/pages
 components:
-  responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    AuditRun_TagHealth_TrendsItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+    PageUrlFilterEnum:
+      type: string
+      enum:
+      - contains
+      - regex
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    TagInfoTrait:
+      type: object
+      description: Common tag info
+      required:
+      - tagId
+      - tagName
+      - tagCategoryId
+      - tagCategoryName
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagName:
+          $ref: '#/components/schemas/TagName'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        tagCategoryName:
+          $ref: '#/components/schemas/TagCategoryName'
+    AuditRun_TagHealth_PageListItem:
       allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
       - type: object
         required:
-        - totalTagLoadTimeAverage
-        - totalTagRequestSizeAverage
-        - totalSlowTagCount
-        - totalBrokenTagCount
-        - totalTagInstanceCount
+        - filteredTagLoadTimeAverage
+        - filteredTagRequestSizeAverage
+        - filteredTagInstanceCount
+        - filteredBrokenTagCount
         properties:
-          totalTagLoadTimeAverage:
+          filteredTagLoadTimeAverage:
             $ref: '#/components/schemas/TagLoadTime'
-          totalTagRequestSizeAverage:
+          filteredTagRequestSizeAverage:
             $ref: '#/components/schemas/TagRequestSize'
-          totalSlowTagCount:
+          filteredTagInstanceCount:
             type: integer
-            description: Total number of tag request loaded slower than 2 sec
-          slowTagPercentage:
-            type: number
-            format: double
-            description: Percentage of tag requests loaded slower than 2 sec
-          totalBrokenTagCount:
+            description: Number of tag requests on a page passing all applied filters
+          filteredBrokenTagCount:
             type: integer
-            description: Total number of broken tag requests (0, 400+ or 500+ HTTP status code)
-          brokenTagPercentage:
-            type: number
-            format: double
-            description: Percentage of tag requests loaded slower than 2 sec
-          totalTagInstanceCount:
-            type: integer
-            description: Number of tag requests passing all applied filters
-    RunId:
+            description: Number of broken tag requests on a page passing all applied filters
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    TagAccount:
+      type: string
+      description: Tag account
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
+      properties:
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    TagRequestSize:
       type: integer
-      format: int64
-      example: 33010
+      description: Tag network request size, in bytes
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
+    AuditRun_TagHealth_TagStatusCodeDistribution:
+      description: See `StatusCodeEnum`
+      type: object
+      required:
+      - good
+      - redirect
+      - broken
+      properties:
+        good:
+          type: integer
+          description: Number of tag requests with "good" status code
+        redirect:
+          type: integer
+          description: Number of tag requests with "redirect" status code
+        broken:
+          type: integer
+          description: Number of tag requests with "broken" status code
+    StatusCodeEnum:
+      description: good - 2xx, redirects - 3xx, broken - all others
+      deprecated: true
+      type: string
+      enum:
+      - good
+      - redirects
+      - broken
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
     PageFiltersTrait:
       type: object
       description: Common trait for page filters
@@ -290,355 +359,10 @@ components:
           $ref: '#/components/schemas/PageRedirectCountFilter'
         hasBrokenLinks:
           type: boolean
-    AuditRun_TagHealth_PageListItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
-      - type: object
-        required:
-        - filteredTagLoadTimeAverage
-        - filteredTagRequestSizeAverage
-        - filteredTagInstanceCount
-        - filteredBrokenTagCount
-        properties:
-          filteredTagLoadTimeAverage:
-            $ref: '#/components/schemas/TagLoadTime'
-          filteredTagRequestSizeAverage:
-            $ref: '#/components/schemas/TagRequestSize'
-          filteredTagInstanceCount:
-            type: integer
-            description: Number of tag requests on a page passing all applied filters
-          filteredBrokenTagCount:
-            type: integer
-            description: Number of broken tag requests on a page passing all applied filters
-    ItemRun_SpecificTrendValueItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        required:
-        - trendValue
-        properties:
-          trendValue:
-            type: number
-    StringInclusionFilterTypeEnum:
-      type: string
-      enum:
-      - contains
-      - not_contains
-    AuditRun_TagHealth_RequestDTO:
-      allOf:
-      - $ref: '#/components/schemas/PageFiltersTrait'
-      - type: object
-        properties:
-          pageStatusCode:
-            $ref: '#/components/schemas/StatusCodeEnum'
-          primaryTagsOnly:
-            type: boolean
-            description: if true then return only pages/tags with primary tags else return all pages/tags
-          tagLoadTime:
-            $ref: '#/components/schemas/TagLoadTimeFilter'
-          tagStatusCode:
-            $ref: '#/components/schemas/StatusCodeEnum'
-          tagId:
-            $ref: '#/components/schemas/TagId'
-          tagCategoryId:
-            $ref: '#/components/schemas/TagCategoryId'
-          tagVendorId:
-            $ref: '#/components/schemas/TagVendorId'
-          tagAccount:
-            $ref: '#/components/schemas/TagAccount'
-          tagRequestSize:
-            $ref: '#/components/schemas/AuditRun_TagHealth_TagRequestSize'
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    TagRequestSize:
-      type: integer
-      description: Tag network request size, in bytes
-    AuditRun_TagHealth_TagAccountListItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRun_TagHealth_TagListItemTrait'
-      - type: object
-        required:
-        - tagAccount
-        properties:
-          tagAccount:
-            $ref: '#/components/schemas/TagAccount'
-    AuditRunPageTrait:
-      description: Common trait for audit page with mandatory page properties
-      type: object
-      required:
-      - pageId
-      - pageUrl
-      properties:
-        pageId:
-          $ref: '#/components/schemas/PageId'
-        pageUrl:
-          $ref: '#/components/schemas/PageUrl'
-    TagCategoryId:
-      type: integer
-      description: Tag category ID
-    StatusCodeEnum:
-      description: good - 2xx, redirects - 3xx, broken - all others
-      deprecated: true
-      type: string
-      enum:
-      - good
-      - redirects
-      - broken
-    AuditRunPageCommonColumnsTrait:
-      description: Trait for audit page with common page properties
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageTrait'
-      - type: object
-        required:
-        - pageLoadTime
-        - pageStatusCode
-        properties:
-          pageLoadTime:
-            $ref: '#/components/schemas/PageLoadTime'
-          pageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    TagName:
-      type: string
-      description: Tag name
-    IntegerFilterTypeEnum:
-      type: string
-      enum:
-      - specific
-      - range
-    TagLoadTime:
-      type: integer
-      description: Tag load time, in milliseconds
-      default: 0
-    PageUrlFilterEnum:
-      type: string
-      enum:
-      - contains
-      - regex
-    PageRedirectCountFilter:
-      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    PageLoadTimeFilter:
-      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    TagVendorId:
-      type: integer
-      description: Tag vendor ID
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    PageId:
-      type: string
-      example: f9d32cc7cc2046d6decb145a80289287f5226323
-    PageUrlFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/PageUrlFilterEnum'
-        filterValue:
-          type: string
-          minLength: 1
-        negated:
-          type: boolean
-          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
-          default: false
-    AuditRun_TagHealth_TagListDTO:
-      type: object
-      required:
-      - tags
-      properties:
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_TagHealth_TagListItem'
-    PageUrl:
-      type: string
-      format: url
-      example: https://example.com/about
-    ItemRun_SpecificTrendValuesDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
     AuditRun_TagHealth_TagRequestSize:
       description: Tag request size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
       allOf:
       - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    IntegerFilter:
-      type: object
-      required:
-      - filterType
-      - negated
-      properties:
-        filterType:
-          $ref: '#/components/schemas/IntegerFilterTypeEnum'
-        negated:
-          type: boolean
-          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
-      discriminator:
-        propertyName: filterType
-        mapping:
-          specific: '#/components/schemas/SpecificIntegerFilter'
-          range: '#/components/schemas/IntegerRangeFilter'
-    PageTitleFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          description: Page title as displayed by browser
-          minLength: 1
-          example: ObserveP
-    AuditRun_TagHealth_TagAccountsSortColumn:
-      description: For `tag_loadtime_*` lower and upper bounds are correspondingly inclusive and exclusive
-      type: string
-      enum:
-      - tag_account
-      - tag_instance_count
-      - tag_request_size_average
-      - tag_load_time_below_500
-      - tag_load_time_from_500_to_1000
-      - tag_load_time_from_1000_to_2000
-      - tag_load_time_above_2000
-    AuditRunPageCommonColumnsWithFinalValuesTrait:
-      description: Trait for audit page with final URL and final status code
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
-      - type: object
-        properties:
-          finalPageUrl:
-            $ref: '#/components/schemas/PageUrl'
-          finalPageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    AuditRun_TagHealth_TagStatusCodeDistribution:
-      description: See `StatusCodeEnum`
-      type: object
-      required:
-      - good
-      - redirect
-      - broken
-      properties:
-        good:
-          type: integer
-          description: Number of tag requests with "good" status code
-        redirect:
-          type: integer
-          description: Number of tag requests with "redirect" status code
-        broken:
-          type: integer
-          description: Number of tag requests with "broken" status code
-    TagInfoTrait:
-      type: object
-      description: Common tag info
-      required:
-      - tagId
-      - tagName
-      - tagCategoryId
-      - tagCategoryName
-      properties:
-        tagId:
-          $ref: '#/components/schemas/TagId'
-        tagName:
-          $ref: '#/components/schemas/TagName'
-        tagCategoryId:
-          $ref: '#/components/schemas/TagCategoryId'
-        tagCategoryName:
-          $ref: '#/components/schemas/TagCategoryName'
-    PageLoadTime:
-      type: integer
-      description: Time page took to load, in milliseconds
-    AuditRun_TagHealth_TagListItemTrait:
-      allOf:
-      - $ref: '#/components/schemas/TagInfoTrait'
-      - type: object
-        required:
-        - tagInstanceCount
-        - tagRequestSizeAverage
-        - tagLoadTimeDistribution
-        - tagStatusCodeDistribution
-        properties:
-          tagInstanceCount:
-            type: integer
-            description: Number of tag requests
-          tagRequestSizeAverage:
-            $ref: '#/components/schemas/TagRequestSize'
-          tagLoadTimeDistribution:
-            $ref: '#/components/schemas/AuditRun_TagHealth_TagLoadTimeDistribution'
-          tagStatusCodeDistribution:
-            $ref: '#/components/schemas/AuditRun_TagHealth_TagStatusCodeDistribution'
-    AuditRun_TagHealth_TrendsDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_TagHealth_TrendsItem'
-    TagLoadTimeFilter:
-      description: Should have `min` and/or `max` properties defined
-      type: object
-      properties:
-        min:
-          type: integer
-          description: Minimum (inclusive) tag load time in milliseconds
-          minimum: 0
-        max:
-          type: integer
-          description: Maximum (exclusive) tag load time in milliseconds
     AuditRun_TagHealth_TrendsEnum:
       type: string
       x-implements:
@@ -651,6 +375,85 @@ components:
       - broken_tags
       - broken_tag_percentage
       - tag_requests
+    AuditRun_TagHealth_TagAccountListDTO:
+      type: object
+      required:
+      - metadata
+      - tagAccounts
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        tagAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_TagHealth_TagAccountListItem'
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRunPageTrait:
+      description: Common trait for audit page with mandatory page properties
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    AuditRun_TagHealth_PageSortColumn:
+      type: string
+      enum:
+      - page_url
+      - final_page_url
+      - page_load_time
+      - page_status_code
+      - final_page_status_code
+      - tag_load_time_average
+      - tag_request_size_average
+      - tag_instance_count
+      - broken_tag_count
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+    TagCategoryName:
+      type: string
+      description: Name of a category of a tag
+    TagLoadTime:
+      type: integer
+      description: Tag load time, in milliseconds
+      default: 0
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
     AuditRun_TagHealth_TagListItem:
       allOf:
       - $ref: '#/components/schemas/AuditRun_TagHealth_TagListItemTrait'
@@ -661,56 +464,18 @@ components:
           filteredTagAccountCount:
             type: integer
             description: Number of accounts of a tag passing all applied filters
-    PageSizeFilter:
-      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+    AuditRun_TagHealth_TagAccountListItem:
       allOf:
-      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
-    CombinedPageStatusCodeEnum:
-      type: string
-      description: '- `broken` - initial or final URL are `broken`,
-
-        - `good` - initial URL is `good` or `redirect` and final URL is `good`
-
-        '
-      enum:
-      - broken
-      - good
-    AuditId:
+      - $ref: '#/components/schemas/AuditRun_TagHealth_TagListItemTrait'
+      - type: object
+        required:
+        - tagAccount
+        properties:
+          tagAccount:
+            $ref: '#/components/schemas/TagAccount'
+    TagId:
       type: integer
-      format: int64
-      example: 107239
-    TagCategoryName:
-      type: string
-      description: Name of a category of a tag
-    IntegerRangeFilterTrait:
-      type: object
-      description: Common trait for integer min max filter
-      properties:
-        min:
-          type: integer
-          minimum: 0
-        max:
-          type: integer
-    AuditRun_TagHealth_TagLoadTimeDistribution:
-      type: object
-      required:
-      - below500
-      - 500to1000
-      - 1000to2000
-      - above2000
-      properties:
-        below500:
-          type: integer
-          description: Number of tag requests with load time < 500 ms
-        500to1000:
-          type: integer
-          description: Number of tag requests with 500 ms ≤ load time < 1000 ms
-        1000to2000:
-          type: integer
-          description: Number of tag requests with 1000 ms ≤ load time < 2000 ms
-        above2000:
-          type: integer
-          description: Number of tag requests with 2000 ms ≤ load time
+      description: Tag ID
     ItemRunTrendsItemTrait:
       type: object
       required:
@@ -721,20 +486,40 @@ components:
           $ref: '#/components/schemas/RunId'
         completedAt:
           $ref: '#/components/schemas/DateAndTime'
-    TagId:
-      type: integer
-      description: Tag ID
-    LongIntegerRangeFilterTrait:
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    IntegerRangeFilterTrait:
       type: object
-      description: Common trait for long integer min max filter
+      description: Common trait for integer min max filter
       properties:
         min:
           type: integer
-          format: int64
           minimum: 0
         max:
           type: integer
-          format: int64
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
     AuditRun_TagHealth_SummaryDTO:
       description: Slow tag - request loaded slower than 2 sec
       type: object
@@ -782,63 +567,125 @@ components:
           $ref: '#/components/schemas/AuditRun_TagHealth_TagLoadTimeDistribution'
         tagStatusCodeDistribution:
           $ref: '#/components/schemas/AuditRun_TagHealth_TagStatusCodeDistribution'
-    AuditRun_TagHealth_TagAccountListDTO:
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
       type: object
       required:
-      - metadata
-      - tagAccounts
+      - pagination
       properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        tagAccounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_TagHealth_TagAccountListItem'
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    AuditRun_TagHealth_PageListDTO:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    AuditRun_TagHealth_TrendsDTO:
       type: object
       required:
-      - metadata
-      - pages
+      - runs
       properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        pages:
+        runs:
           type: array
           items:
-            $ref: '#/components/schemas/AuditRun_TagHealth_PageListItem'
-    AuditRun_TagHealth_PageSortColumn:
-      type: string
-      enum:
-      - page_url
-      - final_page_url
-      - page_load_time
-      - page_status_code
-      - final_page_status_code
-      - tag_load_time_average
-      - tag_request_size_average
-      - tag_instance_count
-      - broken_tag_count
-    TagAccount:
-      type: string
-      description: Tag account
+            $ref: '#/components/schemas/AuditRun_TagHealth_TrendsItem'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
+    AuditRun_TagHealth_TagListDTO:
+      type: object
+      required:
+      - tags
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_TagHealth_TagListItem'
+    AuditRun_TagHealth_TrendsItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - totalTagLoadTimeAverage
+        - totalTagRequestSizeAverage
+        - totalSlowTagCount
+        - totalBrokenTagCount
+        - totalTagInstanceCount
+        properties:
+          totalTagLoadTimeAverage:
+            $ref: '#/components/schemas/TagLoadTime'
+          totalTagRequestSizeAverage:
+            $ref: '#/components/schemas/TagRequestSize'
+          totalSlowTagCount:
+            type: integer
+            description: Total number of tag request loaded slower than 2 sec
+          slowTagPercentage:
+            type: number
+            format: double
+            description: Percentage of tag requests loaded slower than 2 sec
+          totalBrokenTagCount:
+            type: integer
+            description: Total number of broken tag requests (0, 400+ or 500+ HTTP status code)
+          brokenTagPercentage:
+            type: number
+            format: double
+            description: Percentage of tag requests loaded slower than 2 sec
+          totalTagInstanceCount:
+            type: integer
+            description: Number of tag requests passing all applied filters
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
     AuditRun_TagHealth_FilteredRequestDTO:
       description: Request body for Tag Health report with filters present in path removed
       allOf:
@@ -855,52 +702,153 @@ components:
             $ref: '#/components/schemas/TagAccount'
           tagRequestSize:
             $ref: '#/components/schemas/AuditRun_TagHealth_TagRequestSize'
+    AuditRun_TagHealth_PageListDTO:
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_TagHealth_PageListItem'
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    AuditRun_TagHealth_TagAccountsSortColumn:
+      description: For `tag_loadtime_*` lower and upper bounds are correspondingly inclusive and exclusive
+      type: string
+      enum:
+      - tag_account
+      - tag_instance_count
+      - tag_request_size_average
+      - tag_load_time_below_500
+      - tag_load_time_from_500_to_1000
+      - tag_load_time_from_1000_to_2000
+      - tag_load_time_above_2000
+    AuditRun_TagHealth_RequestDTO:
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        properties:
+          pageStatusCode:
+            $ref: '#/components/schemas/StatusCodeEnum'
+          primaryTagsOnly:
+            type: boolean
+            description: if true then return only pages/tags with primary tags else return all pages/tags
+          tagLoadTime:
+            $ref: '#/components/schemas/TagLoadTimeFilter'
+          tagStatusCode:
+            $ref: '#/components/schemas/StatusCodeEnum'
+          tagId:
+            $ref: '#/components/schemas/TagId'
+          tagCategoryId:
+            $ref: '#/components/schemas/TagCategoryId'
+          tagVendorId:
+            $ref: '#/components/schemas/TagVendorId'
+          tagAccount:
+            $ref: '#/components/schemas/TagAccount'
+          tagRequestSize:
+            $ref: '#/components/schemas/AuditRun_TagHealth_TagRequestSize'
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRun_TagHealth_TagLoadTimeDistribution:
+      type: object
+      required:
+      - below500
+      - 500to1000
+      - 1000to2000
+      - above2000
+      properties:
+        below500:
+          type: integer
+          description: Number of tag requests with load time < 500 ms
+        500to1000:
+          type: integer
+          description: Number of tag requests with 500 ms ≤ load time < 1000 ms
+        1000to2000:
+          type: integer
+          description: Number of tag requests with 1000 ms ≤ load time < 2000 ms
+        above2000:
+          type: integer
+          description: Number of tag requests with 2000 ms ≤ load time
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
     PageStatusCode:
       type: integer
       description: Page HTTP status code
+    AuditRun_TagHealth_TagListItemTrait:
+      allOf:
+      - $ref: '#/components/schemas/TagInfoTrait'
+      - type: object
+        required:
+        - tagInstanceCount
+        - tagRequestSizeAverage
+        - tagLoadTimeDistribution
+        - tagStatusCodeDistribution
+        properties:
+          tagInstanceCount:
+            type: integer
+            description: Number of tag requests
+          tagRequestSizeAverage:
+            $ref: '#/components/schemas/TagRequestSize'
+          tagLoadTimeDistribution:
+            $ref: '#/components/schemas/AuditRun_TagHealth_TagLoadTimeDistribution'
+          tagStatusCodeDistribution:
+            $ref: '#/components/schemas/AuditRun_TagHealth_TagStatusCodeDistribution'
+    TagLoadTimeFilter:
+      description: Should have `min` and/or `max` properties defined
+      type: object
+      properties:
+        min:
+          type: integer
+          description: Minimum (inclusive) tag load time in milliseconds
+          minimum: 0
+        max:
+          type: integer
+          description: Maximum (exclusive) tag load time in milliseconds
+    PageTitleFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    TagName:
+      type: string
+      description: Tag name
   parameters:
-    AuditRun_TagAccountList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 100
-        minimum: 100
-    AuditId:
-      name: auditId
+    RunId:
+      name: runId
       in: path
       required: true
-      description: Unique identification number for web audit
+      description: Unique identification number for web audit or journey run
       deprecated: false
       allowEmptyValue: false
       schema:
-        $ref: '#/components/schemas/AuditId'
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    AuditRun_PagesList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 50
-        minimum: 50
-    TagId:
-      name: tagId
-      in: path
-      required: true
-      description: Tag ID
-      schema:
-        $ref: '#/components/schemas/TagId'
+        $ref: '#/components/schemas/RunId'
     AuditRun_TagHealth_PagesSortParam:
       name: sortBy
       in: query
@@ -916,6 +864,30 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
+    TagId:
+      name: tagId
+      in: path
+      required: true
+      description: Tag ID
+      schema:
+        $ref: '#/components/schemas/TagId'
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    AuditRun_TagAccountList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
     AuditRun_Trends_DaysParam:
       name: days
       in: query
@@ -925,15 +897,43 @@ components:
         description: Number of days to get trend values for, relative to current time
         maximum: 390
         minimum: 1
-    RunId:
-      name: runId
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    AuditId:
+      name: auditId
       in: path
       required: true
-      description: Unique identification number for web audit or journey run
+      description: Unique identification number for web audit
       deprecated: false
       allowEmptyValue: false
       schema:
-        $ref: '#/components/schemas/RunId'
+        $ref: '#/components/schemas/AuditId'
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

@@ -67,42 +67,19 @@ paths:
       - API_Key: []
       description: PUT /v3/web-journeys/{webJourneyId}/custom-headers
 components:
-  responses:
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-  parameters:
-    WebJourneyId:
-      name: webJourneyId
-      in: path
-      required: true
-      description: Unique identification number for web journey item
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/WebJourneyId'
   schemas:
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
     WebJourneyId:
       type: integer
       format: int64
@@ -124,18 +101,41 @@ components:
               isApplyToAll:
                 type: boolean
                 description: Indicates whether custom header should be applied to all requests. For GET request, indicates that the header is not just assigned to the request but also applied to all requests. For PUT request, it specifies that the header should be updated to apply to all requests, if set to true, header will not be applied to the request.
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+  parameters:
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
   securitySchemes:
     API_Key:
       type: apiKey

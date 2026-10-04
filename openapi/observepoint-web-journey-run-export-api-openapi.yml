@@ -53,35 +53,7 @@ paths:
       - API_Key: []
       description: POST /v3/web-journeys/{webJourneyId}/runs/{runId}/exports/{exportType}
 components:
-  responses:
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   parameters:
-    WebJourneyId:
-      name: webJourneyId
-      in: path
-      required: true
-      description: Unique identification number for web journey item
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/WebJourneyId'
     RunId:
       name: runId
       in: path
@@ -91,6 +63,15 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
   schemas:
     ExportResultDTO:
       type: object
@@ -99,6 +80,18 @@ components:
       properties:
         exportId:
           $ref: '#/components/schemas/ExportId'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
     WebJourneyRun_ExportTypeEnum:
       type: string
       description: All supported web journey run export types
@@ -114,26 +107,33 @@ components:
       type: integer
       format: int64
       example: 107239
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     ExportId:
       type: integer
       format: int64
       description: Unique ID of an export
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

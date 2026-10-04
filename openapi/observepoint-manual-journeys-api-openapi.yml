@@ -950,77 +950,6 @@ paths:
       - Manual Journeys
 components:
   schemas:
-    TagCategory:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-      description: Tag category data
-    RunRuleDetails:
-      type: object
-      required:
-      - actionRuleOverview
-      - globalRuleOverview
-      properties:
-        actionRuleOverview:
-          $ref: '#/components/schemas/RuleResultOverview'
-        globalRuleOverview:
-          $ref: '#/components/schemas/RuleResultOverview'
-    Authorization:
-      type: object
-      required:
-      - login
-      - password
-      properties:
-        login:
-          type: string
-        password:
-          type: string
-    HarJourneyRunCreateRequest:
-      type: object
-      required:
-      - harFiles
-      properties:
-        harFiles:
-          items:
-            $ref: '#/components/schemas/UploadedHarFile'
-          type: array
-        journeyRunName:
-          type: string
-        webhookUrl:
-          type: string
-      description: Model for creation of live connect run based on har files
-    Action:
-      type: object
-      required:
-      - actionType
-      - id
-      - name
-      - runId
-      - sequence
-      properties:
-        actionType:
-          format: int32
-          type: integer
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-        note:
-          type: string
-        runId:
-          format: int32
-          type: integer
-        sequence:
-          format: int32
-          type: integer
     RequestLog:
       type: object
       required:
@@ -1057,6 +986,120 @@ components:
         timestamp:
           format: int64
           type: integer
+    TagType:
+      type: object
+    TagVendor:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    Value:
+      type: object
+    Tag:
+      type: object
+      required:
+      - category
+      - duplicateScoring
+      - icon
+      - id
+      - name
+      properties:
+        category:
+          $ref: '#/components/schemas/TagCategory'
+        duplicateScoring:
+          type: boolean
+        icon:
+          description: Tag icon URI
+          type: string
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        numSignatures:
+          type: number
+        numVariables:
+          type: number
+        type:
+          $ref: '#/components/schemas/TagType'
+        vendor:
+          $ref: '#/components/schemas/TagVendor'
+      description: Tag data
+    Journey:
+      type: object
+      required:
+      - createdAt
+      - emails
+      - folderId
+      - id
+      - name
+      - osOfDevice
+      - updatedAt
+      - userId
+      - versionOfOs
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        emails:
+          items:
+            type: string
+          type: array
+        folderId:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        journeyType:
+          format: int32
+          type: integer
+        labels:
+          items:
+            $ref: '#/components/schemas/Label'
+          type: array
+        name:
+          type: string
+        osOfDevice:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: int32
+          type: integer
+        versionOfOs:
+          type: string
+    Authorization:
+      type: object
+      required:
+      - login
+      - password
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    HarJourneyRunCreateRequest:
+      type: object
+      required:
+      - harFiles
+      properties:
+        harFiles:
+          items:
+            $ref: '#/components/schemas/UploadedHarFile'
+          type: array
+        journeyRunName:
+          type: string
+        webhookUrl:
+          type: string
+      description: Model for creation of live connect run based on har files
     Label:
       type: object
       required:
@@ -1067,6 +1110,27 @@ components:
           format: int32
           type: integer
         name:
+          type: string
+    Pagination:
+      type: object
+      required:
+      - limit
+      - offset
+      properties:
+        limit:
+          format: int32
+          type: integer
+        offset:
+          format: int32
+          type: integer
+    UploadedHarFile:
+      type: object
+      required:
+      - s3Key
+      properties:
+        name:
+          type: string
+        s3Key:
           type: string
     JourneyRequest:
       type: object
@@ -1093,6 +1157,150 @@ components:
           type: string
         versionOfOs:
           type: string
+    RuleResultOverview:
+      type: object
+      required:
+      - broken
+      - failed
+      - notApplied
+      - passed
+      properties:
+        broken:
+          format: int32
+          type: integer
+        failed:
+          format: int32
+          type: integer
+        notApplied:
+          format: int32
+          type: integer
+        passed:
+          format: int32
+          type: integer
+    Certificate:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    Function1RequestContextFutureRouteResult:
+      type: object
+    RequestLogProperty:
+      type: object
+      required:
+      - propName
+      - propValue
+      properties:
+        propName:
+          type: string
+        propValue:
+          type: string
+    ItemIsRunningApiError:
+      type: object
+      required:
+      - errorCode
+      - message
+      - runId
+      properties:
+        errorCode:
+          format: int32
+          type: integer
+        message:
+          type: string
+        runId:
+          format: int64
+          type: integer
+    TagCategory:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+      description: Tag category data
+    InitializedJourney:
+      type: object
+      required:
+      - journeyId
+      - name
+      - proxyInfo
+      - runId
+      properties:
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        journeyId:
+          format: int32
+          type: integer
+        name:
+          type: string
+        proxyInfo:
+          $ref: '#/components/schemas/ProxyInfo'
+        runId:
+          format: int32
+          type: integer
+    RunRuleDetails:
+      type: object
+      required:
+      - actionRuleOverview
+      - globalRuleOverview
+      properties:
+        actionRuleOverview:
+          $ref: '#/components/schemas/RuleResultOverview'
+        globalRuleOverview:
+          $ref: '#/components/schemas/RuleResultOverview'
+    SeqValue:
+      type: object
+      required:
+      - empty
+      - traversableAgain
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    Action:
+      type: object
+      required:
+      - actionType
+      - id
+      - name
+      - runId
+      - sequence
+      properties:
+        actionType:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        note:
+          type: string
+        runId:
+          format: int32
+          type: integer
+        sequence:
+          format: int32
+          type: integer
+    SeqString:
+      type: object
+      required:
+      - empty
+      - traversableAgain
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
     ProxyInfo:
       type: object
       required:
@@ -1153,220 +1361,12 @@ components:
           $ref: '#/components/schemas/Value'
         versionOfOs:
           type: string
-    SeqString:
-      type: object
-      required:
-      - empty
-      - traversableAgain
-      properties:
-        empty:
-          type: boolean
-        traversableAgain:
-          type: boolean
-    Function1RequestContextFutureRouteResult:
-      type: object
-    Journey:
-      type: object
-      required:
-      - createdAt
-      - emails
-      - folderId
-      - id
-      - name
-      - osOfDevice
-      - updatedAt
-      - userId
-      - versionOfOs
-      properties:
-        createdAt:
-          format: date-time
-          type: string
-        emails:
-          items:
-            type: string
-          type: array
-        folderId:
-          format: int32
-          type: integer
-        id:
-          format: int32
-          type: integer
-        journeyType:
-          format: int32
-          type: integer
-        labels:
-          items:
-            $ref: '#/components/schemas/Label'
-          type: array
-        name:
-          type: string
-        osOfDevice:
-          type: string
-        updatedAt:
-          format: date-time
-          type: string
-        userId:
-          format: int32
-          type: integer
-        versionOfOs:
-          type: string
-    Pagination:
-      type: object
-      required:
-      - limit
-      - offset
-      properties:
-        limit:
-          format: int32
-          type: integer
-        offset:
-          format: int32
-          type: integer
-    ItemIsRunningApiError:
-      type: object
-      required:
-      - errorCode
-      - message
-      - runId
-      properties:
-        errorCode:
-          format: int32
-          type: integer
-        message:
-          type: string
-        runId:
-          format: int64
-          type: integer
-    RuleResultOverview:
-      type: object
-      required:
-      - broken
-      - failed
-      - notApplied
-      - passed
-      properties:
-        broken:
-          format: int32
-          type: integer
-        failed:
-          format: int32
-          type: integer
-        notApplied:
-          format: int32
-          type: integer
-        passed:
-          format: int32
-          type: integer
-    TagVendor:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-    RequestLogProperty:
-      type: object
-      required:
-      - propName
-      - propValue
-      properties:
-        propName:
-          type: string
-        propValue:
-          type: string
-    InitializedJourney:
-      type: object
-      required:
-      - journeyId
-      - name
-      - proxyInfo
-      - runId
-      properties:
-        certificate:
-          $ref: '#/components/schemas/Certificate'
-        journeyId:
-          format: int32
-          type: integer
-        name:
-          type: string
-        proxyInfo:
-          $ref: '#/components/schemas/ProxyInfo'
-        runId:
-          format: int32
-          type: integer
-    SeqValue:
-      type: object
-      required:
-      - empty
-      - traversableAgain
-      properties:
-        empty:
-          type: boolean
-        traversableAgain:
-          type: boolean
-    TagType:
-      type: object
-    Value:
-      type: object
-    UploadedHarFile:
-      type: object
-      required:
-      - s3Key
-      properties:
-        name:
-          type: string
-        s3Key:
-          type: string
-    Certificate:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-    Tag:
-      type: object
-      required:
-      - category
-      - duplicateScoring
-      - icon
-      - id
-      - name
-      properties:
-        category:
-          $ref: '#/components/schemas/TagCategory'
-        duplicateScoring:
-          type: boolean
-        icon:
-          description: Tag icon URI
-          type: string
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
-        numSignatures:
-          type: number
-        numVariables:
-          type: number
-        type:
-          $ref: '#/components/schemas/TagType'
-        vendor:
-          $ref: '#/components/schemas/TagVendor'
-      description: Tag data
   requestBodies:
-    SeqValue:
+    Pagination:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SeqValue'
+            $ref: '#/components/schemas/Pagination'
     LabelArray:
       content:
         application/json:
@@ -1374,11 +1374,11 @@ components:
             items:
               $ref: '#/components/schemas/Label'
             type: array
-    Pagination:
+    SeqValue:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Pagination'
+            $ref: '#/components/schemas/SeqValue'
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

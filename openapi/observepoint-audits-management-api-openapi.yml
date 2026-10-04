@@ -330,50 +330,7 @@ paths:
       - API_Key: []
       description: POST /v3/web-audits/{auditId}/runs/{runId}/consent-categories/reprocess
 components:
-  responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    RunInfoDTO:
-      type: object
-      description: Run execution information
-      required:
-      - id
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Run ID
-        completedAt:
-          type: string
-          format: date-time
-          description: Timestamp when the run completed
-        pageCount:
-          type: integer
-          format: int64
-          description: Number of pages processed in the run
     WebAudit_ConsentCategorySnapshots_ResponseDTO:
       type: object
       description: 'NOTE: For individual consent category snapshot, Field consentCategoryId is omitted when the consent category is deleted'
@@ -382,317 +339,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
-    ConsentCategory_Cmp_Data:
-      type: object
-      required:
-      - cmpVendor
-      - oneTrustCookieGroupDomain
-      - oneTrustCookieGroupId
-      - oneTrustCookieGroupGeo
-      properties:
-        cmpVendor:
-          $ref: '#/components/schemas/ConsentCategory_VendorTypeEnum'
-        oneTrustCookieGroupDescription:
-          type: string
-          description: The OneTrust provided description of the group
-        oneTrustCookieGroupDomain:
-          type: string
-          description: The domain reported by OneTrust for which the consent group applies
-          example: observepoint.com
-        oneTrustCookieGroupId:
-          type: string
-          description: The OneTrust ID for the group
-          example: C001
-        oneTrustCookieGroupGeo:
-          type: string
-          description: The geographic location for which the consent group applies
-          example: us, ut
-        sourceUrl:
-          type: string
-          description: The full URL of the page where the CMP import was run
-          example: https://example.com
-    AuditRun_RunNowRequestDTO:
-      type: object
-      required:
-      - callbackWorkflowEventType
-      - callbackRepositoryOwner
-      - callbackRepositoryName
-      properties:
-        startingUrls:
-          minItems: 0
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-        callbackWorkflowEventType:
-          type: string
-          description: 'The workflow file to be used in for starting the callback workflow
-
-            Has to be a file name without extension, e.g. "audit-complete" instead of "audit-complete.yml"
-
-            '
-        callbackRepositoryOwner:
-          type: string
-          description: 'The owner of the repository where the callback workflow is defined
-
-            This is required to correctly invoke the callback workflow
-
-            '
-        callbackRepositoryName:
-          type: string
-          description: 'The name of the repository where the callback workflow is defined
-
-            This is required to correctly invoke the callback workflow
-
-            '
-        callbackContext:
-          type: object
-          description: 'Contains a context for the callback URL to be used in the run
-
-            '
-        maxPages:
-          type:
-          - integer
-          - 'null'
-          description: 'Maximum number of pages to scan during the audit run.
-
-            If not provided, will default to the count of starting URLs if it exceeds the current audit configuration limit.
-
-            '
-        ghAppName:
-          description: 'GitHub App to use for the callback workflow dispatch.
-
-            Defaults to observepoint-integration if not specified (handled in service layer).
-
-            '
-          allOf:
-          - $ref: '#/components/schemas/GhAppNameEnum'
-    Label:
-      description: DTO for Labels
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-        name:
-          type: string
-    DomainInfoDTO:
-      type: object
-      description: Domain information
-      required:
-      - id
-      - name
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-    ConsentCategorySnapshotId:
-      type: integer
-      format: int64
-      example: 33010
-      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
-    UndeleteWebAuditResponse:
-      type: object
-      required:
-      - id
-      - status
-      properties:
-        id:
-          type: integer
-          format: int32
-        status:
-          $ref: '#/components/schemas/UndeleteStatus'
-        folderId:
-          type: integer
-          format: int32
-        subFolderId:
-          type: integer
-          format: int32
-        code:
-          $ref: '#/components/schemas/UndeleteFailureCode'
-        reason:
-          type: string
-    AuditRun_SitemapDataItem:
-      type: object
-      required:
-      - sitemapUrl
-      - urlsFound
-      properties:
-        sitemapUrl:
-          type: string
-        urlsFound:
-          type: integer
-    UndeleteFailureCode:
+    ConsentCategory_VendorTypeEnum:
       type: string
       enum:
-      - destination_gone
-      - already_restored
-      - error
-    AttachmentPatchDocument_RequestDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
-    AuditNotesDTO:
-      type: object
-      description: Audit notes information
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Unique identifier for the audit notes
-        notes:
-          type: string
-          description: Notes content for the audit
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    ConsentCategoryDTO:
-      type: object
-      properties:
-        name:
-          type: string
-        notes:
-          type: string
-        type:
-          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
-        id:
-          $ref: '#/components/schemas/ConsentCategoryId'
-        isDefaultCC:
-          type: boolean
-          description: If true, this is the default consent category
-        cmpData:
-          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
-        updatedType:
-          $ref: '#/components/schemas/ConsentCategory_updatedType'
-        updatedAt:
-          type: string
-          format: date-time
-          description: The last time this consent category was updated in UTC timezone
-    WebAudit_ConsentCategories_ResponseDTO:
-      type: object
-      required:
-      - consentCategories
-      properties:
-        consentCategories:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategoryDTO'
-    AttachmentPatchDocument_ItemDTO:
-      description: A JSONPatch document for modifying consent preference attachments
-      properties:
-        op:
-          type: string
-          description: The operation to be performed
-          enum:
-          - add
-          - remove
-        path:
-          type: string
-        value:
-          type: integer
-          description: id of the item to assign
-      example:
-      - op: add
-        path: /-
-        value: 1
-      - op: remove
-        path: /
-        value: 2
+      - ONE_TRUST
     ConsentCategory_updatedType:
       type: string
       enum:
       - ONETRUST_IMPORT
       - FILE_IMPORT
       - APP_CREATE
-    ConsentCategoryId:
-      type: integer
-      example: 3301
-      description: ID of consent category
-    UndeleteStatus:
-      type: string
-      enum:
-      - restored
-      - failed
-    UndeleteWebAuditRequest:
-      type: object
-      required:
-      - id
-      - folderId
-      - subFolderId
-      properties:
-        id:
-          type: integer
-          format: int32
-        folderId:
-          type: integer
-          format: int32
-        subFolderId:
-          type: integer
-          format: int32
-    ConsentCategory_VendorTypeEnum:
-      type: string
-      enum:
-      - ONE_TRUST
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    WebAuditDTO:
-      type: object
-      description: Web audit information
-      required:
-      - auditId
-      - auditName
-      - folderId
-      - domainId
-      properties:
-        auditId:
-          type: integer
-          description: Unique identifier for the audit
-        auditName:
-          type: string
-          description: Name of the audit
-        ownerId:
-          type: integer
-          description: User ID of the audit owner
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp when the audit was created
-        folderId:
-          type: integer
-          description: Folder ID where the audit is stored
-        domainId:
-          type: integer
-          description: Domain ID associated with the audit
-        updatedAt:
-          type: string
-          format: date-time
-          description: Timestamp when the audit was last updated
     AuditRun_SitemapData:
       type: object
       description: Data about sitemaps that were discovered and visited by the audit
@@ -715,64 +371,19 @@ components:
             format: url
             example: https://www.example.com/sitemap.xml
           description: List of sitemap URLs that could not be visited
-    ConsentCategory_TypeEnum:
-      type: string
-      enum:
-      - approved
-      - unapproved
-    ConsentCategorySnapshotDTO:
+    WebAudit_ConsentCategories_ResponseDTO:
       type: object
-      description: A consent category snapshot dto
       required:
-      - name
-      - type
-      - consentCategoryId
-      - consentCategorySnapshotId
-      - consentCategoryConfigExists
+      - consentCategories
       properties:
-        name:
-          type: string
-        notes:
-          type: string
-        type:
-          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
-        consentCategoryId:
-          $ref: '#/components/schemas/ConsentCategoryId'
-        consentCategorySnapshotId:
-          $ref: '#/components/schemas/ConsentCategorySnapshotId'
-        consentCategoryConfigExists:
-          type: boolean
-          description: If false, the consent category config doesn't exist anymore
-    LatestRunItemDTO:
-      type: object
-      description: Latest run information for an audit
-      required:
-      - id
-      - name
-      - latestRun
-      - domainInfo
-      properties:
-        id:
-          type: integer
-          description: Audit ID
-        name:
-          type: string
-          description: Audit name
-        latestRun:
-          $ref: '#/components/schemas/RunInfoDTO'
-        domainInfo:
-          $ref: '#/components/schemas/DomainInfoDTO'
-        labels:
+        consentCategories:
           type: array
-          description: Labels associated with the audit
           items:
-            $ref: '#/components/schemas/Label'
-    GhAppNameEnum:
-      type: string
-      description: Allowed GitHub App names for installation
-      enum:
-      - observepoint-integration
-      - observepoint-test-app
+            $ref: '#/components/schemas/ConsentCategoryDTO'
+    ConsentCategoryId:
+      type: integer
+      example: 3301
+      description: ID of consent category
     AuditRun_ConfigurationInfoResponseDTO:
       type: object
       required:
@@ -899,16 +510,371 @@ components:
           - 'null'
           format: int64
           description: ID of the user who stopped the audit run early, if applicable
-  parameters:
+    AuditNotesDTO:
+      type: object
+      description: Audit notes information
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the audit notes
+        notes:
+          type: string
+          description: Notes content for the audit
+    GhAppNameEnum:
+      type: string
+      description: Allowed GitHub App names for installation
+      enum:
+      - observepoint-integration
+      - observepoint-test-app
+    AuditRun_SitemapDataItem:
+      type: object
+      required:
+      - sitemapUrl
+      - urlsFound
+      properties:
+        sitemapUrl:
+          type: string
+        urlsFound:
+          type: integer
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRun_RunNowRequestDTO:
+      type: object
+      required:
+      - callbackWorkflowEventType
+      - callbackRepositoryOwner
+      - callbackRepositoryName
+      properties:
+        startingUrls:
+          minItems: 0
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        callbackWorkflowEventType:
+          type: string
+          description: 'The workflow file to be used in for starting the callback workflow
+
+            Has to be a file name without extension, e.g. "audit-complete" instead of "audit-complete.yml"
+
+            '
+        callbackRepositoryOwner:
+          type: string
+          description: 'The owner of the repository where the callback workflow is defined
+
+            This is required to correctly invoke the callback workflow
+
+            '
+        callbackRepositoryName:
+          type: string
+          description: 'The name of the repository where the callback workflow is defined
+
+            This is required to correctly invoke the callback workflow
+
+            '
+        callbackContext:
+          type: object
+          description: 'Contains a context for the callback URL to be used in the run
+
+            '
+        maxPages:
+          type:
+          - integer
+          - 'null'
+          description: 'Maximum number of pages to scan during the audit run.
+
+            If not provided, will default to the count of starting URLs if it exceeds the current audit configuration limit.
+
+            '
+        ghAppName:
+          description: 'GitHub App to use for the callback workflow dispatch.
+
+            Defaults to observepoint-integration if not specified (handled in service layer).
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/GhAppNameEnum'
+    LatestRunItemDTO:
+      type: object
+      description: Latest run information for an audit
+      required:
+      - id
+      - name
+      - latestRun
+      - domainInfo
+      properties:
+        id:
+          type: integer
+          description: Audit ID
+        name:
+          type: string
+          description: Audit name
+        latestRun:
+          $ref: '#/components/schemas/RunInfoDTO'
+        domainInfo:
+          $ref: '#/components/schemas/DomainInfoDTO'
+        labels:
+          type: array
+          description: Labels associated with the audit
+          items:
+            $ref: '#/components/schemas/Label'
+    AttachmentPatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
+    ConsentCategory_Cmp_Data:
+      type: object
+      required:
+      - cmpVendor
+      - oneTrustCookieGroupDomain
+      - oneTrustCookieGroupId
+      - oneTrustCookieGroupGeo
+      properties:
+        cmpVendor:
+          $ref: '#/components/schemas/ConsentCategory_VendorTypeEnum'
+        oneTrustCookieGroupDescription:
+          type: string
+          description: The OneTrust provided description of the group
+        oneTrustCookieGroupDomain:
+          type: string
+          description: The domain reported by OneTrust for which the consent group applies
+          example: observepoint.com
+        oneTrustCookieGroupId:
+          type: string
+          description: The OneTrust ID for the group
+          example: C001
+        oneTrustCookieGroupGeo:
+          type: string
+          description: The geographic location for which the consent group applies
+          example: us, ut
+        sourceUrl:
+          type: string
+          description: The full URL of the page where the CMP import was run
+          example: https://example.com
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    RunInfoDTO:
+      type: object
+      description: Run execution information
+      required:
+      - id
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Run ID
+        completedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the run completed
+        pageCount:
+          type: integer
+          format: int64
+          description: Number of pages processed in the run
+    AttachmentPatchDocument_ItemDTO:
+      description: A JSONPatch document for modifying consent preference attachments
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+          - add
+          - remove
+        path:
+          type: string
+        value:
+          type: integer
+          description: id of the item to assign
+      example:
+      - op: add
+        path: /-
+        value: 1
+      - op: remove
+        path: /
+        value: 2
+    UndeleteFailureCode:
+      type: string
+      enum:
+      - destination_gone
+      - already_restored
+      - error
+    UndeleteWebAuditResponse:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: integer
+          format: int32
+        status:
+          $ref: '#/components/schemas/UndeleteStatus'
+        folderId:
+          type: integer
+          format: int32
+        subFolderId:
+          type: integer
+          format: int32
+        code:
+          $ref: '#/components/schemas/UndeleteFailureCode'
+        reason:
+          type: string
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    UndeleteWebAuditRequest:
+      type: object
+      required:
+      - id
+      - folderId
+      - subFolderId
+      properties:
+        id:
+          type: integer
+          format: int32
+        folderId:
+          type: integer
+          format: int32
+        subFolderId:
+          type: integer
+          format: int32
+    DomainInfoDTO:
+      type: object
+      description: Domain information
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+    ConsentCategorySnapshotDTO:
+      type: object
+      description: A consent category snapshot dto
+      required:
+      - name
+      - type
+      - consentCategoryId
+      - consentCategorySnapshotId
+      - consentCategoryConfigExists
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+        type:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        consentCategoryId:
+          $ref: '#/components/schemas/ConsentCategoryId'
+        consentCategorySnapshotId:
+          $ref: '#/components/schemas/ConsentCategorySnapshotId'
+        consentCategoryConfigExists:
+          type: boolean
+          description: If false, the consent category config doesn't exist anymore
+    ConsentCategoryDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+        type:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        id:
+          $ref: '#/components/schemas/ConsentCategoryId'
+        isDefaultCC:
+          type: boolean
+          description: If true, this is the default consent category
+        cmpData:
+          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
+        updatedType:
+          $ref: '#/components/schemas/ConsentCategory_updatedType'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last time this consent category was updated in UTC timezone
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    UndeleteStatus:
+      type: string
+      enum:
+      - restored
+      - failed
     AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
+      type: integer
+      format: int64
+      example: 107239
+    ConsentCategorySnapshotId:
+      type: integer
+      format: int64
+      example: 33010
+      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
+    ConsentCategory_TypeEnum:
+      type: string
+      enum:
+      - approved
+      - unapproved
+    WebAuditDTO:
+      type: object
+      description: Web audit information
+      required:
+      - auditId
+      - auditName
+      - folderId
+      - domainId
+      properties:
+        auditId:
+          type: integer
+          description: Unique identifier for the audit
+        auditName:
+          type: string
+          description: Name of the audit
+        ownerId:
+          type: integer
+          description: User ID of the audit owner
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the audit was created
+        folderId:
+          type: integer
+          description: Folder ID where the audit is stored
+        domainId:
+          type: integer
+          description: Domain ID associated with the audit
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the audit was last updated
+  parameters:
     RunId:
       name: runId
       in: path
@@ -918,6 +884,40 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

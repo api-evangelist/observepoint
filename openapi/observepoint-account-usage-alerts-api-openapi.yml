@@ -36,17 +36,7 @@ paths:
       security:
       - API_Key: []
 components:
-  responses:
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    AlertId:
-      type: integer
-      format: int64
     AlertResultStatusEnum:
       type: string
       description: 'All statuses except `TRIGGERED` and `NOT_TRIGGERED` mean that alert/metric could not be computed. Statuses:
@@ -70,18 +60,19 @@ components:
       - NO_VALUE
       - PREVIOUS_RUN_NOT_FOUND
       - PREVIOUS_RUN_NO_VALUE
-    AuditRun_AuditSummary_AlertsResponseItemConfig:
-      allOf:
-      - $ref: '#/components/schemas/AlertConfigTrait'
-      - type: object
-        required:
-        - subscriberCount
-        - isUserSubscribed
-        properties:
-          subscriberCount:
-            type: integer
-          isUserSubscribed:
-            type: boolean
+    AccountUsage_AlertSummary_AlertsResponseItem:
+      type: object
+      required:
+      - id
+      - config
+      - result
+      properties:
+        id:
+          $ref: '#/components/schemas/AlertId'
+        config:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
+        result:
+          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
     ErrorModel:
       type: object
       properties:
@@ -94,20 +85,63 @@ components:
           type: string
         validationReport:
           type: object
-    AlertMetricValueComparisonOperatorEnum:
+    AlertConfigTrait:
+      description: Core parts of alert definition
+      type: object
+      required:
+      - name
+      - metricType
+      - targetValueComparator
+      - filtersV0
+      properties:
+        name:
+          $ref: '#/components/schemas/AlertName'
+        metricType:
+          $ref: '#/components/schemas/AlertMetricTypeEnum'
+        metricChangeType:
+          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
+        targetValueComparator:
+          $ref: '#/components/schemas/AlertMetricValueComparator'
+        filtersV0:
+          type: object
+          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
+
+            '
+    AlertMetricChangeTypeEnum:
       type: string
+      description: 'Behaviour per type:
+
+        - VALUE_CHANGE: current - previous
+
+        - VALUE_CHANGE_ABS: ABS(current - previous)
+
+        - RELATIVE_VALUE_CHANGE: 100% * (current - previous) / previous
+
+        - RELATIVE_VALUE_CHANGE: ABS(100% * (current - previous) / previous)
+
+
+        Composite metric change operators shown on ObservePoint UI should be defined as described below:
+
+        - `Changes by (∆)` = VALUE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+)` = VALUE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-)` = VALUE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        - `Any change` = VALUE_CHANGE_ABS (or VALUE_CHANGE) + NOT_EQUAL(0)
+
+        - `Changes by (∆ %)` = RELATIVE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+%)` = RELATIVE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-%)` = RELATIVE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        '
       enum:
-      - GREATER
-      - GREATER_OR_EQUAL
-      - EQUAL
-      - NOT_EQUAL
-      - LESS_OR_EQUAL
-      - LESS
-      - BETWEEN
-      - NOT_BETWEEN
-    AuditRun_AuditSummary_AlertResult:
-      allOf:
-      - $ref: '#/components/schemas/AlertResultDetails'
+      - VALUE_CHANGE
+      - VALUE_CHANGE_ABS
+      - RELATIVE_VALUE_CHANGE
+      - RELATIVE_VALUE_CHANGE_ABS
     AlertMetricTypeEnum:
       type: string
       description: "Deprecated metric types:\n  - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT\n  - PAGE_SUMMARY_FAILED_RULE_COUNT\n"
@@ -201,6 +235,15 @@ components:
       - RULE_RESULTS_FAILED_RULE_PAGE_COUNT
       - RULE_RESULTS_PASSED_RULE_PAGE_COUNT
       - RULE_RESULTS_NOT_APPLIED_RULE_PAGE_COUNT
+    AccountUsage_AlertSummary_AlertsResponseDTO:
+      type: object
+      required:
+      - alerts
+      properties:
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountUsage_AlertSummary_AlertsResponseItem'
     AlertResultDetails:
       type: object
       required:
@@ -220,80 +263,16 @@ components:
           description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
           type: number
           format: double
-    AccountUsage_AlertSummary_AlertsResponseItem:
-      type: object
-      required:
-      - id
-      - config
-      - result
-      properties:
-        id:
-          $ref: '#/components/schemas/AlertId'
-        config:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertsResponseItemConfig'
-        result:
-          $ref: '#/components/schemas/AuditRun_AuditSummary_AlertResult'
-    AlertConfigTrait:
-      description: Core parts of alert definition
-      type: object
-      required:
-      - name
-      - metricType
-      - targetValueComparator
-      - filtersV0
-      properties:
-        name:
-          $ref: '#/components/schemas/AlertName'
-        metricType:
-          $ref: '#/components/schemas/AlertMetricTypeEnum'
-        metricChangeType:
-          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
-        targetValueComparator:
-          $ref: '#/components/schemas/AlertMetricValueComparator'
-        filtersV0:
-          type: object
-          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
-
-            '
     AlertName:
       type: string
       minLength: 1
       description: User-defined name of the alert
-    AlertMetricChangeTypeEnum:
-      type: string
-      description: 'Behaviour per type:
-
-        - VALUE_CHANGE: current - previous
-
-        - VALUE_CHANGE_ABS: ABS(current - previous)
-
-        - RELATIVE_VALUE_CHANGE: 100% * (current - previous) / previous
-
-        - RELATIVE_VALUE_CHANGE: ABS(100% * (current - previous) / previous)
-
-
-        Composite metric change operators shown on ObservePoint UI should be defined as described below:
-
-        - `Changes by (∆)` = VALUE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
-
-        - `Increases by (+)` = VALUE_CHANGE + GREATER_OR_EQUAL(positive number)
-
-        - `Decreases by (-)` = VALUE_CHANGE + LESS_OR_EQUAL(negative number)
-
-        - `Any change` = VALUE_CHANGE_ABS (or VALUE_CHANGE) + NOT_EQUAL(0)
-
-        - `Changes by (∆ %)` = RELATIVE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
-
-        - `Increases by (+%)` = RELATIVE_CHANGE + GREATER_OR_EQUAL(positive number)
-
-        - `Decreases by (-%)` = RELATIVE_CHANGE + LESS_OR_EQUAL(negative number)
-
-        '
-      enum:
-      - VALUE_CHANGE
-      - VALUE_CHANGE_ABS
-      - RELATIVE_VALUE_CHANGE
-      - RELATIVE_VALUE_CHANGE_ABS
+    AuditRun_AuditSummary_AlertResult:
+      allOf:
+      - $ref: '#/components/schemas/AlertResultDetails'
+    AlertId:
+      type: integer
+      format: int64
     AlertMetricValueComparator:
       type: object
       description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
@@ -315,15 +294,36 @@ components:
           LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
           BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
           NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
-    AccountUsage_AlertSummary_AlertsResponseDTO:
-      type: object
-      required:
-      - alerts
-      properties:
-        alerts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AccountUsage_AlertSummary_AlertsResponseItem'
+    AlertMetricValueComparisonOperatorEnum:
+      type: string
+      enum:
+      - GREATER
+      - GREATER_OR_EQUAL
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_OR_EQUAL
+      - LESS
+      - BETWEEN
+      - NOT_BETWEEN
+    AuditRun_AuditSummary_AlertsResponseItemConfig:
+      allOf:
+      - $ref: '#/components/schemas/AlertConfigTrait'
+      - type: object
+        required:
+        - subscriberCount
+        - isUserSubscribed
+        properties:
+          subscriberCount:
+            type: integer
+          isUserSubscribed:
+            type: boolean
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

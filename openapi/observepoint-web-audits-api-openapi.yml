@@ -273,332 +273,7 @@ paths:
       security:
       - API_Key: []
 components:
-  responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    responses-BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    responses-NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    responses-UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    StartingUrlFailureItem:
-      required:
-      - statusCode
-      - pageCount
-      properties:
-        statusCode:
-          $ref: '#/components/schemas/PageStatusCode'
-        pageCount:
-          type: integer
-        browserError:
-          type: string
-          description: error produced by browser upon opening the page
-          example: This site can’t be reached. example.com’s server IP address could not be found. ERR_NAME_NOT_RESOLVED
-    PagesWithJsVariablesDTO:
-      type: object
-      required:
-      - metadata
-      - pages
-      properties:
-        metadata:
-          $ref: '#/components/schemas/S3IterableResponseMetadata'
-        pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/PageWithJsVariables'
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    RequestDomainDTO-parsed1:
-      type: object
-      properties:
-        domain:
-          type: string
-          example: observepoint.com
-        scheme:
-          type: string
-          example: https
-        isValid:
-          type: boolean
-          example: true
-    OnPagesActionResults:
-      description: (Optional) Present if failure/s is/are present for any Page's On-Page Actions execution
-      type: object
-      required:
-      - totalConfiguredCount
-      - totalFailedCount
-      - resultsSample
-      properties:
-        totalConfiguredCount:
-          type: integer
-          description: Total number of pages configured with On-Page Actions for the Audit run
-        totalFailedCount:
-          type: integer
-          description: Total number of Pages in the Audit run with On-Page Action failures
-        resultsSample:
-          description: A sample of On-Page actions failures.
-          type: array
-          minItems: 1
-          maxItems: 3
-          items:
-            $ref: '#/components/schemas/OnPagesActionResultItem'
-    S3IterableResponseMetadata:
-      description: Metadata for iterable results from S3
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/S3PaginationMetadata'
-    OnPagesActionResultItem:
-      type: object
-      required:
-      - pageUrl
-      - results
-      properties:
-        pageUrl:
-          type: string
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditActionResult'
-    AuditPage:
-      type: object
-      properties:
-        id:
-          $ref: '#/components/schemas/PageId'
-        url:
-          type: string
-        loadTime:
-          type: number
-        statusCode:
-          type: integer
-        size:
-          type: number
-    AuditRun_Pages_DTO:
-      description: DTO returning pages of a particular run in paged way.
-      type: object
-      required:
-      - metadata
-      - pages
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditPage'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AuditActionResult:
-      type: object
-      required:
-      - auditActionSnapshotId
-      - failureMessage
-      properties:
-        auditActionSnapshotId:
-          $ref: '#/components/schemas/AuditActionSnapshotId'
-        failureMessage:
-          type: string
-    PageId:
-      type: string
-      example: f9d32cc7cc2046d6decb145a80289287f5226323
-    RequestDomainDTO-failedToParse:
-      type: object
-      properties:
-        isValid:
-          type: boolean
-          example: false
-        OriginalUrl:
-          type: string
-          example: fadsjguianvasnkd
-    RequestDomainDTO-parsed2:
-      type: object
-      properties:
-        domain:
-          type: string
-          example: obs_ervepoint.com
-        scheme:
-          type: string
-          example: https
-        isValid:
-          type: boolean
-          example: false
-    PageUrl:
-      type: string
-      format: url
-      example: https://example.com/about
-    AuditActionSnapshotId:
-      type: integer
-      format: int64
-      minimum: 0
-      description: An ID assigned to actions of all types on an audit - unique in the context of an individual run
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    AuditFailureResults:
-      type: object
-      required:
-      - preAuditActionResults
-      properties:
-        preAuditActionResults:
-          $ref: '#/components/schemas/PreAuditActionResults'
-        onPagesActionResults:
-          $ref: '#/components/schemas/OnPagesActionResults'
-        startingUrlResults:
-          $ref: '#/components/schemas/StartingUrlResults'
-    JsVariable:
-      type: object
-      required:
-      - name
-      - value
-      properties:
-        name:
-          description: Name of collected JS variable
-          example: dataLayer
-          type: string
-        value:
-          description: 'Raw value of collected JS variable as it appeared on a page.
-
-            Can be any value - string, number, boolean, array, object or `null`
-
-            '
-          type:
-          - object
-          - 'null'
-    StartingUrlResults:
-      type: object
-      description: "Provide information for the following use cases:\n  One and Out - All starting URLs failed to launch\n  One and Out - All links found were excluded by filters\n"
-      required:
-      - failureType
-      properties:
-        failureType:
-          description: "Possible types:\n  - `no_links_scanned_one_and_out` All conditions must be met:\n    1. Number of scanned pages matches number of starting URLs\n    2. Scan limit is higher than number of scanned pages\n    3. At least 1 link has been excluded.\n  - `all_starting_urls_failed_one_and_out` Flag indicating if all starting Urls failed navigation.\n    Navigation resulted in status codes:\n     - zero\n     - 403\n     - 500+\n    Details for this data is available from the page summary pages endpoint\n  - `all_starting_urls_failed_zero_and_out` Flag indicating if all starting Urls failed navigation but without records.\n"
-          type: string
-          enum:
-          - no_links_scanned_one_and_out
-          - all_starting_urls_failed_one_and_out
-          - all_starting_urls_failed_zero_and_out
-        linksExcludedSample:
-          description: '(Optional) Present if failureType is `no_links_scanned_one_and_out`
-
-            A sample of links found from starting URLs that were excluded from the audit.
-
-            '
-          type: array
-          minItems: 1
-          maxItems: 10
-          items:
-            $ref: '#/components/schemas/PageUrl'
-        startingUrlFailures:
-          description: (Optional) Present when `all_starting_urls_failed_one_and_out` is true
-          type: array
-          items:
-            $ref: '#/components/schemas/StartingUrlFailureItem'
-    PageWithJsVariables:
-      type: object
-      required:
-      - pageId
-      - pageUrl
-      - pageInitialStatusCode
-      - pageFinalStatusCode
-      - variables
-      properties:
-        pageId:
-          $ref: '#/components/schemas/PageId'
-        pageUrl:
-          $ref: '#/components/schemas/PageUrl'
-        pageInitialStatusCode:
-          $ref: '#/components/schemas/PageStatusCode'
-        pageFinalStatusCode:
-          $ref: '#/components/schemas/PageStatusCode'
-        variables:
-          description: All JS variables found on specific page
-          type: array
-          items:
-            $ref: '#/components/schemas/JsVariable'
-    RequestDomainDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/RequestDomainParsingResult'
-    CookieDTO:
-      type: object
-      properties:
-        name:
-          type: string
-        domain:
-          type: string
-      description: Cookie name and domain
     AuditRun_AuditSummary_ScoresDTO:
       type: object
       required:
@@ -621,28 +296,211 @@ components:
           $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
         cookies:
           $ref: '#/components/schemas/AuditRun_AuditSummary_Score'
-    AuditId:
+    RequestDomainDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/RequestDomainParsingResult'
+    AuditActionSnapshotId:
       type: integer
       format: int64
-      example: 107239
-    RequestDomainParsingResult:
-      oneOf:
-      - $ref: '#/components/schemas/RequestDomainDTO-parsed1'
-      - $ref: '#/components/schemas/RequestDomainDTO-parsed2'
-      - $ref: '#/components/schemas/RequestDomainDTO-failedToParse'
-    AuditRun_AuditSummary_Score:
+      minimum: 0
+      description: An ID assigned to actions of all types on an audit - unique in the context of an individual run
+    OnPagesActionResults:
+      description: (Optional) Present if failure/s is/are present for any Page's On-Page Actions execution
       type: object
       required:
-      - score
-      - max
+      - totalConfiguredCount
+      - totalFailedCount
+      - resultsSample
       properties:
-        score:
-          type: number
-          format: float
-          description: Amount of points obtained in given score category. Rounded to one digit after dot
-        max:
+        totalConfiguredCount:
           type: integer
-          description: Max points for given score category, inclusive
+          description: Total number of pages configured with On-Page Actions for the Audit run
+        totalFailedCount:
+          type: integer
+          description: Total number of Pages in the Audit run with On-Page Action failures
+        resultsSample:
+          description: A sample of On-Page actions failures.
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/OnPagesActionResultItem'
+    PreAuditActionResults:
+      type: object
+      required:
+      - zeroAndOut
+      properties:
+        zeroAndOut:
+          description: Indicates whether pre-audit actions failed executing in all allocated engine containers.
+          type: boolean
+        preAuditActionFailures:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AuditActionResult'
+          description: 'Pre-audit action results failures. A a set of failed actions with their failure messages.
+
+            Uniqueness is determined by the combination of `failureMessage` and `auditActionSnapshotId`.
+
+            '
+    AuditRun_PagesSort:
+      description: possible ways to sort pages in a given run
+      type: string
+      enum:
+      - url
+      - load_time
+      - status_code
+      - size
+    RequestDomainDTO-parsed2:
+      type: object
+      properties:
+        domain:
+          type: string
+          example: obs_ervepoint.com
+        scheme:
+          type: string
+          example: https
+        isValid:
+          type: boolean
+          example: false
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    JsVariable:
+      type: object
+      required:
+      - name
+      - value
+      properties:
+        name:
+          description: Name of collected JS variable
+          example: dataLayer
+          type: string
+        value:
+          description: 'Raw value of collected JS variable as it appeared on a page.
+
+            Can be any value - string, number, boolean, array, object or `null`
+
+            '
+          type:
+          - object
+          - 'null'
+    PageWithJsVariables:
+      type: object
+      required:
+      - pageId
+      - pageUrl
+      - pageInitialStatusCode
+      - pageFinalStatusCode
+      - variables
+      properties:
+        pageId:
+          $ref: '#/components/schemas/PageId'
+        pageUrl:
+          $ref: '#/components/schemas/PageUrl'
+        pageInitialStatusCode:
+          $ref: '#/components/schemas/PageStatusCode'
+        pageFinalStatusCode:
+          $ref: '#/components/schemas/PageStatusCode'
+        variables:
+          description: All JS variables found on specific page
+          type: array
+          items:
+            $ref: '#/components/schemas/JsVariable'
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
+    StartingUrlFailureItem:
+      required:
+      - statusCode
+      - pageCount
+      properties:
+        statusCode:
+          $ref: '#/components/schemas/PageStatusCode'
+        pageCount:
+          type: integer
+        browserError:
+          type: string
+          description: error produced by browser upon opening the page
+          example: This site can’t be reached. example.com’s server IP address could not be found. ERR_NAME_NOT_RESOLVED
+    AuditFailureResults:
+      type: object
+      required:
+      - preAuditActionResults
+      properties:
+        preAuditActionResults:
+          $ref: '#/components/schemas/PreAuditActionResults'
+        onPagesActionResults:
+          $ref: '#/components/schemas/OnPagesActionResults'
+        startingUrlResults:
+          $ref: '#/components/schemas/StartingUrlResults'
+    RequestDomainDTO-parsed1:
+      type: object
+      properties:
+        domain:
+          type: string
+          example: observepoint.com
+        scheme:
+          type: string
+          example: https
+        isValid:
+          type: boolean
+          example: true
+    RequestDomainDTO-failedToParse:
+      type: object
+      properties:
+        isValid:
+          type: boolean
+          example: false
+        OriginalUrl:
+          type: string
+          example: fadsjguianvasnkd
+    PagesWithJsVariablesDTO:
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/S3IterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageWithJsVariables'
+    CookieDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        domain:
+          type: string
+      description: Cookie name and domain
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
     S3PaginationMetadata:
       description: 'Represents pagination metadata for results from S3, where each result page contains multiple pageIds.
 
@@ -673,6 +531,127 @@ components:
           type:
           - string
           - 'null'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AuditRun_AuditSummary_Score:
+      type: object
+      required:
+      - score
+      - max
+      properties:
+        score:
+          type: number
+          format: float
+          description: Amount of points obtained in given score category. Rounded to one digit after dot
+        max:
+          type: integer
+          description: Max points for given score category, inclusive
+    AuditPage:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/PageId'
+        url:
+          type: string
+        loadTime:
+          type: number
+        statusCode:
+          type: integer
+        size:
+          type: number
+    StartingUrlResults:
+      type: object
+      description: "Provide information for the following use cases:\n  One and Out - All starting URLs failed to launch\n  One and Out - All links found were excluded by filters\n"
+      required:
+      - failureType
+      properties:
+        failureType:
+          description: "Possible types:\n  - `no_links_scanned_one_and_out` All conditions must be met:\n    1. Number of scanned pages matches number of starting URLs\n    2. Scan limit is higher than number of scanned pages\n    3. At least 1 link has been excluded.\n  - `all_starting_urls_failed_one_and_out` Flag indicating if all starting Urls failed navigation.\n    Navigation resulted in status codes:\n     - zero\n     - 403\n     - 500+\n    Details for this data is available from the page summary pages endpoint\n  - `all_starting_urls_failed_zero_and_out` Flag indicating if all starting Urls failed navigation but without records.\n"
+          type: string
+          enum:
+          - no_links_scanned_one_and_out
+          - all_starting_urls_failed_one_and_out
+          - all_starting_urls_failed_zero_and_out
+        linksExcludedSample:
+          description: '(Optional) Present if failureType is `no_links_scanned_one_and_out`
+
+            A sample of links found from starting URLs that were excluded from the audit.
+
+            '
+          type: array
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/PageUrl'
+        startingUrlFailures:
+          description: (Optional) Present when `all_starting_urls_failed_one_and_out` is true
+          type: array
+          items:
+            $ref: '#/components/schemas/StartingUrlFailureItem'
+    OnPagesActionResultItem:
+      type: object
+      required:
+      - pageUrl
+      - results
+      properties:
+        pageUrl:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditActionResult'
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    RequestDomainParsingResult:
+      oneOf:
+      - $ref: '#/components/schemas/RequestDomainDTO-parsed1'
+      - $ref: '#/components/schemas/RequestDomainDTO-parsed2'
+      - $ref: '#/components/schemas/RequestDomainDTO-failedToParse'
+    AuditRun_Pages_DTO:
+      description: DTO returning pages of a particular run in paged way.
+      type: object
+      required:
+      - metadata
+      - pages
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditPage'
+    S3IterableResponseMetadata:
+      description: Metadata for iterable results from S3
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/S3PaginationMetadata'
     GeoLocationDTO:
       type: object
       properties:
@@ -682,62 +661,29 @@ components:
           type: integer
         countryName:
           type: string
-    AuditRun_PagesSort:
-      description: possible ways to sort pages in a given run
-      type: string
-      enum:
-      - url
-      - load_time
-      - status_code
-      - size
-    PreAuditActionResults:
-      type: object
-      required:
-      - zeroAndOut
-      properties:
-        zeroAndOut:
-          description: Indicates whether pre-audit actions failed executing in all allocated engine containers.
-          type: boolean
-        preAuditActionFailures:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/AuditActionResult'
-          description: 'Pre-audit action results failures. A a set of failed actions with their failure messages.
-
-            Uniqueness is determined by the combination of `failureMessage` and `auditActionSnapshotId`.
-
-            '
     PageStatusCode:
       type: integer
       description: Page HTTP status code
+    AuditActionResult:
+      type: object
+      required:
+      - auditActionSnapshotId
+      - failureMessage
+      properties:
+        auditActionSnapshotId:
+          $ref: '#/components/schemas/AuditActionSnapshotId'
+        failureMessage:
+          type: string
   parameters:
-    AuditId:
-      name: auditId
+    RunId:
+      name: runId
       in: path
       required: true
-      description: Unique identification number for web audit
+      description: Unique identification number for web audit or journey run
       deprecated: false
       allowEmptyValue: false
       schema:
-        $ref: '#/components/schemas/AuditId'
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    AuditRun_PagesList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 50
-        minimum: 50
+        $ref: '#/components/schemas/RunId'
     pageParam:
       name: page
       in: query
@@ -756,15 +702,69 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/PageId'
-    RunId:
-      name: runId
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    AuditId:
+      name: auditId
       in: path
       required: true
-      description: Unique identification number for web audit or journey run
+      description: Unique identification number for web audit
       deprecated: false
       allowEmptyValue: false
       schema:
-        $ref: '#/components/schemas/RunId'
+        $ref: '#/components/schemas/AuditId'
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    responses-UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    responses-BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    responses-NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

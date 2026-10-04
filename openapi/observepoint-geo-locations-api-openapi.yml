@@ -54,18 +54,6 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorModel'
   schemas:
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     GeoLocationCountryDTO:
       type: object
       description: Represents a country with geo-location information including continent details
@@ -98,6 +86,18 @@ components:
           type: string
           description: Name of the continent this country belongs to
           example: Asia
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
   securitySchemes:
     API_Key:
       type: apiKey

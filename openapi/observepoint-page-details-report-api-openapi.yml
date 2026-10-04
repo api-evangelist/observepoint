@@ -581,88 +581,25 @@ paths:
       description: GET /v3/web-audits/{auditId}/pages/{pageId}/trends/web-vitals/{trendName}
 components:
   schemas:
-    AuditRun_FileChanges_FileChangeType:
-      type: string
-      enum:
-      - new_file
-      - not_changed
-      - changed_file
-      - deleted_file
-      - unknown
-    WebVitalsSummary:
+    RequestLogItemFileInfo:
       type: object
-      description: Google's Web Vitals metrics for a given page
       required:
-      - largestContentfulPaint
-      - cumulativeLayoutShift
-      - firstContentfulPaint
-      - timeToFirstByte
+      - filename
+      - requestDomain
       properties:
-        largestContentfulPaint:
-          $ref: '#/components/schemas/WebVitalDetails'
-        cumulativeLayoutShift:
-          $ref: '#/components/schemas/WebVitalDetails'
-        firstContentfulPaint:
-          $ref: '#/components/schemas/WebVitalDetails'
-        timeToFirstByte:
-          $ref: '#/components/schemas/WebVitalDetails'
-    AuditRunPage_BrowserLogs_MessagesSortColumn:
-      type: string
-      enum:
-      - message
-      - timestamp
-      - level
-      - source
-      - count
-      - related_tag
-    AuditRun_PageWebVitals:
-      type: object
-      description: Web Vitals for a single page
-      properties:
-        largestContentfulPaint:
-          $ref: '#/components/schemas/WebVitalsLargestContentfulPaint'
-        firstContentfulPaint:
-          type: number
-          format: double
-          description: FCP time in milliseconds
-        timeToFirstByte:
-          type: number
-          format: double
-          description: TTFB time in milliseconds
-        cumulativeLayoutShift:
-          type: number
-          format: double
-          description: unitless measurement of CLS
-    CookieOriginTypeEnum:
-      type:
-      - string
-      - 'null'
-      enum:
-      - PRE_AUDIT_ACTION
-      - PAGE_LOAD
-      - ON_PAGE_ACTION
-    RequestLogItemTag:
-      allOf:
-      - $ref: '#/components/schemas/TagInfoTrait'
-    AuditRunPage_ConsoleLogs_RequestDTO:
+        lastModifiedDate:
+          $ref: '#/components/schemas/DateAndTime'
+        filename:
+          $ref: '#/components/schemas/RequestFilename'
+        requestDomain:
+          $ref: '#/components/schemas/RequestDomain'
+    Variable:
       type: object
       properties:
-        includedLevels:
-          type: array
-          items:
-            $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
-        search:
+        name:
           type: string
-          description: Filters logs by `message` and `source` with 'contains' predicate
-    SparkLinePageInsights:
-      type: object
-      properties:
-        loadTime:
-          type: number
-        statusCode:
-          type: number
-        size:
-          type: number
+        value:
+          type: string
     RequestLogItemFileChange:
       type: object
       description: 'Available only for JavaScript files for now. Provided only for customers that have Privacy features available.
@@ -677,10 +614,77 @@ components:
           $ref: '#/components/schemas/AuditRun_FileChanges_DateDifferenceInMinutes'
         largestSizeDifference:
           $ref: '#/components/schemas/AuditRun_FileChanges_SizeDifferenceInBytes'
-    PageTrendsDTO:
+    SparkLinesDTO:
       type: array
       items:
-        $ref: '#/components/schemas/PageTrendDTO'
+        $ref: '#/components/schemas/SparkLineDTO'
+    AuditRun_PageDetails_WebVitalsTrends_Response:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_PageDetails_WebVitalsTrendsItem'
+    AccessibilitySuccessCriteria:
+      type: object
+      required:
+      - wcagSuccessCriteria
+      properties:
+        wcagSuccessCriteria:
+          type: string
+          description: The WCAG success criteria that the issue is associated with
+          example: 1.4.6
+        w3Link:
+          type: string
+          description: The link to the W3 page for the issue
+          example: https://www.w3.org/WAI/WCAG21/Understanding/contrast-enhanced
+    TagCategoryId:
+      type: integer
+      description: Tag category ID
+    FullCookieTrait:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        domain:
+          type: string
+        path:
+          type: string
+        httpOnly:
+          type: boolean
+        secure:
+          type: boolean
+        samesite:
+          type: string
+        expires:
+          type: string
+        partyType:
+          $ref: '#/components/schemas/CookiePartyType'
+        origin:
+          $ref: '#/components/schemas/CookieOriginDto'
+        initiators:
+          type: array
+          items:
+            $ref: '#/components/schemas/CookieInitiator'
+        partitionKey:
+          type: string
+    TagCategoryName:
+      type: string
+      description: Name of a category of a tag
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
     CookieChangeTypeEnum:
       type: string
       enum:
@@ -689,10 +693,80 @@ components:
       - DELETE
       - NO_CHANGE
       - REPEAT_SET
+    AuditCookieChangeAction:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseCookieChangeActionTrait'
+      - type: object
+        required:
+        - actionSnapshotId
+        properties:
+          actionSnapshotId:
+            type: integer
+    AuditRunPage_BrowserLogs_MessagesSortColumn:
+      type: string
+      enum:
+      - message
+      - timestamp
+      - level
+      - source
+      - count
+      - related_tag
     WebVitalsLargestContentfulPaint:
       type: number
       format: double
       description: LCP time in milliseconds
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    AuditRun_PageDetails_TrendsEnum:
+      type: string
+      enum:
+      - pageSize
+      - pageLoadTime
+      example: pageSize
+    RequestFilename:
+      type: string
+      description: Name of the file. Identified as the last non-empty part of URL path
+      example: main.js
+    CookiePartyType:
+      type: string
+      description: 'Indicates if cookie domain is different from domain of a page it was set on.
+
+        `owned_3rd_party` is deprecated
+
+        '
+      enum:
+      - 1st_party
+      - owned_3rd_party
+      - 3rd_party
+    WebVitalDetails:
+      type: object
+      description: Specific details for a given Web Vital
+      required:
+      - pass
+      - warnThreshold
+      - failThreshold
+      properties:
+        value:
+          type: number
+          format: double
+          description: The value of the Web Vital.  May also be null.
+          example: 1234.56
+        pass:
+          type: boolean
+          description: Whether the Web Vital is beneath the warning threshold
+        warnThreshold:
+          type: number
+          format: double
+          description: The threshold for the vital to be in a warning state
+          example: 1234
+        failThreshold:
+          type: number
+          format: double
+          description: The threshold for the vital to be in a fail state
+          example: 1234
     TagInfo:
       type: object
       properties:
@@ -722,38 +796,55 @@ components:
         tagUniqueRequestCount:
           type: integer
           description: Number of tag requests that do not have duplicates or multiples
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AuditRun_PageInfo_RedirectChainElement:
-      type: object
-      required:
-      - statusCode
-      - url
-      - type
-      properties:
-        statusCode:
-          type: integer
-          example: 302
-        url:
-          type: string
-          example: https://example.com
-          maxLength: 11264
-        type:
-          $ref: '#/components/schemas/BrowserRedirectType'
     AuditRun_PageDetails_WebVitalsTrendsItem:
       allOf:
       - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
       - $ref: '#/components/schemas/AuditRun_PageWebVitals'
+    CookieOriginDto:
+      type: object
+      properties:
+        originType:
+          $ref: '#/components/schemas/CookieOriginTypeEnum'
+        action:
+          $ref: '#/components/schemas/CookieChangeTypeEnum'
+    FileSubstitutionFailure:
+      type: object
+      required:
+      - failureType
+      properties:
+        failureType:
+          $ref: '#/components/schemas/FileSubstitutionFailureType'
+        failureMessage:
+          type: string
+    BrowserLogMessageLevelEnum:
+      type: string
+      enum:
+      - error
+      - warn
+      - info
+      - debug
+      - other
+    TagInfoTrait:
+      type: object
+      description: Common tag info
+      required:
+      - tagId
+      - tagName
+      - tagCategoryId
+      - tagCategoryName
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagName:
+          $ref: '#/components/schemas/TagName'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        tagCategoryName:
+          $ref: '#/components/schemas/TagCategoryName'
+    HarEntryIndex:
+      type: integer
+      minimum: 0
+      description: The 0-based index of the HAR entry that this request corresponds to. Used to uniquely identify a request on a page.
     RequestLogDTO:
       type: object
       required:
@@ -766,16 +857,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RequestLog'
-    GetRequestsByHarEntryIndices_ResponseDto:
-      type: object
-      required:
-      - requests
-      properties:
-        requests:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/GetRequestsByHarEntryIndices_RequestItem'
+    AuditRun_FileChanges_FileChangeType:
+      type: string
+      enum:
+      - new_file
+      - not_changed
+      - changed_file
+      - deleted_file
+      - unknown
+    StatusCodeEnum:
+      description: good - 2xx, redirects - 3xx, broken - all others
+      deprecated: true
+      type: string
+      enum:
+      - good
+      - redirects
+      - broken
     BaseCookieChangeActionTrait:
       type: object
       required:
@@ -786,11 +883,93 @@ components:
           type: integer
         label:
           type: string
-    BrowserRedirectType:
+    FileMappingResultsDTO:
+      type: object
+      properties:
+        remoteFileMappingId:
+          type: integer
+        match:
+          type: string
+        matchType:
+          $ref: '#/components/schemas/FileMappingMatchTypeEnum'
+        fileUrl:
+          type: string
+        mappedRequests:
+          type: array
+          items:
+            type: string
+    TagInfoDTOWithInsights:
+      type: object
+      properties:
+        pageTagInsights:
+          $ref: '#/components/schemas/TagInsights'
+        pageTags:
+          $ref: '#/components/schemas/TagInfoDTO'
+    TagInsights:
+      type: object
+      properties:
+        noOfTagRequests:
+          type: integer
+        noOfUniqueTags:
+          type: integer
+        noOfBrokenTags:
+          type: integer
+    StringInclusionFilterTypeEnum:
       type: string
       enum:
-      - SERVER_SIDE
-      - CLIENT_SIDE
+      - contains
+      - not_contains
+    CountryCode:
+      type: string
+      description: ISO 3166-1 (Alpha-2) country code
+      example: US
+    AuditRun_PageInfo_LinkItem:
+      type: object
+      required:
+      - initial_page_url
+      - initial_page_status_code
+      - final_page_url
+      - final_page_status_code
+      - page_linked_from_url
+      - outer_html
+      properties:
+        initial_page_url:
+          type: string
+          description: URL initially opened by engine
+        initial_page_status_code:
+          type: integer
+          description: Initial status code observed by engine
+        final_page_url:
+          type: string
+          description: Final URL after all redirects. If no redirects, equal to `initial_page_url`
+        final_page_status_code:
+          type: integer
+          description: Final status code observed by engine after all redirects. If no redirects, equal to `initial_page_status_code`
+        page_linked_from_url:
+          type: string
+          description: URL of another page that has link to this page
+        outer_html:
+          type: string
+          maxLength: 500
+          example: <a href='https://www.iana.org/domains/example'>More information...</a>
+    AuditRun_PageWebVitals:
+      type: object
+      description: Web Vitals for a single page
+      properties:
+        largestContentfulPaint:
+          $ref: '#/components/schemas/WebVitalsLargestContentfulPaint'
+        firstContentfulPaint:
+          type: number
+          format: double
+          description: FCP time in milliseconds
+        timeToFirstByte:
+          type: number
+          format: double
+          description: TTFB time in milliseconds
+        cumulativeLayoutShift:
+          type: number
+          format: double
+          description: unitless measurement of CLS
     StringInclusionFilter:
       type: object
       required:
@@ -802,22 +981,23 @@ components:
         filterValue:
           type: string
           minLength: 1
-    FileSubstitution:
+    GetCookiesByHarEntryIndices_ResponseDto:
       type: object
       required:
-      - substituteUrl
+      - requests
       properties:
-        substituteUrl:
-          type: string
-          description: URL of the file that was used as a substitute
-        tagId:
-          type: integer
-        failure:
-          $ref: '#/components/schemas/FileSubstitutionFailure'
-    AuditCookieInsights:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseCookieInsights'
+        requests:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/GetCookiesByHarEntryIndices_RequestItem'
+    FileSubstitutionFailureType:
+      type: string
+      enum:
+      - unknown
+      - file_size_limit_exceeded
+      - file_not_found
+      - cannot_get_file
     GetRequestsByHarEntryIndices_RequestItem:
       allOf:
       - $ref: '#/components/schemas/RequestLogTrait'
@@ -850,8 +1030,17 @@ components:
             $ref: '#/components/schemas/ConsoleLogSummary'
           fileSubstitution:
             $ref: '#/components/schemas/FileSubstitution'
-    FullCookieTrait:
+    CookieTrait:
       type: object
+      required:
+      - name
+      - value
+      - domain
+      - path
+      - httpOnly
+      - secure
+      - sameSite
+      - expires
       properties:
         name:
           type: string
@@ -865,604 +1054,13 @@ components:
           type: boolean
         secure:
           type: boolean
-        samesite:
+        sameSite:
           type: string
         expires:
           type: string
-        partyType:
-          $ref: '#/components/schemas/CookiePartyType'
-        origin:
-          $ref: '#/components/schemas/CookieOriginDto'
-        initiators:
-          type: array
-          items:
-            $ref: '#/components/schemas/CookieInitiator'
-        partitionKey:
-          type: string
-    RequestDomain:
-      type: string
-      description: Network request URL domain
-      example: example.com
-    AuditPageCookieChangeItem:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseResponseCookieChangeItemTrait'
-      - type: object
-        required:
-        - action
-        - initiators
-        - cookieOriginType
-        properties:
-          action:
-            $ref: '#/components/schemas/AuditCookieChangeAction'
-          initiators:
-            type: array
-            items:
-              $ref: '#/components/schemas/CookieChangeInitiator'
-          cookieOriginType:
-            $ref: '#/components/schemas/CookieOriginTypeEnum'
-    AuditRun_PageInfo_LinkItem:
-      type: object
-      required:
-      - initial_page_url
-      - initial_page_status_code
-      - final_page_url
-      - final_page_status_code
-      - page_linked_from_url
-      - outer_html
-      properties:
-        initial_page_url:
-          type: string
-          description: URL initially opened by engine
-        initial_page_status_code:
-          type: integer
-          description: Initial status code observed by engine
-        final_page_url:
-          type: string
-          description: Final URL after all redirects. If no redirects, equal to `initial_page_url`
-        final_page_status_code:
-          type: integer
-          description: Final status code observed by engine after all redirects. If no redirects, equal to `initial_page_status_code`
-        page_linked_from_url:
-          type: string
-          description: URL of another page that has link to this page
-        outer_html:
-          type: string
-          maxLength: 500
-          example: <a href='https://www.iana.org/domains/example'>More information...</a>
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    AuditRun_PageInfo_LinksDTO:
-      type: object
-      required:
-      - links
-      properties:
-        links:
-          type: array
-          maxItems: 1000
-          items:
-            $ref: '#/components/schemas/AuditRun_PageInfo_LinkItem'
-    TagAccount:
-      type: string
-      description: Tag account
-    AuditRun_PageInfo_ThisUrlTypeEnum:
-      type: string
-      enum:
-      - initial
-      - final
-    AuditRun_PageDetails_WebVitalsTrends_Stats:
-      type: object
-      description: Web Vitals trends statistics (min, max, average, median)
-      required:
-      - min
-      - max
-      - average
-      - median
-      properties:
-        min:
-          type: number
-          format: double
-        max:
-          type: number
-          format: double
-        average:
-          type: number
-          format: double
-        median:
-          type: number
-          format: double
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    WebVitalDetails:
-      type: object
-      description: Specific details for a given Web Vital
-      required:
-      - pass
-      - warnThreshold
-      - failThreshold
-      properties:
-        value:
-          type: number
-          format: double
-          description: The value of the Web Vital.  May also be null.
-          example: 1234.56
-        pass:
-          type: boolean
-          description: Whether the Web Vital is beneath the warning threshold
-        warnThreshold:
-          type: number
-          format: double
-          description: The threshold for the vital to be in a warning state
-          example: 1234
-        failThreshold:
-          type: number
-          format: double
-          description: The threshold for the vital to be in a fail state
-          example: 1234
-    FileMappingResultsDTO:
-      type: object
-      properties:
-        remoteFileMappingId:
-          type: integer
-        match:
-          type: string
-        matchType:
-          $ref: '#/components/schemas/FileMappingMatchTypeEnum'
-        fileUrl:
-          type: string
-        mappedRequests:
-          type: array
-          items:
-            type: string
-    StringInclusionFilterTypeEnum:
-      type: string
-      enum:
-      - contains
-      - not_contains
-    RequestOriginTypeEnum:
-      type:
-      - string
-      - 'null'
-      enum:
-      - PRE_AUDIT_ACTION
-      - ON_PAGE
-    AuditPageCookiesDTO:
-      type: object
-      required:
-      - insights
-      - cookies
-      properties:
-        insights:
-          $ref: '#/components/schemas/AuditCookieInsights'
-        cookies:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditPageCookieItem'
-    TagInsights:
-      type: object
-      properties:
-        noOfTagRequests:
-          type: integer
-        noOfUniqueTags:
-          type: integer
-        noOfBrokenTags:
-          type: integer
-    TagCategoryId:
-      type: integer
-      description: Tag category ID
-    StatusCodeEnum:
-      description: good - 2xx, redirects - 3xx, broken - all others
-      deprecated: true
-      type: string
-      enum:
-      - good
-      - redirects
-      - broken
-    TagVendorId:
-      type: integer
-      description: Tag vendor ID
     PageId:
       type: string
       example: f9d32cc7cc2046d6decb145a80289287f5226323
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    AuditRun_PageInfo_LinkSummary:
-      type: object
-      required:
-      - linkToInitialUrlCount
-      - linkToFinalUrlCount
-      properties:
-        linkToInitialUrlCount:
-          type: integer
-          example: 32
-        linkToFinalUrlCount:
-          type: integer
-          example: 12
-        linksFromThisPageV2:
-          type: object
-          required:
-          - scannedInternalSuccessfulPageCount
-          - scannedInternalBrokenPageCount
-          - scannedExternalSuccessfulPageCount
-          - scannedExternalBrokenPageCount
-          - unscannedInternaLinkCount
-          - unscannedExternaLinkCount
-          properties:
-            scannedInternalSuccessfulPageCount:
-              type: integer
-            scannedInternalBrokenPageCount:
-              type: integer
-            scannedExternalSuccessfulPageCount:
-              type: integer
-            scannedExternalBrokenPageCount:
-              type: integer
-            unscannedInternaLinkCount:
-              type: integer
-            unscannedExternaLinkCount:
-              type: integer
-    AuditRun_PageDetails_RequestLogSortColumn:
-      type: string
-      enum:
-      - request_start_time
-      - request_url
-      - tag_name
-      - mime_type
-      - response_size
-      - load_time
-      - status_code
-      - geo
-      - date_difference
-      - size_difference
-      - started_at
-    AuditRunPage_InitiatorsSummary:
-      type: object
-      required:
-      - totalNetworkRequestCount
-      - filteredNetworkRequestCount
-      - totalBrokenNetworkRequestCount
-      - filteredBrokenNetworkRequestCount
-      - totalTagCount
-      - filteredTagCount
-      - totalCookieCount
-      - filteredCookieCount
-      properties:
-        totalNetworkRequestCount:
-          type: integer
-          minimum: 1
-        filteredNetworkRequestCount:
-          type: integer
-          minimum: 0
-        totalBrokenNetworkRequestCount:
-          type: integer
-          minimum: 0
-        filteredBrokenNetworkRequestCount:
-          type: integer
-          minimum: 0
-        totalTagCount:
-          type: integer
-          minimum: 0
-        filteredTagCount:
-          type: integer
-          minimum: 0
-        totalCookieCount:
-          type: integer
-          minimum: 0
-        filteredCookieCount:
-          type: integer
-          minimum: 0
-    QueryByHarEntryIndices_RequestDto:
-      type: object
-      required:
-      - harEntryIndices
-      properties:
-        harEntryIndices:
-          type: array
-          description: Empty array means "query all (no filtering)"
-          minItems: 0
-          maxItems: 10000
-          items:
-            $ref: '#/components/schemas/HarEntryIndex'
-    AuditRun_PageDetails_SpecificWebVitalsTrend_Response:
-      type: object
-      required:
-      - stats
-      - runs
-      properties:
-        stats:
-          $ref: '#/components/schemas/AuditRun_PageDetails_WebVitalsTrends_Stats'
-        runs:
-          type: array
-          items:
-            allOf:
-            - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-            - type: object
-              required:
-              - trendValue
-              properties:
-                trendValue:
-                  type: number
-                  format: double
-    TagInfoTrait:
-      type: object
-      description: Common tag info
-      required:
-      - tagId
-      - tagName
-      - tagCategoryId
-      - tagCategoryName
-      properties:
-        tagId:
-          $ref: '#/components/schemas/TagId'
-        tagName:
-          $ref: '#/components/schemas/TagName'
-        tagCategoryId:
-          $ref: '#/components/schemas/TagCategoryId'
-        tagCategoryName:
-          $ref: '#/components/schemas/TagCategoryName'
-    CountryCode:
-      type: string
-      description: ISO 3166-1 (Alpha-2) country code
-      example: US
-    RequestLogItemFileInfo:
-      type: object
-      required:
-      - filename
-      - requestDomain
-      properties:
-        lastModifiedDate:
-          $ref: '#/components/schemas/DateAndTime'
-        filename:
-          $ref: '#/components/schemas/RequestFilename'
-        requestDomain:
-          $ref: '#/components/schemas/RequestDomain'
-    GetCookiesByHarEntryIndices_ResponseDto:
-      type: object
-      required:
-      - requests
-      properties:
-        requests:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/GetCookiesByHarEntryIndices_RequestItem'
-    GetCookiesByHarEntryIndices_RequestCookieItem:
-      allOf:
-      - $ref: '#/components/schemas/BaseResponseCookieChangeItemTrait'
-    PageScoreValue:
-      type: number
-      format: double
-      description: Page accessibility score in %, 1 digit after decimal point
-      minimum: 0
-      maximum: 100
-    InitiatorParentChildRelationType:
-      type: string
-      description: 'Default value is `normal`, may be omitted.
-
-        The root node does not have relation.
-
-        '
-      enum:
-      - normal
-      - weak
-    SparkLineDTO:
-      type: object
-      properties:
-        runId:
-          type: number
-        runCompletionDate:
-          type: string
-          format: date-time
-        pageInsights:
-          $ref: '#/components/schemas/SparkLinePageInsights'
-    RequestLogItemGeoLocation:
-      type: object
-      required:
-      - countryCode
-      - countryName
-      properties:
-        countryCode:
-          $ref: '#/components/schemas/CountryCode'
-        countryName:
-          type: string
-    AuditCookieChangeAction:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseCookieChangeActionTrait'
-      - type: object
-        required:
-        - actionSnapshotId
-        properties:
-          actionSnapshotId:
-            type: integer
-    AuditRunPage_InitiatorsTree_RequestDTO:
-      description: Request body with filters for Page Details Initiators tree, supporting filtering by request tags and cookies as well as request attributes
-      type: object
-      properties:
-        tagsOnly:
-          type: boolean
-          description: If set then return only tags, else ignored
-        primaryTagsOnly:
-          type: boolean
-          description: If set then return only primary tags, else ignored
-        tagId:
-          $ref: '#/components/schemas/TagId'
-        tagAccount:
-          $ref: '#/components/schemas/TagAccount'
-        tagVendorId:
-          $ref: '#/components/schemas/TagVendorId'
-        tagCategoryId:
-          $ref: '#/components/schemas/TagCategoryId'
-        withCookiesOnly:
-          type: boolean
-          description: If set then return only requests that specified cookies, else ignored
-        cookieName:
-          $ref: '#/components/schemas/StringInclusionFilter'
-        cookieDomain:
-          $ref: '#/components/schemas/StringInclusionFilter'
-        partyType:
-          $ref: '#/components/schemas/CookiePartyType'
-        requestUrl:
-          $ref: '#/components/schemas/StringInclusionFilter'
-        requestStatusCode:
-          $ref: '#/components/schemas/StatusCodeEnum'
-    CookieOriginRequestDTO:
-      type: object
-      properties:
-        name:
-          type: string
-        domain:
-          type: string
-        path:
-          type: string
-    AuditRun_PageInfo_LinkDownloadOptionEnum:
-      type: string
-      enum:
-      - to_internal_pages
-      - to_external_pages
-      - to_urls_not_audited
-    RequestLogTrait:
-      type: object
-      required:
-      - harEntryIndex
-      - requestUrl
-      - statusCode
-      - loadTime
-      properties:
-        harEntryIndex:
-          $ref: '#/components/schemas/HarEntryIndex'
-        resourceType:
-          type: string
-          description: The type of resource that was requested.  e.g. 'xhr', 'script', 'image', 'stylesheet', 'font', 'document', 'other'. Available since [WORK-24937](https://observepoint.atlassian.net/browse/WORK-24937)
-        method:
-          type: string
-          description: The HTTP method used for the request
-        serverIPAddress:
-          type: string
-          format: ipAddress
-          description: The IP address of the server that responded to the request
-        httpVersion:
-          type: string
-          description: The HTTP version used for the request (e.g. 'HTTP/1.1')
-        requestUrl:
-          type: string
-        statusCode:
-          type: integer
-          description: HTTP status code of network request
-        loadTime:
-          type: number
-          description: Time took for network request to execute, in milliseconds
-        geoLocation:
-          type: string
-          deprecated: true
-          description: Use `geoLocationInfo` property instead. It will be renamed to `geoLocation` soon
-        geoLocationInfo:
-          $ref: '#/components/schemas/RequestLogItemGeoLocation'
-        mimeType:
-          type: string
-        fileInfo:
-          $ref: '#/components/schemas/RequestLogItemFileInfo'
-        responseSizeBytes:
-          type: integer
-        startedAt:
-          $ref: '#/components/schemas/DateAndTime'
-        startedAtRelativeToPageNavigation:
-          type: integer
-          format: int64
-    SparkLinesDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/SparkLineDTO'
-    HarEntryIndex:
-      type: integer
-      minimum: 0
-      description: The 0-based index of the HAR entry that this request corresponds to. Used to uniquely identify a request on a page.
-    CookieChangeSnapshot:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/CookieTrait'
-      - type: object
-        required:
-        - partyType
-        properties:
-          partyType:
-            $ref: '#/components/schemas/CookiePartyType'
-          cookieTTL:
-            type: integer
-            description: difference (in minutes) between cookie expiration and cookie set time (page scan) cookieTTL
-            format: int64
-          partitionKey:
-            type: string
-    Variable:
-      type: object
-      properties:
-        name:
-          type: string
-        value:
-          type: string
-    BrowserConsoleLog:
-      type: object
-      properties:
-        timestamp:
-          type: integer
-          format: int64
-          example: 1612568767911
-        message:
-          type: string
-          example: 'loadscript added to queue: /path/to/example.js'
-        level:
-          $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
-        source:
-          type: string
-        count:
-          type: integer
-          example: 4
-        relatedTag:
-          $ref: '#/components/schemas/BrowserConsoleLogTagItem'
-      required:
-      - timestamp
-      - message
-      - level
-      - count
     PageInfo:
       type: object
       properties:
@@ -1539,6 +1137,84 @@ components:
           $ref: '#/components/schemas/WebVitalsSummary'
         accessibilityChecksSummary:
           $ref: '#/components/schemas/AccessibilityChecksResults'
+    BaseCookieInitiator:
+      type: object
+      required:
+      - initiatorType
+      properties:
+        initiatorType:
+          $ref: '#/components/schemas/CookieInitiatorTypeEnum'
+        tagId:
+          type: integer
+          description: Will include a tag ID when a specific tag signature has been matched to initiating requests
+        requestUrl:
+          type: string
+          description: "For `initiatorType`:\n  - `HTTP` - `requestUrl` will be the URL of the request that created the cookie\n  - `APP`, `OP_ACTION`, `UNKNOWN` - This field will be undefined\n"
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    AuditPageCookieItem:
+      type: object
+      description: When `getOrigins` is `true`, will include `changes` array and `uniqueInitiatorCount`, but `initiators` array won't be included
+      allOf:
+      - $ref: '#/components/schemas/FullCookieTrait'
+      - type: object
+        properties:
+          ttlInMinutes:
+            type: integer
+            format: int64
+          uniqueInitiatorCount:
+            type: integer
+          changes:
+            type: array
+            items:
+              $ref: '#/components/schemas/AuditPageCookieChangeItem'
+          cookieChangedDuring:
+            type: array
+            items:
+              $ref: '#/components/schemas/CookieOriginTypeEnum'
+            description: Origins where this cookie was changed during the audit (PRE_AUDIT_ACTION, PAGE_LOAD, ON_PAGE_ACTION)
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    CookieOriginTypeEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - PRE_AUDIT_ACTION
+      - PAGE_LOAD
+      - ON_PAGE_ACTION
+    TagInfoDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagInfo'
     AuditRun_WebVitalsTrends_Enum:
       type: string
       enum:
@@ -1546,6 +1222,784 @@ components:
       - first_contentful_paint
       - time_to_first_byte
       - cumulative_layout_shift
+    ConsoleLogSummary:
+      type: object
+      required:
+      - errorLogCount
+      - warnLogCount
+      - infoLogCount
+      - debugLogCount
+      - otherLogCount
+      properties:
+        errorLogCount:
+          type: integer
+        warnLogCount:
+          type: integer
+        debugLogCount:
+          type: integer
+        infoLogCount:
+          type: integer
+          example: 4
+        otherLogCount:
+          type: integer
+          deprecated: true
+          description: Deprecated, included only for backward compatibility, value is always 0
+    SparkLinePageInsights:
+      type: object
+      properties:
+        loadTime:
+          type: number
+        statusCode:
+          type: number
+        size:
+          type: number
+    TagInstance:
+      type: object
+      properties:
+        tagInstanceId:
+          type: string
+        account:
+          type: string
+        bytes:
+          type: integer
+        loadTime:
+          type: integer
+          format: int64
+        duplicates:
+          type: integer
+        multiples:
+          type: integer
+        statusCode:
+          type: integer
+        tagInstanceVariables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+        relatedCookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/CookieOriginRequestDTO'
+        harEntryIndex:
+          $ref: '#/components/schemas/HarEntryIndex'
+    QueryByHarEntryIndices_RequestDto:
+      type: object
+      required:
+      - harEntryIndices
+      properties:
+        harEntryIndices:
+          type: array
+          description: Empty array means "query all (no filtering)"
+          minItems: 0
+          maxItems: 10000
+          items:
+            $ref: '#/components/schemas/HarEntryIndex'
+    AuditActionResult:
+      type: object
+      required:
+      - auditActionSnapshotId
+      - failureMessage
+      properties:
+        auditActionSnapshotId:
+          $ref: '#/components/schemas/AuditActionSnapshotId'
+        failureMessage:
+          type: string
+    AuditRun_PageInfo_RedirectChainElement:
+      type: object
+      required:
+      - statusCode
+      - url
+      - type
+      properties:
+        statusCode:
+          type: integer
+          example: 302
+        url:
+          type: string
+          example: https://example.com
+          maxLength: 11264
+        type:
+          $ref: '#/components/schemas/BrowserRedirectType'
+    AuditRun_PageDetails_RequestLogSortColumn:
+      type: string
+      enum:
+      - request_start_time
+      - request_url
+      - tag_name
+      - mime_type
+      - response_size
+      - load_time
+      - status_code
+      - geo
+      - date_difference
+      - size_difference
+      - started_at
+    GetCookiesByHarEntryIndices_RequestItem:
+      type: object
+      required:
+      - harEntryIndex
+      - cookies
+      properties:
+        harEntryIndex:
+          $ref: '#/components/schemas/HarEntryIndex'
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetCookiesByHarEntryIndices_RequestCookieItem'
+    BrowserConsoleLog:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+          format: int64
+          example: 1612568767911
+        message:
+          type: string
+          example: 'loadscript added to queue: /path/to/example.js'
+        level:
+          $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
+        source:
+          type: string
+        count:
+          type: integer
+          example: 4
+        relatedTag:
+          $ref: '#/components/schemas/BrowserConsoleLogTagItem'
+      required:
+      - timestamp
+      - message
+      - level
+      - count
+    AuditRun_PageInfo_ThisUrlTypeEnum:
+      type: string
+      enum:
+      - initial
+      - final
+    CookieInitiator:
+      type: object
+      properties:
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        initiatorType:
+          type: string
+          enum:
+          - HTTP
+          - APP
+          - OP_ACTION
+          - UNKNOWN
+    GetRequestsByHarEntryIndices_ResponseDto:
+      type: object
+      required:
+      - requests
+      properties:
+        requests:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/GetRequestsByHarEntryIndices_RequestItem'
+    BrowserConsoleLogTagItem:
+      allOf:
+      - $ref: '#/components/schemas/TagInfoTrait'
+    GetCookiesByHarEntryIndices_RequestCookieItem:
+      allOf:
+      - $ref: '#/components/schemas/BaseResponseCookieChangeItemTrait'
+    PageScoreValue:
+      type: number
+      format: double
+      description: Page accessibility score in %, 1 digit after decimal point
+      minimum: 0
+      maximum: 100
+    WebVitalsSummary:
+      type: object
+      description: Google's Web Vitals metrics for a given page
+      required:
+      - largestContentfulPaint
+      - cumulativeLayoutShift
+      - firstContentfulPaint
+      - timeToFirstByte
+      properties:
+        largestContentfulPaint:
+          $ref: '#/components/schemas/WebVitalDetails'
+        cumulativeLayoutShift:
+          $ref: '#/components/schemas/WebVitalDetails'
+        firstContentfulPaint:
+          $ref: '#/components/schemas/WebVitalDetails'
+        timeToFirstByte:
+          $ref: '#/components/schemas/WebVitalDetails'
+    AuditCookieInsights:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseCookieInsights'
+    CookieChangeInitiator:
+      allOf:
+      - $ref: '#/components/schemas/BaseCookieInitiator'
+      - type: object
+        description: Only `HTTP` initiator have `requestUrl` and `harEntryIndex` properties
+        properties:
+          line:
+            type: integer
+            description: The line number in the JS file that created the cookie
+          column:
+            type: integer
+            description: The column number in the JS file that created the cookie
+          harEntryIndex:
+            $ref: '#/components/schemas/HarEntryIndex'
+    AuditPageCookieChangeItem:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseResponseCookieChangeItemTrait'
+      - type: object
+        required:
+        - action
+        - initiators
+        - cookieOriginType
+        properties:
+          action:
+            $ref: '#/components/schemas/AuditCookieChangeAction'
+          initiators:
+            type: array
+            items:
+              $ref: '#/components/schemas/CookieChangeInitiator'
+          cookieOriginType:
+            $ref: '#/components/schemas/CookieOriginTypeEnum'
+    AuditPageCookiesDTO:
+      type: object
+      required:
+      - insights
+      - cookies
+      properties:
+        insights:
+          $ref: '#/components/schemas/AuditCookieInsights'
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditPageCookieItem'
+    RequestLogItemTag:
+      allOf:
+      - $ref: '#/components/schemas/TagInfoTrait'
+    BaseCookieInsights:
+      type: object
+      required:
+      - noOfUniqueCookies
+      - noOfUniqueDomains
+      - noOf3rdPartyCookies
+      properties:
+        noOfUniqueCookies:
+          type: integer
+        noOfUniqueDomains:
+          type: integer
+        noOf3rdPartyCookies:
+          type: integer
+    AuditRun_PageDetails_WebVitalsTrends_Stats:
+      type: object
+      description: Web Vitals trends statistics (min, max, average, median)
+      required:
+      - min
+      - max
+      - average
+      - median
+      properties:
+        min:
+          type: number
+          format: double
+        max:
+          type: number
+          format: double
+        average:
+          type: number
+          format: double
+        median:
+          type: number
+          format: double
+    TagId:
+      type: integer
+      description: Tag ID
+    AuditRun_PageDetails_SpecificWebVitalsTrend_Response:
+      type: object
+      required:
+      - stats
+      - runs
+      properties:
+        stats:
+          $ref: '#/components/schemas/AuditRun_PageDetails_WebVitalsTrends_Stats'
+        runs:
+          type: array
+          items:
+            allOf:
+            - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+            - type: object
+              required:
+              - trendValue
+              properties:
+                trendValue:
+                  type: number
+                  format: double
+    InitiatorParentChildRelationType:
+      type: string
+      description: 'Default value is `normal`, may be omitted.
+
+        The root node does not have relation.
+
+        '
+      enum:
+      - normal
+      - weak
+    RequestLogTrait:
+      type: object
+      required:
+      - harEntryIndex
+      - requestUrl
+      - statusCode
+      - loadTime
+      properties:
+        harEntryIndex:
+          $ref: '#/components/schemas/HarEntryIndex'
+        resourceType:
+          type: string
+          description: The type of resource that was requested.  e.g. 'xhr', 'script', 'image', 'stylesheet', 'font', 'document', 'other'. Available since [WORK-24937](https://observepoint.atlassian.net/browse/WORK-24937)
+        method:
+          type: string
+          description: The HTTP method used for the request
+        serverIPAddress:
+          type: string
+          format: ipAddress
+          description: The IP address of the server that responded to the request
+        httpVersion:
+          type: string
+          description: The HTTP version used for the request (e.g. 'HTTP/1.1')
+        requestUrl:
+          type: string
+        statusCode:
+          type: integer
+          description: HTTP status code of network request
+        loadTime:
+          type: number
+          description: Time took for network request to execute, in milliseconds
+        geoLocation:
+          type: string
+          deprecated: true
+          description: Use `geoLocationInfo` property instead. It will be renamed to `geoLocation` soon
+        geoLocationInfo:
+          $ref: '#/components/schemas/RequestLogItemGeoLocation'
+        mimeType:
+          type: string
+        fileInfo:
+          $ref: '#/components/schemas/RequestLogItemFileInfo'
+        responseSizeBytes:
+          type: integer
+        startedAt:
+          $ref: '#/components/schemas/DateAndTime'
+        startedAtRelativeToPageNavigation:
+          type: integer
+          format: int64
+    AccessibilityChecksResults:
+      type: object
+      required:
+      - configurationTags
+      - issues
+      properties:
+        configurationTags:
+          description: The tags used for the run configuration that indicate both version and conformance level
+          type: array
+          items:
+            type: string
+            description: The conformance levels of the checks
+          example:
+          - wcag2a
+          - wcag21aa
+          - wcag2aaa
+          - wcag2aa
+          - wcag21a
+          - wcag22aa
+        scores:
+          $ref: '#/components/schemas/PageAccessibilityScores'
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessibilityRuleResult'
+        inconclusive:
+          description: The accessibility checks that were inconclusive
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessibilityRuleResult'
+          example:
+          - id: color-contrast
+            impact: serious
+            description: Elements must meet enhanced color contrast ratio thresholds
+            help: Elements must meet enhanced color contrast ratio thresholds
+            helpUrl: https://www.w3.org/WAI/WCAG21/Understanding/contrast-enhanced
+            htmlElements:
+            - html: <span class='fl-heading-text'>Validate Your Privacy, Landing Pages, and Analytics</span>
+              htmlCssSelectors:
+              - h1
+              - .fl-heading-text
+              failureSummary: 'Fix any of the following: Element''s background color could not be determined due to a background image'
+    AuditRun_PageInfo_LinksDTO:
+      type: object
+      required:
+      - links
+      properties:
+        links:
+          type: array
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/AuditRun_PageInfo_LinkItem'
+    AuditRun_PageInfo_LinkDirection:
+      type: string
+      enum:
+      - to_this_page
+      - from_this_page
+    FileMappingMatchTypeEnum:
+      type: integer
+      enum:
+      - 1
+      - 2
+      description: 1 - success, 2 - failure
+    AuditRunPage_ConsoleLogsDTO:
+      type: object
+      required:
+      - metadata
+      - consoleLogs
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        consoleLogs:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrowserConsoleLog'
+    PageAccessibilityScores:
+      type: object
+      description: The accessibility scores for the page based on different WCAG versions and conformance levels
+      required:
+      - wcag2a
+      - wcag2aa
+      - wcag2aaa
+      - wcag21a
+      - wcag21aa
+      - wcag21aaa
+      - wcag22a
+      - wcag22aa
+      - wcag22aaa
+      properties:
+        wcag2a:
+          $ref: '#/components/schemas/PageScoreValue'
+        wcag2aa:
+          $ref: '#/components/schemas/PageScoreValue'
+        wcag2aaa:
+          $ref: '#/components/schemas/PageScoreValue'
+        wcag21a:
+          $ref: '#/components/schemas/PageScoreValue'
+        wcag21aa:
+          $ref: '#/components/schemas/PageScoreValue'
+        wcag21aaa:
+          $ref: '#/components/schemas/PageScoreValue'
+        wcag22a:
+          $ref: '#/components/schemas/PageScoreValue'
+        wcag22aa:
+          $ref: '#/components/schemas/PageScoreValue'
+        wcag22aaa:
+          $ref: '#/components/schemas/PageScoreValue'
+    RequestDomain:
+      type: string
+      description: Network request URL domain
+      example: example.com
+    RequestLog:
+      allOf:
+      - $ref: '#/components/schemas/RequestLogTrait'
+      - type: object
+        description: fileChange property is only available for customers who purchased privacy product offering
+        properties:
+          tagId:
+            type: integer
+            deprecated: true
+            description: Use `tag` property instead
+          tag:
+            $ref: '#/components/schemas/RequestLogItemTag'
+          fileChange:
+            $ref: '#/components/schemas/RequestLogItemFileChange'
+          origin:
+            $ref: '#/components/schemas/RequestOriginTypeEnum'
+          relatedCookies:
+            type: array
+            items:
+              $ref: '#/components/schemas/CookieOriginRequestDTO'
+    AuditRunPage_ConsoleLogs_RequestDTO:
+      type: object
+      properties:
+        includedLevels:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrowserLogMessageLevelEnum'
+        search:
+          type: string
+          description: Filters logs by `message` and `source` with 'contains' predicate
+    PageTrendDTO:
+      type: object
+      properties:
+        runId:
+          type: integer
+          format: int64
+        runCompletionDate:
+          type: string
+          format: date-time
+        trendName:
+          type: string
+        trendValue:
+          type: integer
+          format: int64
+    TagAccount:
+      type: string
+      description: Tag account
+    AuditRun_FileChanges_DateDifferenceInMinutes:
+      type: integer
+      description: Number of minutes for date difference between 2 file versions, can be negative
+    AuditActionSnapshotId:
+      type: integer
+      format: int64
+      minimum: 0
+      description: An ID assigned to actions of all types on an audit - unique in the context of an individual run
+    FileSubstitution:
+      type: object
+      required:
+      - substituteUrl
+      properties:
+        substituteUrl:
+          type: string
+          description: URL of the file that was used as a substitute
+        tagId:
+          type: integer
+        failure:
+          $ref: '#/components/schemas/FileSubstitutionFailure'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AuditRunPage_InitiatorsSummary:
+      type: object
+      required:
+      - totalNetworkRequestCount
+      - filteredNetworkRequestCount
+      - totalBrokenNetworkRequestCount
+      - filteredBrokenNetworkRequestCount
+      - totalTagCount
+      - filteredTagCount
+      - totalCookieCount
+      - filteredCookieCount
+      properties:
+        totalNetworkRequestCount:
+          type: integer
+          minimum: 1
+        filteredNetworkRequestCount:
+          type: integer
+          minimum: 0
+        totalBrokenNetworkRequestCount:
+          type: integer
+          minimum: 0
+        filteredBrokenNetworkRequestCount:
+          type: integer
+          minimum: 0
+        totalTagCount:
+          type: integer
+          minimum: 0
+        filteredTagCount:
+          type: integer
+          minimum: 0
+        totalCookieCount:
+          type: integer
+          minimum: 0
+        filteredCookieCount:
+          type: integer
+          minimum: 0
+    AuditRunPage_InitiatorsTree_RequestDTO:
+      description: Request body with filters for Page Details Initiators tree, supporting filtering by request tags and cookies as well as request attributes
+      type: object
+      properties:
+        tagsOnly:
+          type: boolean
+          description: If set then return only tags, else ignored
+        primaryTagsOnly:
+          type: boolean
+          description: If set then return only primary tags, else ignored
+        tagId:
+          $ref: '#/components/schemas/TagId'
+        tagAccount:
+          $ref: '#/components/schemas/TagAccount'
+        tagVendorId:
+          $ref: '#/components/schemas/TagVendorId'
+        tagCategoryId:
+          $ref: '#/components/schemas/TagCategoryId'
+        withCookiesOnly:
+          type: boolean
+          description: If set then return only requests that specified cookies, else ignored
+        cookieName:
+          $ref: '#/components/schemas/StringInclusionFilter'
+        cookieDomain:
+          $ref: '#/components/schemas/StringInclusionFilter'
+        partyType:
+          $ref: '#/components/schemas/CookiePartyType'
+        requestUrl:
+          $ref: '#/components/schemas/StringInclusionFilter'
+        requestStatusCode:
+          $ref: '#/components/schemas/StatusCodeEnum'
+    BrowserRedirectType:
+      type: string
+      enum:
+      - SERVER_SIDE
+      - CLIENT_SIDE
+    SparkLineDTO:
+      type: object
+      properties:
+        runId:
+          type: number
+        runCompletionDate:
+          type: string
+          format: date-time
+        pageInsights:
+          $ref: '#/components/schemas/SparkLinePageInsights'
+    CookieOriginRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        domain:
+          type: string
+        path:
+          type: string
+    TagVendorId:
+      type: integer
+      description: Tag vendor ID
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    AuditRun_PageInfo_LinkSummary:
+      type: object
+      required:
+      - linkToInitialUrlCount
+      - linkToFinalUrlCount
+      properties:
+        linkToInitialUrlCount:
+          type: integer
+          example: 32
+        linkToFinalUrlCount:
+          type: integer
+          example: 12
+        linksFromThisPageV2:
+          type: object
+          required:
+          - scannedInternalSuccessfulPageCount
+          - scannedInternalBrokenPageCount
+          - scannedExternalSuccessfulPageCount
+          - scannedExternalBrokenPageCount
+          - unscannedInternaLinkCount
+          - unscannedExternaLinkCount
+          properties:
+            scannedInternalSuccessfulPageCount:
+              type: integer
+            scannedInternalBrokenPageCount:
+              type: integer
+            scannedExternalSuccessfulPageCount:
+              type: integer
+            scannedExternalBrokenPageCount:
+              type: integer
+            unscannedInternaLinkCount:
+              type: integer
+            unscannedExternaLinkCount:
+              type: integer
+    RequestOriginTypeEnum:
+      type:
+      - string
+      - 'null'
+      enum:
+      - PRE_AUDIT_ACTION
+      - ON_PAGE
+    AuditRun_PageInfo_LinkDownloadOptionEnum:
+      type: string
+      enum:
+      - to_internal_pages
+      - to_external_pages
+      - to_urls_not_audited
+    BaseResponseCookieChangeItemTrait:
+      type: object
+      required:
+      - cookieChangeType
+      - cookie
+      properties:
+        cookieChangeType:
+          $ref: '#/components/schemas/CookieChangeTypeEnum'
+        cookie:
+          $ref: '#/components/schemas/CookieChangeSnapshot'
+    RequestLogItemGeoLocation:
+      type: object
+      required:
+      - countryCode
+      - countryName
+      properties:
+        countryCode:
+          $ref: '#/components/schemas/CountryCode'
+        countryName:
+          type: string
+    AccessibilityTestedElement:
+      type: object
+      required:
+      - html
+      properties:
+        failureSummary:
+          type: string
+          description: Summary of all rule criteria which failed and needs to be resolved.
+          example: 'Fix any of the following: Element has insufficient color contrast of 6.14 (foreground color: #5d5d5d, background color: #f7f7f7, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 7:1'
+        fixOneOf:
+          type: array
+          description: List of rule criteria where at least one must pass for the rule to be considered passing.
+          items:
+            type: string
+        fixAllOf:
+          type: array
+          description: List of rule criteria where all must pass for the rule to be considered passing.
+          items:
+            type: string
+        doNoneOf:
+          type: array
+          description: List of rule criteria where all must not pass for the rule to be considered passing.
+          items:
+            type: string
+        html:
+          type: string
+          description: The html for the node
+          example: '<span style=''font-weight: 400;''>(without 10 new QA headcount.)</span>'
+        htmlCssSelectors:
+          description: The html/css selector for the issue
+          type: array
+          items:
+            type: string
+        shadowDomCssSelectors:
+          description: This points to an element in a shadow DOM and each item (except the n-1th) in this array is a selector to a DOM element with a shadow DOM. The last element in the array points to the final node within the shadow DOM.
+          type: array
+          items:
+            type: array
+            items:
+              type: string
     InitiatorsTreeVertex:
       description: 'Represents a node in the initiators tree.
 
@@ -1595,203 +2049,10 @@ components:
         matchesFilter:
           type: boolean
           description: True if this node matches the filter criteria; false if kept only as a path to matching descendants
-    AccessibilityTestedElement:
-      type: object
-      required:
-      - html
-      properties:
-        failureSummary:
-          type: string
-          description: Summary of all rule criteria which failed and needs to be resolved.
-          example: 'Fix any of the following: Element has insufficient color contrast of 6.14 (foreground color: #5d5d5d, background color: #f7f7f7, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 7:1'
-        fixOneOf:
-          type: array
-          description: List of rule criteria where at least one must pass for the rule to be considered passing.
-          items:
-            type: string
-        fixAllOf:
-          type: array
-          description: List of rule criteria where all must pass for the rule to be considered passing.
-          items:
-            type: string
-        doNoneOf:
-          type: array
-          description: List of rule criteria where all must not pass for the rule to be considered passing.
-          items:
-            type: string
-        html:
-          type: string
-          description: The html for the node
-          example: '<span style=''font-weight: 400;''>(without 10 new QA headcount.)</span>'
-        htmlCssSelectors:
-          description: The html/css selector for the issue
-          type: array
-          items:
-            type: string
-        shadowDomCssSelectors:
-          description: This points to an element in a shadow DOM and each item (except the n-1th) in this array is a selector to a DOM element with a shadow DOM. The last element in the array points to the final node within the shadow DOM.
-          type: array
-          items:
-            type: array
-            items:
-              type: string
-    AuditActionResult:
-      type: object
-      required:
-      - auditActionSnapshotId
-      - failureMessage
-      properties:
-        auditActionSnapshotId:
-          $ref: '#/components/schemas/AuditActionSnapshotId'
-        failureMessage:
-          type: string
-    BaseCookieInsights:
-      type: object
-      required:
-      - noOfUniqueCookies
-      - noOfUniqueDomains
-      - noOf3rdPartyCookies
-      properties:
-        noOfUniqueCookies:
-          type: integer
-        noOfUniqueDomains:
-          type: integer
-        noOf3rdPartyCookies:
-          type: integer
-    TagInstance:
-      type: object
-      properties:
-        tagInstanceId:
-          type: string
-        account:
-          type: string
-        bytes:
-          type: integer
-        loadTime:
-          type: integer
-          format: int64
-        duplicates:
-          type: integer
-        multiples:
-          type: integer
-        statusCode:
-          type: integer
-        tagInstanceVariables:
-          type: array
-          items:
-            $ref: '#/components/schemas/Variable'
-        relatedCookies:
-          type: array
-          items:
-            $ref: '#/components/schemas/CookieOriginRequestDTO'
-        harEntryIndex:
-          $ref: '#/components/schemas/HarEntryIndex'
-    CookieOriginDto:
-      type: object
-      properties:
-        originType:
-          $ref: '#/components/schemas/CookieOriginTypeEnum'
-        action:
-          $ref: '#/components/schemas/CookieChangeTypeEnum'
-    AccessibilitySuccessCriteria:
-      type: object
-      required:
-      - wcagSuccessCriteria
-      properties:
-        wcagSuccessCriteria:
-          type: string
-          description: The WCAG success criteria that the issue is associated with
-          example: 1.4.6
-        w3Link:
-          type: string
-          description: The link to the W3 page for the issue
-          example: https://www.w3.org/WAI/WCAG21/Understanding/contrast-enhanced
-    PageTrendDTO:
-      type: object
-      properties:
-        runId:
-          type: integer
-          format: int64
-        runCompletionDate:
-          type: string
-          format: date-time
-        trendName:
-          type: string
-        trendValue:
-          type: integer
-          format: int64
-    CookiePartyType:
-      type: string
-      description: 'Indicates if cookie domain is different from domain of a page it was set on.
-
-        `owned_3rd_party` is deprecated
-
-        '
-      enum:
-      - 1st_party
-      - owned_3rd_party
-      - 3rd_party
-    TagInfoDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/TagInfo'
-    FileSubstitutionFailureType:
-      type: string
-      enum:
-      - unknown
-      - file_size_limit_exceeded
-      - file_not_found
-      - cannot_get_file
     AuditId:
       type: integer
       format: int64
       example: 107239
-    BaseResponseCookieChangeItemTrait:
-      type: object
-      required:
-      - cookieChangeType
-      - cookie
-      properties:
-        cookieChangeType:
-          $ref: '#/components/schemas/CookieChangeTypeEnum'
-        cookie:
-          $ref: '#/components/schemas/CookieChangeSnapshot'
-    AuditRun_PageInfo_LinkDirection:
-      type: string
-      enum:
-      - to_this_page
-      - from_this_page
-    BaseCookieInitiator:
-      type: object
-      required:
-      - initiatorType
-      properties:
-        initiatorType:
-          $ref: '#/components/schemas/CookieInitiatorTypeEnum'
-        tagId:
-          type: integer
-          description: Will include a tag ID when a specific tag signature has been matched to initiating requests
-        requestUrl:
-          type: string
-          description: "For `initiatorType`:\n  - `HTTP` - `requestUrl` will be the URL of the request that created the cookie\n  - `APP`, `OP_ACTION`, `UNKNOWN` - This field will be undefined\n"
-    CookieChangeInitiator:
-      allOf:
-      - $ref: '#/components/schemas/BaseCookieInitiator'
-      - type: object
-        description: Only `HTTP` initiator have `requestUrl` and `harEntryIndex` properties
-        properties:
-          line:
-            type: integer
-            description: The line number in the JS file that created the cookie
-          column:
-            type: integer
-            description: The column number in the JS file that created the cookie
-          harEntryIndex:
-            $ref: '#/components/schemas/HarEntryIndex'
-    RequestFilename:
-      type: string
-      description: Name of the file. Identified as the last non-empty part of URL path
-      example: main.js
     CookieInitiatorTypeEnum:
       type: string
       description: Type of event that created the cookie
@@ -1800,81 +2061,13 @@ components:
       - APP
       - OP_ACTION
       - UNKNOWN
-    FileSubstitutionFailure:
-      type: object
-      required:
-      - failureType
-      properties:
-        failureType:
-          $ref: '#/components/schemas/FileSubstitutionFailureType'
-        failureMessage:
-          type: string
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    AuditRun_PageDetails_TrendsEnum:
-      type: string
-      enum:
-      - pageSize
-      - pageLoadTime
-      example: pageSize
-    RequestLog:
-      allOf:
-      - $ref: '#/components/schemas/RequestLogTrait'
-      - type: object
-        description: fileChange property is only available for customers who purchased privacy product offering
-        properties:
-          tagId:
-            type: integer
-            deprecated: true
-            description: Use `tag` property instead
-          tag:
-            $ref: '#/components/schemas/RequestLogItemTag'
-          fileChange:
-            $ref: '#/components/schemas/RequestLogItemFileChange'
-          origin:
-            $ref: '#/components/schemas/RequestOriginTypeEnum'
-          relatedCookies:
-            type: array
-            items:
-              $ref: '#/components/schemas/CookieOriginRequestDTO'
-    PageAccessibilityScores:
-      type: object
-      description: The accessibility scores for the page based on different WCAG versions and conformance levels
-      required:
-      - wcag2a
-      - wcag2aa
-      - wcag2aaa
-      - wcag21a
-      - wcag21aa
-      - wcag21aaa
-      - wcag22a
-      - wcag22aa
-      - wcag22aaa
-      properties:
-        wcag2a:
-          $ref: '#/components/schemas/PageScoreValue'
-        wcag2aa:
-          $ref: '#/components/schemas/PageScoreValue'
-        wcag2aaa:
-          $ref: '#/components/schemas/PageScoreValue'
-        wcag21a:
-          $ref: '#/components/schemas/PageScoreValue'
-        wcag21aa:
-          $ref: '#/components/schemas/PageScoreValue'
-        wcag21aaa:
-          $ref: '#/components/schemas/PageScoreValue'
-        wcag22a:
-          $ref: '#/components/schemas/PageScoreValue'
-        wcag22aa:
-          $ref: '#/components/schemas/PageScoreValue'
-        wcag22aaa:
-          $ref: '#/components/schemas/PageScoreValue'
+    AuditRun_FileChanges_SizeDifferenceInBytes:
+      type: integer
+      description: File size change in number of bytes between 2 file versions, can be negative
+    PageTrendsDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/PageTrendDTO'
     AuditRunPage_InitiatorsTree_ResponseDTO:
       type: object
       required:
@@ -1885,145 +2078,6 @@ components:
           $ref: '#/components/schemas/AuditRunPage_InitiatorsSummary'
         initiatorsTreeRoot:
           $ref: '#/components/schemas/InitiatorsTreeVertex'
-    TagName:
-      type: string
-      description: Tag name
-    BrowserLogMessageLevelEnum:
-      type: string
-      enum:
-      - error
-      - warn
-      - info
-      - debug
-      - other
-    GetCookiesByHarEntryIndices_RequestItem:
-      type: object
-      required:
-      - harEntryIndex
-      - cookies
-      properties:
-        harEntryIndex:
-          $ref: '#/components/schemas/HarEntryIndex'
-        cookies:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetCookiesByHarEntryIndices_RequestCookieItem'
-    CookieTrait:
-      type: object
-      required:
-      - name
-      - value
-      - domain
-      - path
-      - httpOnly
-      - secure
-      - sameSite
-      - expires
-      properties:
-        name:
-          type: string
-        value:
-          type: string
-        domain:
-          type: string
-        path:
-          type: string
-        httpOnly:
-          type: boolean
-        secure:
-          type: boolean
-        sameSite:
-          type: string
-        expires:
-          type: string
-    AuditPageCookieItem:
-      type: object
-      description: When `getOrigins` is `true`, will include `changes` array and `uniqueInitiatorCount`, but `initiators` array won't be included
-      allOf:
-      - $ref: '#/components/schemas/FullCookieTrait'
-      - type: object
-        properties:
-          ttlInMinutes:
-            type: integer
-            format: int64
-          uniqueInitiatorCount:
-            type: integer
-          changes:
-            type: array
-            items:
-              $ref: '#/components/schemas/AuditPageCookieChangeItem'
-          cookieChangedDuring:
-            type: array
-            items:
-              $ref: '#/components/schemas/CookieOriginTypeEnum'
-            description: Origins where this cookie was changed during the audit (PRE_AUDIT_ACTION, PAGE_LOAD, ON_PAGE_ACTION)
-    CookieInitiator:
-      type: object
-      properties:
-        tagId:
-          $ref: '#/components/schemas/TagId'
-        initiatorType:
-          type: string
-          enum:
-          - HTTP
-          - APP
-          - OP_ACTION
-          - UNKNOWN
-    AuditRun_FileChanges_SizeDifferenceInBytes:
-      type: integer
-      description: File size change in number of bytes between 2 file versions, can be negative
-    AuditRunPage_ConsoleLogsDTO:
-      type: object
-      required:
-      - metadata
-      - consoleLogs
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        consoleLogs:
-          type: array
-          items:
-            $ref: '#/components/schemas/BrowserConsoleLog'
-    FileMappingMatchTypeEnum:
-      type: integer
-      enum:
-      - 1
-      - 2
-      description: 1 - success, 2 - failure
-    AuditActionSnapshotId:
-      type: integer
-      format: int64
-      minimum: 0
-      description: An ID assigned to actions of all types on an audit - unique in the context of an individual run
-    TagInfoDTOWithInsights:
-      type: object
-      properties:
-        pageTagInsights:
-          $ref: '#/components/schemas/TagInsights'
-        pageTags:
-          $ref: '#/components/schemas/TagInfoDTO'
-    ConsoleLogSummary:
-      type: object
-      required:
-      - errorLogCount
-      - warnLogCount
-      - infoLogCount
-      - debugLogCount
-      - otherLogCount
-      properties:
-        errorLogCount:
-          type: integer
-        warnLogCount:
-          type: integer
-        debugLogCount:
-          type: integer
-        infoLogCount:
-          type: integer
-          example: 4
-        otherLogCount:
-          type: integer
-          deprecated: true
-          description: Deprecated, included only for backward compatibility, value is always 0
     AccessibilityRuleResult:
       type: object
       required:
@@ -2072,89 +2126,26 @@ components:
           items:
             $ref: '#/components/schemas/AccessibilityTestedElement'
           minItems: 1
-    AuditRun_PageDetails_WebVitalsTrends_Response:
+    CookieChangeSnapshot:
       type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_PageDetails_WebVitalsTrendsItem'
-    BrowserConsoleLogTagItem:
       allOf:
-      - $ref: '#/components/schemas/TagInfoTrait'
-    TagCategoryName:
-      type: string
-      description: Name of a category of a tag
-    ItemRunTrendsItemTrait:
-      type: object
-      required:
-      - runId
-      - completedAt
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          $ref: '#/components/schemas/DateAndTime'
-    TagId:
-      type: integer
-      description: Tag ID
-    AuditRun_FileChanges_DateDifferenceInMinutes:
-      type: integer
-      description: Number of minutes for date difference between 2 file versions, can be negative
-    AccessibilityChecksResults:
-      type: object
-      required:
-      - configurationTags
-      - issues
-      properties:
-        configurationTags:
-          description: The tags used for the run configuration that indicate both version and conformance level
-          type: array
-          items:
+      - $ref: '#/components/schemas/CookieTrait'
+      - type: object
+        required:
+        - partyType
+        properties:
+          partyType:
+            $ref: '#/components/schemas/CookiePartyType'
+          cookieTTL:
+            type: integer
+            description: difference (in minutes) between cookie expiration and cookie set time (page scan) cookieTTL
+            format: int64
+          partitionKey:
             type: string
-            description: The conformance levels of the checks
-          example:
-          - wcag2a
-          - wcag21aa
-          - wcag2aaa
-          - wcag2aa
-          - wcag21a
-          - wcag22aa
-        scores:
-          $ref: '#/components/schemas/PageAccessibilityScores'
-        issues:
-          type: array
-          items:
-            $ref: '#/components/schemas/AccessibilityRuleResult'
-        inconclusive:
-          description: The accessibility checks that were inconclusive
-          type: array
-          items:
-            $ref: '#/components/schemas/AccessibilityRuleResult'
-          example:
-          - id: color-contrast
-            impact: serious
-            description: Elements must meet enhanced color contrast ratio thresholds
-            help: Elements must meet enhanced color contrast ratio thresholds
-            helpUrl: https://www.w3.org/WAI/WCAG21/Understanding/contrast-enhanced
-            htmlElements:
-            - html: <span class='fl-heading-text'>Validate Your Privacy, Landing Pages, and Analytics</span>
-              htmlCssSelectors:
-              - h1
-              - .fl-heading-text
-              failureSummary: 'Fix any of the following: Element''s background color could not be determined due to a background image'
+    TagName:
+      type: string
+      description: Tag name
   parameters:
-    AuditRun_Trends_DaysParam:
-      name: days
-      in: query
-      required: true
-      schema:
-        type: integer
-        description: Number of days to get trend values for, relative to current time
-        maximum: 390
-        minimum: 1
     Cookies_GetOriginsParam:
       in: query
       name: getOrigins
@@ -2163,6 +2154,14 @@ components:
         type: boolean
       required: false
       example: true
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
     AuditRun_Page_RequestLog_PageSizeParam:
       in: query
       name: size
@@ -2172,54 +2171,13 @@ components:
         maximum: 1000
         default: 50
         minimum: 50
-    AuditRun_PageInfo_LinkDirection:
-      name: linkDirection
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/AuditRun_PageInfo_LinkDirection'
-    SortDescendingParam:
-      name: sortDesc
+    searchParam:
       in: query
-      description: Controls sorting order
+      name: search
+      description: Filters results by a search string
       required: false
       schema:
-        type: boolean
-        default: false
-    PageId:
-      name: pageId
-      in: path
-      required: true
-      description: Unique identification number for web audit run-page, it is different from dcUUID
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/PageId'
-    RunId:
-      name: runId
-      in: path
-      required: true
-      description: Unique identification number for web audit or journey run
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/RunId'
-    Cookies_HidePreAuditActionOnlyCookiesParam:
-      in: query
-      name: hidePreAuditActionOnlyCookies
-      description: If `true` then cookies which were only changed during pre-audit actions will be hidden
-      schema:
-        type: boolean
-        default: false
-      required: false
-      example: true
-    Cookies_GetInsightsParam:
-      in: query
-      name: getInsights
-      schema:
-        type: boolean
-      required: false
-      example: true
+        type: string
     AuditId:
       name: auditId
       in: path
@@ -2229,15 +2187,21 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/AuditId'
-    pageParam:
-      name: page
+    AuditRun_PageInfo_LinkDirection:
+      name: linkDirection
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/AuditRun_PageInfo_LinkDirection'
+    AuditRun_Trends_DaysParam:
+      name: days
       in: query
-      required: false
+      required: true
       schema:
         type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
     AuditRun_PageInfo_LinkDownloadOptions:
       name: options
       description: Applicable to links from this page
@@ -2249,6 +2213,65 @@ components:
         maxItems: 3
         items:
           $ref: '#/components/schemas/AuditRun_PageInfo_LinkDownloadOptionEnum'
+    showPreAuditActionRequests:
+      in: query
+      name: showPreAuditActionRequests
+      description: Filters results by cookie origin type
+      required: false
+      schema:
+        type: boolean
+        default: false
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    Cookies_GetInsightsParam:
+      in: query
+      name: getInsights
+      schema:
+        type: boolean
+      required: false
+      example: true
+    hideIdentifiedTags:
+      in: query
+      name: hideIdentifiedTags
+      description: Hides requests identified as marketing tags
+      required: false
+      schema:
+        type: boolean
+        default: false
+    Cookies_HidePreAuditActionOnlyCookiesParam:
+      in: query
+      name: hidePreAuditActionOnlyCookies
+      description: If `true` then cookies which were only changed during pre-audit actions will be hidden
+      schema:
+        type: boolean
+        default: false
+      required: false
+      example: true
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    PageId:
+      name: pageId
+      in: path
+      required: true
+      description: Unique identification number for web audit run-page, it is different from dcUUID
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/PageId'
     AuditRun_PageInfo_ThisUrlType:
       name: thisUrlType
       description: 'Applicable to links to this page.
@@ -2263,30 +2286,13 @@ components:
       in: query
       schema:
         $ref: '#/components/schemas/AuditRun_PageInfo_ThisUrlTypeEnum'
-    searchParam:
-      in: query
-      name: search
-      description: Filters results by a search string
-      required: false
-      schema:
-        type: string
-    hideIdentifiedTags:
-      in: query
-      name: hideIdentifiedTags
-      description: Hides requests identified as marketing tags
-      required: false
-      schema:
-        type: boolean
-        default: false
-    showPreAuditActionRequests:
-      in: query
-      name: showPreAuditActionRequests
-      description: Filters results by cookie origin type
-      required: false
-      schema:
-        type: boolean
-        default: false
   responses:
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
     BadRequest:
       description: The request cannot be accepted
       content:
@@ -2295,12 +2301,6 @@ components:
             $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
       content:
         application/json:
           schema:

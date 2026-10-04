@@ -105,48 +105,7 @@ paths:
       - API_Key: []
       description: GET /v3/exports/{exportUuid}
 components:
-  responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ExportUuid:
-      type: string
-      format: uuid
-      description: Unique ID of an export link
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    ExportCenter_ExportStatus:
-      type: string
-      enum:
-      - queued
-      - in_progress
-      - completed
-      - failed
-      - no_data
-    ExportId:
-      type: integer
-      format: int64
-      description: Unique ID of an export
     ExportCenter_ExportedItemTypeEnum:
       type: string
       enum:
@@ -157,17 +116,18 @@ components:
       - alert
       - account_usage
       - grid_data
-    ExportTypeEnum:
+    ExportCenter_ExportsSortColumn:
       type: string
-      description: Enumeration of all high-level export types
       enum:
-      - AUDIT_RUN_EXPORT
-      - WEB_JOURNEY_RUN_EXPORT
-      - MANUAL_JOURNEY_RUN_EXPORT
-      - CONSENT_CATEGORY_EXPORT
-      - ALERT_EXPORT
-      - ACCOUNT_USAGE_EXPORT
-      - GRID_DATA_EXPORT
+      - date_exported
+      - item_name
+      - run_date
+      - export_name
+      - exported_item_type
+      - requested_by
+      - status
+      - is_scheduled
+      default: date_exported
     UserId:
       type: integer
       description: ID of a user
@@ -184,9 +144,107 @@ components:
           type: string
         validationReport:
           type: object
+    ExportCenter_ExportsDTO:
+      type: object
+      required:
+      - metadata
+      - exports
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        exports:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportCenter_ExportsItem'
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    ItemId:
+      type: integer
+      format: int64
+      description: ID of a data collector, see ItemType
+      example: 107239
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
     ScheduledExportId:
       type: integer
       format: int64
+    ExportId:
+      type: integer
+      format: int64
+      description: Unique ID of an export
+    ExportCenter_ExportStatus:
+      type: string
+      enum:
+      - queued
+      - in_progress
+      - completed
+      - failed
+      - no_data
+    ExportUuid:
+      type: string
+      format: uuid
+      description: Unique ID of an export link
+    ExportTypeEnum:
+      type: string
+      description: Enumeration of all high-level export types
+      enum:
+      - AUDIT_RUN_EXPORT
+      - WEB_JOURNEY_RUN_EXPORT
+      - MANUAL_JOURNEY_RUN_EXPORT
+      - CONSENT_CATEGORY_EXPORT
+      - ALERT_EXPORT
+      - ACCOUNT_USAGE_EXPORT
+      - GRID_DATA_EXPORT
     ExportCenter_ExportsItem:
       type: object
       description: 'Not all exports are related to a particular audit/web-journey/manual-journey item or its run, e.g. consent category configs export. Such exports do not have `itemType`, `itemId`, `itemName`, `runId`, `runDate`
@@ -239,86 +297,7 @@ components:
           type: boolean
           description: Whether the export is scheduled or not
           default: false
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    ExportCenter_ExportsSortColumn:
-      type: string
-      enum:
-      - date_exported
-      - item_name
-      - run_date
-      - export_name
-      - exported_item_type
-      - requested_by
-      - status
-      - is_scheduled
-      default: date_exported
-    ItemId:
-      type: integer
-      format: int64
-      description: ID of a data collector, see ItemType
-      example: 107239
-    ExportCenter_ExportsDTO:
-      type: object
-      required:
-      - metadata
-      - exports
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        exports:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExportCenter_ExportsItem'
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
   parameters:
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
     pageParam:
       name: page
       in: query
@@ -328,6 +307,27 @@ components:
         minimum: 0
         default: 0
       description: Page number, starts with 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+  responses:
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

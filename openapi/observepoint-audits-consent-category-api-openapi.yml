@@ -122,10 +122,45 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
-    RunId:
+    ConsentCategory_VendorTypeEnum:
+      type: string
+      enum:
+      - ONE_TRUST
+    ConsentCategory_updatedType:
+      type: string
+      enum:
+      - ONETRUST_IMPORT
+      - FILE_IMPORT
+      - APP_CREATE
+    WebAudit_ConsentCategories_ResponseDTO:
+      type: object
+      required:
+      - consentCategories
+      properties:
+        consentCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategoryDTO'
+    ConsentCategoryId:
       type: integer
-      format: int64
-      example: 33010
+      example: 3301
+      description: ID of consent category
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    AttachmentPatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
     ConsentCategory_Cmp_Data:
       type: object
       required:
@@ -155,27 +190,31 @@ components:
           type: string
           description: The full URL of the page where the CMP import was run
           example: https://example.com
-    ConsentCategorySnapshotId:
+    AttachmentPatchDocument_ItemDTO:
+      description: A JSONPatch document for modifying consent preference attachments
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+          - add
+          - remove
+        path:
+          type: string
+        value:
+          type: integer
+          description: id of the item to assign
+      example:
+      - op: add
+        path: /-
+        value: 1
+      - op: remove
+        path: /
+        value: 2
+    RunId:
       type: integer
       format: int64
       example: 33010
-      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
-    AttachmentPatchDocument_RequestDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     ConsentCategorySnapshotDTO:
       type: object
       description: A consent category snapshot dto
@@ -221,66 +260,40 @@ components:
           type: string
           format: date-time
           description: The last time this consent category was updated in UTC timezone
-    WebAudit_ConsentCategories_ResponseDTO:
-      type: object
-      required:
-      - consentCategories
-      properties:
-        consentCategories:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategoryDTO'
-    AttachmentPatchDocument_ItemDTO:
-      description: A JSONPatch document for modifying consent preference attachments
-      properties:
-        op:
-          type: string
-          description: The operation to be performed
-          enum:
-          - add
-          - remove
-        path:
-          type: string
-        value:
-          type: integer
-          description: id of the item to assign
-      example:
-      - op: add
-        path: /-
-        value: 1
-      - op: remove
-        path: /
-        value: 2
-    ConsentCategory_updatedType:
-      type: string
-      enum:
-      - ONETRUST_IMPORT
-      - FILE_IMPORT
-      - APP_CREATE
-    ConsentCategoryId:
-      type: integer
-      example: 3301
-      description: ID of consent category
     AuditId:
       type: integer
       format: int64
       example: 107239
-    ConsentCategory_VendorTypeEnum:
-      type: string
-      enum:
-      - ONE_TRUST
+    ConsentCategorySnapshotId:
+      type: integer
+      format: int64
+      example: 33010
+      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
     ConsentCategory_TypeEnum:
       type: string
       enum:
       - approved
       - unapproved
+  parameters:
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/RunId'
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
   responses:
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
     UnAuthorized:
       description: Your token is invalid.
       content:
@@ -293,25 +306,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-  parameters:
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
-    RunId:
-      name: runId
-      in: path
-      required: true
-      description: Unique identification number for web audit or journey run
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/RunId'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

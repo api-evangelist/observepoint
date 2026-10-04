@@ -245,92 +245,76 @@ paths:
       - API_Key: []
       description: POST /v3/web-audits/{auditId}/runs/{runId}/reports/request-privacy/request-pages
 components:
-  responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    ConsentCategoryName:
-      type: string
-      description: Name of consent category item (tag, cookie, domain, geo) belongs to
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ConsentCategoryComplianceStatus:
-      type: string
-      enum:
-      - approved
-      - unapproved
-    PageFiltersTrait:
-      type: object
-      description: Common trait for page filters
-      properties:
-        pageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        finalPageUrl:
-          $ref: '#/components/schemas/PageUrlFilter'
-        pageTitle:
-          $ref: '#/components/schemas/PageTitleFilter'
-        initialPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        finalPageStatusCode:
-          $ref: '#/components/schemas/IntegerFilter'
-        combinedPageStatusCode:
-          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
-        pageLoadTime:
-          $ref: '#/components/schemas/PageLoadTimeFilter'
-        pageSize:
-          $ref: '#/components/schemas/PageSizeFilter'
-        redirectCount:
-          $ref: '#/components/schemas/PageRedirectCountFilter'
-        hasBrokenLinks:
-          type: boolean
-    ItemRun_SpecificTrendValueItem:
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
-      allOf:
-      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
-      - type: object
-        required:
-        - trendValue
-        properties:
-          trendValue:
-            type: number
-    StringInclusionFilterTypeEnum:
+    PageUrlFilterEnum:
       type: string
       enum:
       - contains
-      - not_contains
-    AuditRun_RequestPrivacy_PageItem:
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
-      - type: object
-        required:
-        - geoCount
-        - requestCount
-        properties:
-          geoCount:
-            type: integer
-            description: Number of distinct geo locations on a page
-          requestCount:
-            type: integer
-            description: Number of network requests discovered on a page
+      - regex
+    PageUrlFilter:
+      type: object
+      required:
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/PageUrlFilterEnum'
+        filterValue:
+          type: string
+          minLength: 1
+        negated:
+          type: boolean
+          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
+          default: false
+    IntegerFilterTypeEnum:
+      type: string
+      enum:
+      - specific
+      - range
+    CombinedPageStatusCodeEnum:
+      type: string
+      description: '- `broken` - initial or final URL are `broken`,
+
+        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+
+        '
+      enum:
+      - broken
+      - good
+    AuditRun_RequestPrivacy_TrendsDTO:
+      description: Request Privacy report trends
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/AuditRun_RequestPrivacy_TrendItem'
+    LongIntegerRangeFilterTrait:
+      type: object
+      description: Common trait for long integer min max filter
+      properties:
+        min:
+          type: integer
+          format: int64
+          minimum: 0
+        max:
+          type: integer
+          format: int64
+    ConsentCategoryId:
+      type: integer
+      example: 3301
+      description: ID of consent category
+    ItemRun_SpecificTrendValuesDTO:
+      type: object
+      required:
+      - runs
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
     AuditRun_RequestPrivacy_RequestItem:
       type: object
       required:
@@ -358,52 +342,77 @@ components:
             $ref: '#/components/schemas/AuditRunPrivacy_ConsentCategoryItem'
         filteredPageCount:
           type: integer
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
+    PageFiltersTrait:
       type: object
-      required:
-      - pagination
+      description: Common trait for page filters
       properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    AuditRun_RequestPrivacy_RequestsComplianceDTO:
-      description: Request Compliance data
+        pageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        finalPageUrl:
+          $ref: '#/components/schemas/PageUrlFilter'
+        pageTitle:
+          $ref: '#/components/schemas/PageTitleFilter'
+        initialPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        finalPageStatusCode:
+          $ref: '#/components/schemas/IntegerFilter'
+        combinedPageStatusCode:
+          $ref: '#/components/schemas/CombinedPageStatusCodeEnum'
+        pageLoadTime:
+          $ref: '#/components/schemas/PageLoadTimeFilter'
+        pageSize:
+          $ref: '#/components/schemas/PageSizeFilter'
+        redirectCount:
+          $ref: '#/components/schemas/PageRedirectCountFilter'
+        hasBrokenLinks:
+          type: boolean
+    AuditRun_RequestPrivacy_PagesDTO:
       type: object
       required:
       - metadata
-      - requests
+      - pages
       properties:
         metadata:
           $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        requests:
+        pages:
           type: array
           items:
-            $ref: '#/components/schemas/AuditRun_RequestPrivacy_RequestItem'
-    AuditRunPrivacy_ConsentCategoryItem:
-      type: object
-      required:
-      - consentCategoryComplianceStatus
-      - consentCategoryName
-      - consentCategorySnapshotId
-      properties:
-        consentCategoryComplianceStatus:
-          $ref: '#/components/schemas/ConsentCategoryComplianceStatus'
-        consentCategoryName:
-          $ref: '#/components/schemas/ConsentCategoryName'
-        consentCategorySnapshotId:
-          $ref: '#/components/schemas/ConsentCategorySnapshotId'
-    AuditRun_RequestPrivacy_TrendsEnum:
+            $ref: '#/components/schemas/AuditRun_RequestPrivacy_PageItem'
+    AuditRun_RequestPrivacy_RequestsSortColumn:
       type: string
-      x-implements:
-      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
       enum:
+      - compliance_status
+      - page_count
+      - domain
+      - geo
       - request_count
-      - unique_domains
-      - unique_geos
-      - approved_requests
-      - unique_approved_domains
-      - unapproved_requests
-      - unique_unapproved_domains
+      - consent_category_name
+      - consent_categories
+    StringInclusionFilterTypeEnum:
+      type: string
+      enum:
+      - contains
+      - not_contains
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    CountryCode:
+      type: string
+      description: ISO 3166-1 (Alpha-2) country code
+      example: US
+    PageUrl:
+      type: string
+      format: url
+      example: https://example.com/about
     AuditRunPageTrait:
       description: Common trait for audit page with mandatory page properties
       type: object
@@ -415,6 +424,36 @@ components:
           $ref: '#/components/schemas/PageId'
         pageUrl:
           $ref: '#/components/schemas/PageUrl'
+    AuditRunPageCommonColumnsWithFinalValuesTrait:
+      description: Trait for audit page with final URL and final status code
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
+      - type: object
+        properties:
+          finalPageUrl:
+            $ref: '#/components/schemas/PageUrl'
+          finalPageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    ConsentCategoryComplianceStatus:
+      type: string
+      enum:
+      - approved
+      - unapproved
+    PageLoadTime:
+      type: integer
+      description: Time page took to load, in milliseconds
+    AuditRun_RequestPrivacy_RequestPagesRequestDTO:
+      type: object
+      required:
+      - requestDomain
+      allOf:
+      - $ref: '#/components/schemas/PageFiltersTrait'
+      - type: object
+        properties:
+          requestDomain:
+            $ref: '#/components/schemas/RequestDomain'
+          countryCode:
+            $ref: '#/components/schemas/CountryCode'
     AuditRun_RequestPrivacy_TrendItem:
       x-implements:
       - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
@@ -453,24 +492,51 @@ components:
           totalUniqueUnapprovedRequestDomainCount:
             type: integer
             description: Total number of unique unapproved domains discovered
-    ConsentCategorySnapshotId:
-      type: integer
-      format: int64
-      example: 33010
-      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
-    AuditRunPageCommonColumnsTrait:
-      description: Trait for audit page with common page properties
+    AuditRun_RequestPrivacy_RequestDTO:
+      description: Request body with filters for Request Privacy report. `consentCategorySnapshotId` is deprecated, need to use `consentCategoryId` instead
+      type: object
       allOf:
-      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - $ref: '#/components/schemas/PageFiltersTrait'
       - type: object
-        required:
-        - pageLoadTime
-        - pageStatusCode
         properties:
-          pageLoadTime:
-            $ref: '#/components/schemas/PageLoadTime'
-          pageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
+          requestDomain:
+            $ref: '#/components/schemas/RequestDomain'
+          consentCategoryId:
+            $ref: '#/components/schemas/ConsentCategoryId'
+          consentCategorySnapshotId:
+            $ref: '#/components/schemas/ConsentCategorySnapshotId'
+          consentCategoryComplianceStatus:
+            $ref: '#/components/schemas/ConsentCategoryComplianceStatus'
+          countryCode:
+            $ref: '#/components/schemas/CountryCode'
+    ItemRunTrendsItemTrait:
+      type: object
+      required:
+      - runId
+      - completedAt
+      properties:
+        runId:
+          $ref: '#/components/schemas/RunId'
+        completedAt:
+          $ref: '#/components/schemas/DateAndTime'
+    DateAndTime:
+      type: string
+      format: date-time
+      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
+
+        the following additional restrictions:
+
+        1. An uppercase T must separate the date and time portions.
+
+        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
+
+
+        In general, these timestamp requirements are the same in
+
+        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
+
+        '
+      example: '2016-08-18T17:33:00Z'
     AuditRun_RequestPrivacy_GeoLocation:
       type: object
       required:
@@ -482,174 +548,6 @@ components:
         countryName:
           type: string
           example: United States
-    AuditRun_RequestPrivacy_RequestLocationsDTO:
-      type: object
-      required:
-      - locations
-      properties:
-        locations:
-          description: Same `requestGeo.country` may be repeated in different array elements and may have different `status`es with different consent categories
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_RequestPrivacy_RequestLocationItem'
-    AuditRun_RequestPrivacy_PagesSortColumn:
-      type: string
-      enum:
-      - page_url
-      - final_page_url
-      - page_load_time
-      - page_status_code
-      - final_page_status_code
-      - geo_count
-      - request_count
-    IntegerFilterTypeEnum:
-      type: string
-      enum:
-      - specific
-      - range
-    PageUrlFilterEnum:
-      type: string
-      enum:
-      - contains
-      - regex
-    PageRedirectCountFilter:
-      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    PageLoadTimeFilter:
-      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    PageId:
-      type: string
-      example: f9d32cc7cc2046d6decb145a80289287f5226323
-    PageUrlFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/PageUrlFilterEnum'
-        filterValue:
-          type: string
-          minLength: 1
-        negated:
-          type: boolean
-          description: Switches from "contains" to "not contains", and from "matches regex" to "does not match regex". Supported only by Page Summary for now
-          default: false
-    ItemRun_SpecificTrendValuesDTO:
-      type: object
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ItemRun_SpecificTrendValueItem'
-    PageUrl:
-      type: string
-      format: url
-      example: https://example.com/about
-    RunHasNoConsentCategoriesAssigned:
-      type: boolean
-      description: 'When TRUE, run did not have any consent categories assigned.
-
-        When NOT specified or FALSE, it had at least one.
-
-        '
-    AuditRun_RequestPrivacy_TrendsDTO:
-      description: Request Privacy report trends
-      required:
-      - runs
-      properties:
-        runs:
-          type: array
-          maxItems: 5
-          items:
-            $ref: '#/components/schemas/AuditRun_RequestPrivacy_TrendItem'
-    ConsentCategoryId:
-      type: integer
-      example: 3301
-      description: ID of consent category
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    PageTitleFilter:
-      type: object
-      required:
-      - filterType
-      - filterValue
-      properties:
-        filterType:
-          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
-        filterValue:
-          type: string
-          description: Page title as displayed by browser
-          minLength: 1
-          example: ObserveP
-    IntegerFilter:
-      type: object
-      required:
-      - filterType
-      - negated
-      properties:
-        filterType:
-          $ref: '#/components/schemas/IntegerFilterTypeEnum'
-        negated:
-          type: boolean
-          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
-      discriminator:
-        propertyName: filterType
-        mapping:
-          specific: '#/components/schemas/SpecificIntegerFilter'
-          range: '#/components/schemas/IntegerRangeFilter'
-    AuditRunPageCommonColumnsWithFinalValuesTrait:
-      description: Trait for audit page with final URL and final status code
-      allOf:
-      - $ref: '#/components/schemas/AuditRunPageCommonColumnsTrait'
-      - type: object
-        properties:
-          finalPageUrl:
-            $ref: '#/components/schemas/PageUrl'
-          finalPageStatusCode:
-            $ref: '#/components/schemas/PageStatusCode'
-    PageLoadTime:
-      type: integer
-      description: Time page took to load, in milliseconds
     AuditRun_RequestPrivacy_SummaryDTO:
       description: Request Privacy report summary
       type: object
@@ -722,6 +620,41 @@ components:
           description: Number of pages with unapproved domains or geos passing all applied filters
         runHasNoConsentCategoriesAssigned:
           $ref: '#/components/schemas/RunHasNoConsentCategoriesAssigned'
+    AuditRun_RequestPrivacy_RequestsComplianceDTO:
+      description: Request Compliance data
+      type: object
+      required:
+      - metadata
+      - requests
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_RequestPrivacy_RequestItem'
+    AuditRun_RequestPrivacy_RequestLocationsDTO:
+      type: object
+      required:
+      - locations
+      properties:
+        locations:
+          description: Same `requestGeo.country` may be repeated in different array elements and may have different `status`es with different consent categories
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRun_RequestPrivacy_RequestLocationItem'
+    PageId:
+      type: string
+      example: f9d32cc7cc2046d6decb145a80289287f5226323
+    IntegerRangeFilterTrait:
+      type: object
+      description: Common trait for integer min max filter
+      properties:
+        min:
+          type: integer
+          minimum: 0
+        max:
+          type: integer
     AuditRun_RequestPrivacy_RequestLocationItem:
       type: object
       description: Consent category id & name are absent if location has not been matched by any consent category
@@ -735,179 +668,183 @@ components:
           type: integer
         status:
           $ref: '#/components/schemas/ConsentCategoryComplianceStatus'
-    PageSizeFilter:
-      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
-      allOf:
-      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
-    CombinedPageStatusCodeEnum:
+    ConsentCategoryName:
       type: string
-      description: '- `broken` - initial or final URL are `broken`,
+      description: Name of consent category item (tag, cookie, domain, geo) belongs to
+    RunHasNoConsentCategoriesAssigned:
+      type: boolean
+      description: 'When TRUE, run did not have any consent categories assigned.
 
-        - `good` - initial URL is `good` or `redirect` and final URL is `good`
+        When NOT specified or FALSE, it had at least one.
 
         '
-      enum:
-      - broken
-      - good
-    AuditRun_RequestPrivacy_RequestsSortColumn:
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AuditRun_RequestPrivacy_PageItem:
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageCommonColumnsWithFinalValuesTrait'
+      - type: object
+        required:
+        - geoCount
+        - requestCount
+        properties:
+          geoCount:
+            type: integer
+            description: Number of distinct geo locations on a page
+          requestCount:
+            type: integer
+            description: Number of network requests discovered on a page
+    ItemRun_SpecificTrendValueItem:
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.ItemRunTrendsItemTraitInterface
+      allOf:
+      - $ref: '#/components/schemas/ItemRunTrendsItemTrait'
+      - type: object
+        required:
+        - trendValue
+        properties:
+          trendValue:
+            type: number
+    IntegerFilter:
+      type: object
+      required:
+      - filterType
+      - negated
+      properties:
+        filterType:
+          $ref: '#/components/schemas/IntegerFilterTypeEnum'
+        negated:
+          type: boolean
+          description: Switches from `==` to `!=`, and from `between [minInclusive, maxExclusive)` to `NOT between [minInclusive, maxExclusive)`
+      discriminator:
+        propertyName: filterType
+        mapping:
+          specific: '#/components/schemas/SpecificIntegerFilter'
+          range: '#/components/schemas/IntegerRangeFilter'
+    PageRedirectCountFilter:
+      description: Number of redirects for a page. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    AuditRun_RequestPrivacy_PagesSortColumn:
       type: string
       enum:
-      - compliance_status
-      - page_count
-      - domain
-      - geo
+      - page_url
+      - final_page_url
+      - page_load_time
+      - page_status_code
+      - final_page_status_code
+      - geo_count
       - request_count
-      - consent_category_name
-      - consent_categories
-    IntegerRangeFilterTrait:
-      type: object
-      description: Common trait for integer min max filter
-      properties:
-        min:
-          type: integer
-          minimum: 0
-        max:
-          type: integer
-    CountryCode:
-      type: string
-      description: ISO 3166-1 (Alpha-2) country code
-      example: US
-    RequestDomain:
-      type: string
-      description: Network request URL domain
-      example: example.com
-    AuditRun_RequestPrivacy_PagesDTO:
+    AuditRunPrivacy_ConsentCategoryItem:
       type: object
       required:
-      - metadata
-      - pages
+      - consentCategoryComplianceStatus
+      - consentCategoryName
+      - consentCategorySnapshotId
       properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRun_RequestPrivacy_PageItem'
-    ItemRunTrendsItemTrait:
-      type: object
-      required:
-      - runId
-      - completedAt
-      properties:
-        runId:
-          $ref: '#/components/schemas/RunId'
-        completedAt:
-          $ref: '#/components/schemas/DateAndTime'
+        consentCategoryComplianceStatus:
+          $ref: '#/components/schemas/ConsentCategoryComplianceStatus'
+        consentCategoryName:
+          $ref: '#/components/schemas/ConsentCategoryName'
+        consentCategorySnapshotId:
+          $ref: '#/components/schemas/ConsentCategorySnapshotId'
     AuditId:
       type: integer
       format: int64
       example: 107239
+    AuditRunPageCommonColumnsTrait:
+      description: Trait for audit page with common page properties
+      allOf:
+      - $ref: '#/components/schemas/AuditRunPageTrait'
+      - type: object
+        required:
+        - pageLoadTime
+        - pageStatusCode
+        properties:
+          pageLoadTime:
+            $ref: '#/components/schemas/PageLoadTime'
+          pageStatusCode:
+            $ref: '#/components/schemas/PageStatusCode'
+    ConsentCategorySnapshotId:
+      type: integer
+      format: int64
+      example: 33010
+      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
+    PageLoadTimeFilter:
+      description: Page load time in milliseconds. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/IntegerRangeFilterTrait'
+    PageSizeFilter:
+      description: Page size in bytes. Should have `min` and/or `max` properties defined. `min` is inclusive and `max` is exclusive. `min` should be less than `max`.
+      allOf:
+      - $ref: '#/components/schemas/LongIntegerRangeFilterTrait'
+    AuditRun_RequestPrivacy_TrendsEnum:
+      type: string
+      x-implements:
+      - com.observepoint.reportingapi.gen.interfaces.TrendEnumCompatibleWithRunsGrid
+      enum:
+      - request_count
+      - unique_domains
+      - unique_geos
+      - approved_requests
+      - unique_approved_domains
+      - unapproved_requests
+      - unique_unapproved_domains
     PageStatusCode:
       type: integer
       description: Page HTTP status code
-    LongIntegerRangeFilterTrait:
-      type: object
-      description: Common trait for long integer min max filter
-      properties:
-        min:
-          type: integer
-          format: int64
-          minimum: 0
-        max:
-          type: integer
-          format: int64
-    AuditRun_RequestPrivacy_RequestDTO:
-      description: Request body with filters for Request Privacy report. `consentCategorySnapshotId` is deprecated, need to use `consentCategoryId` instead
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/PageFiltersTrait'
-      - type: object
-        properties:
-          requestDomain:
-            $ref: '#/components/schemas/RequestDomain'
-          consentCategoryId:
-            $ref: '#/components/schemas/ConsentCategoryId'
-          consentCategorySnapshotId:
-            $ref: '#/components/schemas/ConsentCategorySnapshotId'
-          consentCategoryComplianceStatus:
-            $ref: '#/components/schemas/ConsentCategoryComplianceStatus'
-          countryCode:
-            $ref: '#/components/schemas/CountryCode'
-    DateAndTime:
-      type: string
-      format: date-time
-      description: 'Date-time in [RFC3339 profile ISO 8601 format](https://www.ietf.org/rfc/rfc3339.txt) with
-
-        the following additional restrictions:
-
-        1. An uppercase T must separate the date and time portions.
-
-        2. An uppercase Z must denote that a numeric time zone offset isn''t present.
-
-
-        In general, these timestamp requirements are the same in
-
-        [AWS Step Functions - Choice Rules](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html)
-
-        '
-      example: '2016-08-18T17:33:00Z'
-    AuditRun_RequestPrivacy_RequestPagesRequestDTO:
+    PageTitleFilter:
       type: object
       required:
-      - requestDomain
-      allOf:
-      - $ref: '#/components/schemas/PageFiltersTrait'
-      - type: object
-        properties:
-          requestDomain:
-            $ref: '#/components/schemas/RequestDomain'
-          countryCode:
-            $ref: '#/components/schemas/CountryCode'
+      - filterType
+      - filterValue
+      properties:
+        filterType:
+          $ref: '#/components/schemas/StringInclusionFilterTypeEnum'
+        filterValue:
+          type: string
+          description: Page title as displayed by browser
+          minLength: 1
+          example: ObserveP
+    RequestDomain:
+      type: string
+      description: Network request URL domain
+      example: example.com
   parameters:
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
-    SortDescendingParam:
-      name: sortDesc
-      in: query
-      description: Controls sorting order
-      required: false
-      schema:
-        type: boolean
-        default: false
-    AuditRun_PagesList_PageSizeParam:
-      in: query
-      name: size
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        default: 50
-        minimum: 50
-    pageParam:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
-    AuditRun_Trends_DaysParam:
-      name: days
-      in: query
-      required: true
-      schema:
-        type: integer
-        description: Number of days to get trend values for, relative to current time
-        maximum: 390
-        minimum: 1
     RunId:
       name: runId
       in: path
@@ -926,12 +863,75 @@ components:
         maximum: 1000
         default: 100
         minimum: 100
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
+    SortDescendingParam:
+      name: sortDesc
+      in: query
+      description: Controls sorting order
+      required: false
+      schema:
+        type: boolean
+        default: false
+    AuditRun_Trends_DaysParam:
+      name: days
+      in: query
+      required: true
+      schema:
+        type: integer
+        description: Number of days to get trend values for, relative to current time
+        maximum: 390
+        minimum: 1
     AuditRun_RequestPrivacy_PagesSortParam:
       name: sortBy
       in: query
       required: false
       schema:
         $ref: '#/components/schemas/AuditRun_RequestPrivacy_PagesSortColumn'
+    AuditRun_PagesList_PageSizeParam:
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        default: 50
+        minimum: 50
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

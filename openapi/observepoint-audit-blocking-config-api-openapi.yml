@@ -67,6 +67,37 @@ paths:
       - API_Key: []
       description: PUT /v3/web-audits/{auditId}/blocking-configuration
 components:
+  schemas:
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    BlockingConfig_DTO:
+      type: object
+      description: The blocking configuration to be applied to the Audit or Journey.
+      properties:
+        tagIds:
+          description: (Optional) Present when blockingType is `tag_id`, a list of tag ids to block
+          type: array
+          items:
+            type: integer
+        tagCategoryIds:
+          description: (Optional) Present when blockingType is `tag_category`, a list of tag category ids to block
+          type: array
+          items:
+            type: integer
   responses:
     UnAuthorized:
       description: Your token is invalid.
@@ -86,37 +117,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-  schemas:
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    BlockingConfig_DTO:
-      type: object
-      description: The blocking configuration to be applied to the Audit or Journey.
-      properties:
-        tagIds:
-          description: (Optional) Present when blockingType is `tag_id`, a list of tag ids to block
-          type: array
-          items:
-            type: integer
-        tagCategoryIds:
-          description: (Optional) Present when blockingType is `tag_category`, a list of tag category ids to block
-          type: array
-          items:
-            type: integer
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
   parameters:
     AuditId:
       name: auditId

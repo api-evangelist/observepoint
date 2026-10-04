@@ -270,71 +270,13 @@ paths:
       - API_Key: []
       description: DELETE /v3/email-inboxes/{emailInboxId}/messages/{receivedEmailMessageId}/runs
 components:
-  responses:
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    EmailInboxId:
-      type: integer
-    EmailInboxLinkExclusionFilters:
-      description: A regex to be used to exclude links in email scans.
-      type: string
     LabelId:
       type: integer
       format: int64
       description: Label identifier
       example: 223
       minimum: 1
-    EmailInboxRequestDTO:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          example: Adove Campaign Holidays, Marketing Department
-        notes:
-          type: string
-        labelIds:
-          description: The ids of the labels to be associated to the Email Inbox
-          type: array
-          uniqueItems: true
-          items:
-            $ref: '#/components/schemas/LabelId'
-        subscribers:
-          $ref: '#/components/schemas/EmailInboxSubscribersDTO'
-        linkExclusionFilters:
-          type: array
-          items:
-            $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
-        omitSocialLinks:
-          type: boolean
     EmailInboxSubscribersDTO:
       type: object
       properties:
@@ -348,6 +290,24 @@ components:
           items:
             type: string
             description: Email address subscribers to be alerted on email message processed.
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    EmailInboxId:
+      type: integer
     EmailInboxResponseDTO:
       type: object
       required:
@@ -385,18 +345,33 @@ components:
             $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
         omitSocialLinks:
           type: boolean
-    ErrorModel:
+    EmailInboxLinkExclusionFilters:
+      description: A regex to be used to exclude links in email scans.
+      type: string
+    EmailInboxRequestDTO:
       type: object
+      required:
+      - name
       properties:
-        timestamp:
+        name:
           type: string
-          format: date-time
-        message:
+          example: Adove Campaign Holidays, Marketing Department
+        notes:
           type: string
-        details:
-          type: string
-        validationReport:
-          type: object
+        labelIds:
+          description: The ids of the labels to be associated to the Email Inbox
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/LabelId'
+        subscribers:
+          $ref: '#/components/schemas/EmailInboxSubscribersDTO'
+        linkExclusionFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailInboxLinkExclusionFilters'
+        omitSocialLinks:
+          type: boolean
     Label:
       description: DTO for Labels
       type: object
@@ -408,25 +383,32 @@ components:
           $ref: '#/components/schemas/LabelId'
         name:
           type: string
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   parameters:
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/AuditId'
-    ReceivedEmailMessageId:
-      name: receivedEmailMessageId
-      in: path
-      required: true
-      description: Unique identification number for received email message record
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        type: integer
     EmailInboxId:
       name: emailInboxId
       in: path
@@ -436,6 +418,24 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/EmailInboxId'
+    ReceivedEmailMessageId:
+      name: receivedEmailMessageId
+      in: path
+      required: true
+      description: Unique identification number for received email message record
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        type: integer
+    AuditId:
+      name: auditId
+      in: path
+      required: true
+      description: Unique identification number for web audit
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/AuditId'
   securitySchemes:
     API_Key:
       type: apiKey

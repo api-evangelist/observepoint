@@ -213,37 +213,33 @@ paths:
       tags:
       - Users
 components:
+  requestBodies:
+    addUserFoldersBody:
+      content:
+        application/json:
+          schema:
+            items:
+              format: int32
+              type: integer
+            type: array
+      description: Folders id list
   schemas:
-    UserDocument:
+    UserFolder:
       type: object
       required:
-      - email
-      - firstName
-      - lastName
-      - timezone
-      - username
+      - accountId
+      - id
+      - name
       properties:
-        email:
+        accountId:
+          format: int32
+          type: integer
+        id:
+          format: int32
+          type: integer
+        name:
           type: string
-        firstName:
-          type: string
-        fullUsageDashboardAccess:
-          type: number
-        lastName:
-          type: string
-        maxPagesPerAudit:
-          type: number
-        permissions:
-          enum:
-          - guest
-          - user
-          - admin
-          type: string
-        timezone:
-          type: string
-        username:
-          type: string
-      description: User create/update model
+      description: User folder model
     User:
       type: object
       required:
@@ -299,32 +295,36 @@ components:
         username:
           type: string
       description: User model
-    UserFolder:
+    UserDocument:
       type: object
       required:
-      - accountId
-      - id
-      - name
+      - email
+      - firstName
+      - lastName
+      - timezone
+      - username
       properties:
-        accountId:
-          format: int32
-          type: integer
-        id:
-          format: int32
-          type: integer
-        name:
+        email:
           type: string
-      description: User folder model
-  requestBodies:
-    addUserFoldersBody:
-      content:
-        application/json:
-          schema:
-            items:
-              format: int32
-              type: integer
-            type: array
-      description: Folders id list
+        firstName:
+          type: string
+        fullUsageDashboardAccess:
+          type: number
+        lastName:
+          type: string
+        maxPagesPerAudit:
+          type: number
+        permissions:
+          enum:
+          - guest
+          - user
+          - admin
+          type: string
+        timezone:
+          type: string
+        username:
+          type: string
+      description: User create/update model
   securitySchemes:
     API_Key:
       description: 'Use the `Authorization` header in your requests with ObservePoint API key as header value.

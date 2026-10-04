@@ -671,40 +671,178 @@ paths:
       - API_Key: []
       description: PATCH /v3/consent-categories/{consentCategoryId}/labels
 components:
-  responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    LabelResponseDTO:
-      description: DTO for get/patch labels
+    ConsentCategory_LibraryItemDTO:
+      allOf:
+      - $ref: '#/components/schemas/ConsentCategoryDTO'
+      - type: object
+        properties:
+          itemCounts:
+            $ref: '#/components/schemas/ConsentCategory_ItemCountsDTO'
+          auditCount:
+            description: the number of audits this consent category is assigned to
+            type: integer
+          labelIds:
+            type: array
+            items:
+              type: integer
+    ConsentCategory_RequestDomainResponseDTO:
       type: object
       properties:
-        labels:
+        requestDomains:
           type: array
           items:
-            $ref: '#/components/schemas/Label'
+            $ref: '#/components/schemas/ConsentCategory_RequestDomainItemDTO'
+    ConsentCategory_VendorTypeEnum:
+      type: string
+      enum:
+      - ONE_TRUST
+    ConsentCategory_WebAudits_ItemDTO:
+      type: object
+      properties:
+        auditId:
+          type: integer
+        auditName:
+          type: string
+        domain:
+          type: string
+        createdBy:
+          type: integer
+        access:
+          type: boolean
+        lastRun:
+          type: string
+          format: date-time
+    PatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/PatchDocument_ItemDTO'
+    WebAudit_ConsentCategorySnapshots_ResponseDTO:
+      type: object
+      description: 'NOTE: For individual consent category snapshot, Field consentCategoryId is omitted when the consent category is deleted'
+      properties:
+        consentCategorySnapshots:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
+    ConsentCategoryUploadWithLabels:
+      type: object
+      required:
+      - labels
+      properties:
+        consentCategoryName:
+          type: string
+        labels:
+          type: array
+          default: []
+          items:
+            type: integer
+        consentCategoryId:
+          $ref: '#/components/schemas/ConsentCategoryId'
+    ConsentCategory_UpdateRequestDTO:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+        notes:
+          type: string
+        isDefaultCC:
+          type: boolean
+          description: If true, this is the default consent category
+        cmpData:
+          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
+    ConsentCategory_updatedType:
+      type: string
+      enum:
+      - ONETRUST_IMPORT
+      - FILE_IMPORT
+      - APP_CREATE
+    ConsentCategory_CreateRequestDTO:
+      type: object
+      required:
+      - name
+      - type
+      properties:
+        name:
+          type: string
+          minLength: 1
+        notes:
+          type: string
+        type:
+          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
+        isDefaultCC:
+          type: boolean
+          description: If true, this is the default consent category
+        cmpData:
+          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
+    WebAudit_ConsentCategories_ResponseDTO:
+      type: object
+      required:
+      - consentCategories
+      properties:
+        consentCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategoryDTO'
+    ConsentCategoryId:
+      type: integer
+      example: 3301
+      description: ID of consent category
+    ConsentCategory_LibraryResponseDTO:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        consentCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategory_LibraryItemDTO'
+    PatchDocument_ItemDTO:
+      description: A JSONPatch document as defined by RFC 6902
+      required:
+      - op
+      - path
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+          - add
+          - remove
+          - replace
+          - move
+          - copy
+          - test
+        path:
+          type: string
+          description: A JSON-Pointer
+        value:
+          type: object
+          description: The value to be used within the operations.
+        from:
+          type: string
+          description: A string containing a JSON Pointer value.
+    RequestDomainMatchType:
+      type: string
+      enum:
+      - domain_any
+      - domain_regex
+      - domain_exact_match
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
     ConsentCategoryUploadPreviewResult:
       type: object
       required:
@@ -716,71 +854,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ConsentCategoryFoundResult'
-    WebAudit_ConsentCategorySnapshots_ResponseDTO:
-      type: object
-      description: 'NOTE: For individual consent category snapshot, Field consentCategoryId is omitted when the consent category is deleted'
-      properties:
-        consentCategorySnapshots:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategorySnapshotDTO'
-    ConsentCategory_TagEntryItemDTO:
-      description: DTO for tag under a consent category bucket
+    AttachmentPatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
+    Label:
+      description: DTO for Labels
       type: object
       required:
-      - tagId
-      - accounts
+      - id
+      - name
       properties:
-        tagId:
-          type: integer
-        anyAccount:
-          type: boolean
-          default: false
-        accounts:
-          type: array
-          uniqueItems: true
-          default: []
-          items:
-            type: string
-            format: text
-            minLength: 1
-    ConsentCategory_CookieEntryItemDTO:
-      description: DTO For Cookie under a consent preference bucket
-      type: object
-      properties:
-        nameType:
-          $ref: '#/components/schemas/CookieNameMatchType'
+        id:
+          $ref: '#/components/schemas/LabelId'
         name:
           type: string
-        domainType:
-          $ref: '#/components/schemas/CookieDomainMatchType'
-        domain:
-          type: string
-        cookieDescription:
-          type: string
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ConsentCategoriesUploadRequest:
-      type: object
-      required:
-      - fileId
-      - consentCategories
-      properties:
-        fileId:
-          type: string
-        consentCategories:
-          type: array
-          default: []
-          items:
-            $ref: '#/components/schemas/ConsentCategoryUploadWithLabels'
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
     ConsentCategory_Cmp_Data:
       type: object
       required:
@@ -810,6 +898,104 @@ components:
           type: string
           description: The full URL of the page where the CMP import was run
           example: https://example.com
+    ConsentCategory_ItemCountsDTO:
+      type: object
+      properties:
+        tags:
+          description: the number of tags in this consent category
+          type: integer
+        cookies:
+          description: the number of cookies in this consent category
+          type: integer
+        requestDomainsAndGeos:
+          description: the number of request domain/geo location pairs in this consent category
+          type: integer
+    AttachmentPatchDocument_ItemDTO:
+      description: A JSONPatch document for modifying consent preference attachments
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+          - add
+          - remove
+        path:
+          type: string
+        value:
+          type: integer
+          description: id of the item to assign
+      example:
+      - op: add
+        path: /-
+        value: 1
+      - op: remove
+        path: /
+        value: 2
+    CookieDomainMatchType:
+      type: string
+      enum:
+      - domain_any
+      - domain_regex
+      - domain_exact_match
+    ConsentCategoryFoundResult:
+      type: object
+      required:
+      - consentCategoryName
+      - noOfNewCookies
+      - consentCategoryId
+      properties:
+        consentCategoryName:
+          type: string
+        noOfNewCookies:
+          type: integer
+        noOfNewTags:
+          type: integer
+        noOfNewRequests:
+          type: integer
+        consentCategoryId:
+          $ref: '#/components/schemas/ConsentCategoryId'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+    ConsentCategory_CookieEntryItemDTO:
+      description: DTO For Cookie under a consent preference bucket
+      type: object
+      properties:
+        nameType:
+          $ref: '#/components/schemas/CookieNameMatchType'
+        name:
+          type: string
+        domainType:
+          $ref: '#/components/schemas/CookieDomainMatchType'
+        domain:
+          type: string
+        cookieDescription:
+          type: string
+    ConsentCategory_TagEntryItemDTO:
+      description: DTO for tag under a consent category bucket
+      type: object
+      required:
+      - tagId
+      - accounts
+      properties:
+        tagId:
+          type: integer
+        anyAccount:
+          type: boolean
+          default: false
+        accounts:
+          type: array
+          uniqueItems: true
+          default: []
+          items:
+            type: string
+            format: text
+            minLength: 1
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
     CommonIterableResponseMetadata:
       description: Common metadata for iterable
       type: object
@@ -818,167 +1004,56 @@ components:
       properties:
         pagination:
           $ref: '#/components/schemas/PaginationMetadata'
-    ConsentCategory_RequestDomainResponseDTO:
-      type: object
-      properties:
-        requestDomains:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategory_RequestDomainItemDTO'
-    ConsentCategory_RequestDomainItemDTO:
-      description: DTO for request domain under a consent category
+    ConsentCategoriesUploadRequest:
       type: object
       required:
-      - domainType
+      - fileId
+      - consentCategories
       properties:
-        domain:
+        fileId:
           type: string
-        domainType:
-          $ref: '#/components/schemas/RequestDomainMatchType'
-        locationIds:
-          description: geo location ids
+        consentCategories:
           type: array
+          default: []
           items:
-            type: integer
-        anyLocation:
-          description: true if request domain should apply to any location
-          type: boolean
+            $ref: '#/components/schemas/ConsentCategoryUploadWithLabels'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
     CookieNameMatchType:
       type: string
       enum:
       - name_any
       - name_regex
       - name_exact_match
-    ConsentCategory_WebAudits_ItemDTO:
+    ConsentCategory_TagEntryResponseDTO:
       type: object
       properties:
-        auditId:
-          type: integer
-        auditName:
-          type: string
-        domain:
-          type: string
-        createdBy:
-          type: integer
-        access:
-          type: boolean
-        lastRun:
-          type: string
-          format: date-time
-    ConsentCategory_CookieEntryResponseDTO:
-      description: DTO for cookie entry response
-      type: object
-      required:
-      - cookies
-      properties:
-        cookies:
+        tags:
           type: array
           items:
-            $ref: '#/components/schemas/ConsentCategory_CookieEntryItemDTO'
-    ConsentCategorySnapshotId:
-      type: integer
-      format: int64
-      example: 33010
-      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
-    Label:
-      description: DTO for Labels
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-        name:
-          type: string
-    PatchDocument_ItemDTO:
-      description: A JSONPatch document as defined by RFC 6902
-      required:
-      - op
-      - path
-      properties:
-        op:
-          type: string
-          description: The operation to be performed
-          enum:
-          - add
-          - remove
-          - replace
-          - move
-          - copy
-          - test
-        path:
-          type: string
-          description: A JSON-Pointer
-        value:
-          type: object
-          description: The value to be used within the operations.
-        from:
-          type: string
-          description: A string containing a JSON Pointer value.
-    PatchDocument_RequestDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/PatchDocument_ItemDTO'
-    ConsentCategory_WebAudits_ResponseDTO:
-      type: object
-      properties:
-        webAudits:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategory_WebAudits_ItemDTO'
-    AttachmentPatchDocument_RequestDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
-    ConsentCategory_UpdateRequestDTO:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          minLength: 1
-        notes:
-          type: string
-        isDefaultCC:
-          type: boolean
-          description: If true, this is the default consent category
-        cmpData:
-          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
-    ConsentCategoryLibrarySortByEnum:
-      type: string
-      default: name
-      enum:
-      - name
-      - type
-      - updated_at
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    ConsentCategoryUploadWithLabels:
-      type: object
-      required:
-      - labels
-      properties:
-        consentCategoryName:
-          type: string
-        labels:
-          type: array
-          default: []
-          items:
-            type: integer
-        consentCategoryId:
-          $ref: '#/components/schemas/ConsentCategoryId'
+            $ref: '#/components/schemas/ConsentCategory_TagEntryItemDTO'
     ConsentCategorySnapshotDTO:
       type: object
       description: A consent category snapshot dto
@@ -1024,186 +1099,86 @@ components:
           type: string
           format: date-time
           description: The last time this consent category was updated in UTC timezone
-    ConsentCategory_ItemCountsDTO:
-      type: object
-      properties:
-        tags:
-          description: the number of tags in this consent category
-          type: integer
-        cookies:
-          description: the number of cookies in this consent category
-          type: integer
-        requestDomainsAndGeos:
-          description: the number of request domain/geo location pairs in this consent category
-          type: integer
-    WebAudit_ConsentCategories_ResponseDTO:
-      type: object
-      required:
-      - consentCategories
-      properties:
-        consentCategories:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategoryDTO'
-    AttachmentPatchDocument_ItemDTO:
-      description: A JSONPatch document for modifying consent preference attachments
-      properties:
-        op:
-          type: string
-          description: The operation to be performed
-          enum:
-          - add
-          - remove
-        path:
-          type: string
-        value:
-          type: integer
-          description: id of the item to assign
-      example:
-      - op: add
-        path: /-
-        value: 1
-      - op: remove
-        path: /
-        value: 2
-    ConsentCategory_updatedType:
-      type: string
-      enum:
-      - ONETRUST_IMPORT
-      - FILE_IMPORT
-      - APP_CREATE
-    ConsentCategoryId:
+    LabelId:
       type: integer
-      example: 3301
-      description: ID of consent category
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    ConsentCategory_TagEntryResponseDTO:
-      type: object
-      properties:
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentCategory_TagEntryItemDTO'
-    ConsentCategoryFoundResult:
-      type: object
-      required:
-      - consentCategoryName
-      - noOfNewCookies
-      - consentCategoryId
-      properties:
-        consentCategoryName:
-          type: string
-        noOfNewCookies:
-          type: integer
-        noOfNewTags:
-          type: integer
-        noOfNewRequests:
-          type: integer
-        consentCategoryId:
-          $ref: '#/components/schemas/ConsentCategoryId'
-        labels:
-          type: array
-          items:
-            $ref: '#/components/schemas/Label'
-    ConsentCategory_VendorTypeEnum:
-      type: string
-      enum:
-      - ONE_TRUST
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
     AuditId:
       type: integer
       format: int64
       example: 107239
-    ConsentCategory_LibraryResponseDTO:
+    LabelResponseDTO:
+      description: DTO for get/patch labels
       type: object
       properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        consentCategories:
+        labels:
           type: array
           items:
-            $ref: '#/components/schemas/ConsentCategory_LibraryItemDTO'
-    CookieDomainMatchType:
-      type: string
-      enum:
-      - domain_any
-      - domain_regex
-      - domain_exact_match
-    RequestDomainMatchType:
-      type: string
-      enum:
-      - domain_any
-      - domain_regex
-      - domain_exact_match
+            $ref: '#/components/schemas/Label'
+    ConsentCategorySnapshotId:
+      type: integer
+      format: int64
+      example: 33010
+      description: Use in filtering purposes is DEPRECATED in favour of `ConsentCategoryId`! Snapshot Id of consent category attached to this run
+    ConsentCategory_CookieEntryResponseDTO:
+      description: DTO for cookie entry response
+      type: object
+      required:
+      - cookies
+      properties:
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategory_CookieEntryItemDTO'
     ConsentCategory_TypeEnum:
       type: string
       enum:
       - approved
       - unapproved
-    ConsentCategory_LibraryItemDTO:
-      allOf:
-      - $ref: '#/components/schemas/ConsentCategoryDTO'
-      - type: object
-        properties:
-          itemCounts:
-            $ref: '#/components/schemas/ConsentCategory_ItemCountsDTO'
-          auditCount:
-            description: the number of audits this consent category is assigned to
-            type: integer
-          labelIds:
-            type: array
-            items:
-              type: integer
-    ConsentCategory_CreateRequestDTO:
+    ConsentCategory_WebAudits_ResponseDTO:
       type: object
-      required:
+      properties:
+        webAudits:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentCategory_WebAudits_ItemDTO'
+    ConsentCategoryLibrarySortByEnum:
+      type: string
+      default: name
+      enum:
       - name
       - type
+      - updated_at
+    ConsentCategory_RequestDomainItemDTO:
+      description: DTO for request domain under a consent category
+      type: object
+      required:
+      - domainType
       properties:
-        name:
+        domain:
           type: string
-          minLength: 1
-        notes:
-          type: string
-        type:
-          $ref: '#/components/schemas/ConsentCategory_TypeEnum'
-        isDefaultCC:
+        domainType:
+          $ref: '#/components/schemas/RequestDomainMatchType'
+        locationIds:
+          description: geo location ids
+          type: array
+          items:
+            type: integer
+        anyLocation:
+          description: true if request domain should apply to any location
           type: boolean
-          description: If true, this is the default consent category
-        cmpData:
-          $ref: '#/components/schemas/ConsentCategory_Cmp_Data'
   parameters:
-    PageSize:
-      in: query
-      name: pageSize
-      required: false
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique identification number for web audit or journey run
+      deprecated: false
+      allowEmptyValue: false
       schema:
-        type: integer
-        maximum: 1000
-        default: 100
-        minimum: 100
+        $ref: '#/components/schemas/RunId'
     PageParam:
       in: query
       name: page
@@ -1213,15 +1188,15 @@ components:
         type: integer
         default: 0
         minimum: 0
-    AuditId:
-      name: auditId
-      in: path
-      required: true
-      description: Unique identification number for web audit
-      deprecated: false
-      allowEmptyValue: false
+    PageSize:
+      in: query
+      name: pageSize
+      required: false
       schema:
-        $ref: '#/components/schemas/AuditId'
+        type: integer
+        maximum: 1000
+        default: 100
+        minimum: 100
     SortDescendingParam:
       name: sortDesc
       in: query
@@ -1239,15 +1214,40 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/ConsentCategoryId'
-    RunId:
-      name: runId
+    AuditId:
+      name: auditId
       in: path
       required: true
-      description: Unique identification number for web audit or journey run
+      description: Unique identification number for web audit
       deprecated: false
       allowEmptyValue: false
       schema:
-        $ref: '#/components/schemas/RunId'
+        $ref: '#/components/schemas/AuditId'
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

@@ -993,152 +993,7 @@ paths:
       security:
       - API_Key: []
 components:
-  responses:
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    WebJourneyRun_UnAuthorized:
-      description: Authentication failed
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-          example:
-            message: Unauthorized
   schemas:
-    WebJourneyActionRequestResponse:
-      type: object
-      properties:
-        pageref:
-          type: string
-        startedDateTime:
-          type: string
-          format: date-time
-          description: The full date and time, according to ISO-8601 (e. g. 2020-08-25T21:15:43Z)
-        time:
-          type: integer
-          minimum: 0
-          description: Request's duration in milliseconds
-        request:
-          $ref: '#/components/schemas/HarRequest'
-        response:
-          $ref: '#/components/schemas/HarResponse'
-        cache:
-          $ref: '#/components/schemas/HarCache'
-        timings:
-          $ref: '#/components/schemas/HarEntryTimings'
-        serverIPAddress:
-          type: string
-        connection:
-          type: string
-        comment:
-          type: string
-        resourceType:
-          type: string
-          description: Resource type (script, xhr, image, document, font, ping, etc.)
-        locationData:
-          $ref: '#/components/schemas/LocationData'
-        tag:
-          $ref: '#/components/schemas/TagProperties'
-        tagId:
-          type: integer
-    LabelResponseDTO:
-      description: DTO for get/patch labels
-      type: object
-      properties:
-        labels:
-          type: array
-          items:
-            $ref: '#/components/schemas/Label'
-    LocationData:
-      type: object
-      required:
-      - country
-      properties:
-        country:
-          type: string
-    HarPostParameter:
-      type: object
-      properties:
-        name:
-          type: string
-        value:
-          type:
-          - string
-          - 'null'
-        fileName:
-          type:
-          - string
-          - 'null'
-          format: fileName
-        contentType:
-          type:
-          - string
-          - 'null'
-          format: mimeType
-        comment:
-          $ref: '#/components/schemas/HarComment'
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    HarCache:
-      type:
-      - object
-      - 'null'
-      properties:
-        beforeRequest:
-          $ref: '#/components/schemas/HarCacheEntry'
-        afterRequest:
-          $ref: '#/components/schemas/HarCacheEntry'
-        comment:
-          $ref: '#/components/schemas/HarComment'
-    WebJourneyRun_RunExistsResponseDTO:
-      type: object
-      description: Response when a journey is already running
-      properties:
-        currentRunId:
-          type: integer
-          format: int64
-          description: The ID of the currently running run
-        code:
-          $ref: '#/components/schemas/WebJourneyRun_ErrorCode'
-      required:
-      - currentRunId
-      - code
-      example:
-        currentRunId: 5765431
-        code: 33
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
     WebJourneyFailureTypeEnum:
       type: string
       description: Type of failure for a web journey run
@@ -1149,6 +1004,18 @@ components:
       - JOURNEY_HAR_COLLECTION_ERROR
       - JOURNEY_SCREENSHOT_COLLECTION_ERROR
       - JOURNEY_DATA_COLLECTION_ERROR
+    WebJourneyActionRules:
+      type: object
+      properties:
+        actionId:
+          type: integer
+          format: int64
+          description: The ID of the action
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+          description: List of rules for this action
     WebJourneyRun_CreatedResponseDTO:
       type: object
       description: Response when a run is successfully created
@@ -1161,30 +1028,58 @@ components:
       - newRunId
       example:
         newRunId: 5765432
-    HarResponseContent:
+    WebActionSelectorType:
+      type: string
+      enum:
+      - id
+      - name
+      - css
+      - xpath
+      - htmlattributes
+    HarCookie:
+      allOf:
+      - $ref: '#/components/schemas/CookieBase'
+      - type: object
+        properties:
+          comment:
+            $ref: '#/components/schemas/HarComment'
+    HarRequest:
       type: object
       properties:
-        size:
-          type: integer
-          minimum: 0
-        compression:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-        mimeType:
+        method:
           type: string
-          format: mimeType
-        text:
-          type:
-          - string
-          - 'null'
-        encoding:
-          type:
-          - string
-          - 'null'
+        url:
+          type: string
+        httpVersion:
+          type: string
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarCookie'
+        headers:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarHeaderOrQueryString'
+        queryString:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarHeaderOrQueryString'
+        postData:
+          $ref: '#/components/schemas/HarPostData'
+        headersSize:
+          type: integer
+          minimum: -1
+          description: Number of bytes in request headers (including ending \r\n\r\n). -1 if unavailable
+        bodySize:
+          type: integer
+          minimum: -1
+          description: Number of bytes in POST data payload. -1 if unavailable
         comment:
           $ref: '#/components/schemas/HarComment'
+        substitution:
+          $ref: '#/components/schemas/Substitution'
+        requestBlocking:
+          $ref: '#/components/schemas/RequestBlocking'
     SequencedAction:
       type: object
       properties:
@@ -1250,87 +1145,44 @@ components:
       required:
       - sequence
       - actionType
-    HarCookie:
-      allOf:
-      - $ref: '#/components/schemas/CookieBase'
-      - type: object
-        properties:
-          comment:
-            $ref: '#/components/schemas/HarComment'
-    Schedule:
+    RemoteFileMappingFailure:
       type: object
       required:
-      - dtStart
-      - tzId
-      - recurrenceRule
-      - isPaused
-      - description
-      - presetType
-      allOf:
-      - $ref: '#/components/schemas/BaseScheduleForCreation'
-      - type: object
-        properties:
-          description:
-            type: string
-            description: A description of the schedule.
-          presetType:
-            type: string
-            description: The preset type of the schedule.
-            enum:
-            - 12_HOUR
-            - BIWEEKLY
-            - SEMI_ANNUALLY
-            - YEARLY
-            - RUN_ONCE
-            - 15_MIN
-            - HOURLY
-            - 6_HOUR
-            - DAILY
-            - WEEKLY
-            - MONTHLY
-            - QUARTERLY
-            - CUSTOM
-            - UNSCHEDULED
-    WebJourneyAndActionRulesRequest:
+      - failureType
+      properties:
+        failureType:
+          $ref: '#/components/schemas/RemoteFileMappingFailureType'
+        failureMessage:
+          type: string
+    ConsoleLogDto:
       type: object
       properties:
-        webJourneyRules:
-          type: array
-          items:
-            type: integer
-          uniqueItems: true
-          description: Set of web journey rule IDs
-        actionRules:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebJourneyActionRulesRequest'
-          description: List of action rule requests
-    RequestBlocking:
-      type: object
-      description: (Optional) Present if run configuration had TMS blocking enabled and request for this entry was blocked.
-      required:
-      - blockReason
-      - urlSignature
-      properties:
-        blockReason:
-          description: The configuration chosen by user. Phase 2 will include url_signature
+        message:
+          type: string
+          description: The console message
+        count:
+          type: integer
+          minimum: 1
+          description: The number of times this exact console message was encountered in the given context
+        level:
           type: string
           enum:
-          - tag_id
-          - tag_category
-          - url_signature
-        urlSignature:
-          type: string
-          description: The singature used to identify requests.  Tag Signatures shall not be exposed to customers (blockReason is `tag_id` or `tag_category`).
-        tagId:
-          description: (Optional - Present when reason is `tag_id`) Allows FE to get Vendor, Category and other info as they do in tag initiators
+          - SEVERE
+          - WARNING
+          - INFO
+          - FINE
+          description: The console log level
+        timestamp:
           type: integer
-        tagCategoryId:
-          description: (Optional) Present when reason is `tag_category`)
-          type: integer
-        failureMessage:
-          description: (Optional) Present if the request was meant to be blocked but it was not.
+          format: int64
+          description: Timestamp when the log occurred
+        source:
           type: string
+          description: The file that triggered the console log, if it can be determined
+    WebJourneyId:
+      type: integer
+      format: int64
+      example: 107239
     WebJourneyStatusDTO:
       type: object
       description: Current status of a web journey
@@ -1359,278 +1211,47 @@ components:
         failureType:
           $ref: '#/components/schemas/WebJourneyFailureTypeEnum'
           description: The failure type of the last run, present only when status indicates failure
-    PageFilter:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        ruleId:
-          type: integer
-          format: int32
-        value:
-          type: string
-        type:
-          $ref: '#/components/schemas/PageFilterTypeEnum'
-        matchType:
-          $ref: '#/components/schemas/MatchTypeEnum'
-    Label:
-      description: DTO for Labels
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          $ref: '#/components/schemas/LabelId'
-        name:
-          type: string
-    WebJourneyRun_ErrorResponseDTO:
-      type: object
-      properties:
-        message:
-          type: string
-        code:
-          $ref: '#/components/schemas/WebJourneyRun_ErrorCode'
-      required:
-      - message
-      - code
-      example:
-        message: An error occurred
-        code: 10
-    ConsoleLogDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The console message
-        count:
-          type: integer
-          minimum: 1
-          description: The number of times this exact console message was encountered in the given context
-        level:
-          type: string
-          enum:
-          - SEVERE
-          - WARNING
-          - INFO
-          - FINE
-          description: The console log level
-        timestamp:
-          type: integer
-          format: int64
-          description: Timestamp when the log occurred
-        source:
-          type: string
-          description: The file that triggered the console log, if it can be determined
-    WebJourneyRunStatusEnum:
-      type: string
-      description: Status of a web journey run
-      enum:
-      - NotChecked
-      - Ok
-      - Failure
-      - PageFailure
-      - ActionFailure
-      - RulesFailure
-      - ExecutingActions
-      - ProcessingRules
-      - DataCollectionFailure
-      example: Ok
-    datetime:
-      type: string
+    nullableDatetime:
+      type:
+      - string
+      - 'null'
       format: date-time
       description: The full date and time, according to ISO-8601 (e. g. 2020-08-25T21:15:43Z)
-    UndeleteFailureCode:
-      type: string
-      enum:
-      - destination_gone
-      - already_restored
-      - error
-    HarHeaderOrQueryString:
+    HarResponseContent:
       type: object
       properties:
-        name:
+        size:
+          type: integer
+          minimum: 0
+        compression:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+        mimeType:
           type: string
-        value:
+          format: mimeType
+        text:
+          type:
+          - string
+          - 'null'
+        encoding:
           type:
           - string
           - 'null'
         comment:
           $ref: '#/components/schemas/HarComment'
-    RuleTag:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        ruleId:
-          type: integer
-          format: int32
-        tagId:
-          type: integer
-          format: int32
-        matchType:
-          $ref: '#/components/schemas/MatchTypeEnum'
-        account:
-          type: string
-        validationDescription:
-          type: string
-        clause:
-          $ref: '#/components/schemas/ClauseEnum'
-        variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/RuleTagVariable'
-    HarCacheEntry:
+    HarCache:
       type:
       - object
       - 'null'
       properties:
-        expires:
-          $ref: '#/components/schemas/nullableDatetime'
-        lastAccess:
-          $ref: '#/components/schemas/datetime'
-        eTag:
-          type: string
-        hitCount:
-          type: integer
-          minimum: 0
+        beforeRequest:
+          $ref: '#/components/schemas/HarCacheEntry'
+        afterRequest:
+          $ref: '#/components/schemas/HarCacheEntry'
         comment:
           $ref: '#/components/schemas/HarComment'
-    WebActionSelectorType:
-      type: string
-      enum:
-      - id
-      - name
-      - css
-      - xpath
-      - htmlattributes
-    AttachmentPatchDocument_RequestDTO:
-      type: array
-      items:
-        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
-    WebJourneyActionRulesRequest:
-      type: object
-      properties:
-        actionId:
-          type: integer
-          format: int64
-          description: The ID of the action
-        rules:
-          type: array
-          items:
-            type: integer
-          uniqueItems: true
-          description: Set of rule IDs for this action
-    RemoteFileMappingFailureType:
-      type: integer
-      enum:
-      - 1
-      - 2
-      - 3
-      - 4
-      x-enum-varnames:
-      - UNKNOWN
-      - FILE_SIZE_LIMIT_EXCEEDED
-      - FILE_NOT_FOUND
-      - CANNOT_GET_FILE
-    ActionSetActionDto:
-      allOf:
-      - $ref: '#/components/schemas/SequencedAction'
-      - type: object
-        properties:
-          actionSetId:
-            type: integer
-            format: int64
-            description: ID of the action set this action belongs to. For actionType 'actionSet', this contains the referenced action set ID
-          pageFilter:
-            type: string
-            description: Page filter pattern for the action
-    Rule:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        name:
-          type: string
-        accountId:
-          type: integer
-          format: int32
-        createdBy:
-          type: integer
-          format: int32
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        recipients:
-          type: array
-          items:
-            type: string
-        checkTimes:
-          type: integer
-          format: int32
-        matchAllFilters:
-          type: boolean
-        pageFilters:
-          type: array
-          items:
-            $ref: '#/components/schemas/PageFilter'
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/RuleTag'
-        labels:
-          type: array
-          items:
-            $ref: '#/components/schemas/Label'
-        fromTemplate:
-          type: boolean
-    HarPostData:
-      type:
-      - object
-      - 'null'
-      properties:
-        mimeType:
-          type: string
-          format: mimeType
-        params:
-          type: array
-          items:
-            $ref: '#/components/schemas/HarPostParameter'
-        text:
-          type: string
-        comment:
-          $ref: '#/components/schemas/HarComment'
-    WebJourneyRun_ErrorCode:
-      type: integer
-      description: 'Error codes:
-
-        - 10: ValidationError
-
-        - 11: MalformedRequest
-
-        - 33: AlreadyRunning
-
-        - 34: UsageLimitExceeded
-
-        '
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
     HarEntryTimings:
       type: object
       properties:
@@ -1665,6 +1286,430 @@ components:
           minimum: -1
         comment:
           $ref: '#/components/schemas/HarComment'
+    WebJourneyNotificationConfig:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+          description: List of email addresses for notifications
+        alerts:
+          type: boolean
+          description: Whether alerts are enabled
+        webHookUrl:
+          type: string
+          description: Webhook URL for notifications
+    WebJourneyFrequencyEnum:
+      type: string
+      description: Frequency options for web journey execution
+      enum:
+      - paused
+      - once
+      - 15 minutes
+      - 1 hour
+      - 6 hours
+      - 12 hours
+      - daily
+      - weekly
+      - biweekly
+      - monthly
+      example: daily
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    HarComment:
+      type:
+      - string
+      - 'null'
+    SelectorTypeEnum:
+      type: string
+      enum:
+      - Empty
+      - String
+      - UrlParameter
+      - DataLayer
+      - Tag
+    RuleTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        tagId:
+          type: integer
+          format: int32
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+        account:
+          type: string
+        validationDescription:
+          type: string
+        clause:
+          $ref: '#/components/schemas/ClauseEnum'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleTagVariable'
+    RemoteFileMapping:
+      type: object
+      description: Remote file mapping configuration
+      required:
+      - id
+      - name
+      - matchType
+      - matchValue
+      - accountId
+      - createdBy
+      - createdAt
+      - updatedBy
+      - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Simple surrogate key in the database for this RFM config
+          example: 123
+        name:
+          type: string
+          maxLength: 255
+          description: A user-supplied name to identify this RFM config
+          example: Google Analytics Replacement
+        fileId:
+          type:
+          - string
+          - 'null'
+          description: A string GUID used as the uploaded replacement file's "name" in S3
+          example: 8c59d02b-6ebc-4893-9391-9be26c6d34cc
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          maxLength: 5000
+          description: The replacement URL, or else the name of the replacement file before it was uploaded
+          example: https://example.com/replacement-script.js
+        matchType:
+          type: string
+          enum:
+          - equals
+          - regex
+          description: Either "regex" or "equals"
+          example: equals
+        matchValue:
+          type: string
+          description: The request URL to be replaced (or the regex that matches URLs to replace)
+          example: https://www.google-analytics.com/analytics.js
+        accountId:
+          type: integer
+          description: Foreign key reference to accounts table. The owner of this RemoteFileMapping
+          example: 343
+        createdBy:
+          type: integer
+          description: Foreign key reference to the users table. Who created this RFM?
+          example: 1362
+        createdAt:
+          type: string
+          format: date-time
+          description: When this RFM was created
+          example: '2024-01-01T10:15:00.000Z'
+        updatedBy:
+          type: integer
+          description: Foreign key reference to the users table. Who updated this RFM most recently?
+          example: 1362
+        updatedAt:
+          type: string
+          format: date-time
+          description: When this RFM was last updated
+          example: '2024-01-02T10:15:00.000Z'
+    PageFilterTypeEnum:
+      type:
+      - integer
+      - 'null'
+      description: Type of the page filter.
+      enum:
+      - 1
+      - 2
+      x-enum-varnames:
+      - URL
+      - STATUSCODE
+      x-enum-descriptions:
+      - URL filter type
+      - StatusCode filter type
+    AttachmentPatchDocument_RequestDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentPatchDocument_ItemDTO'
+    Label:
+      description: DTO for Labels
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          $ref: '#/components/schemas/LabelId'
+        name:
+          type: string
+    WebActionSelector:
+      type: object
+      properties:
+        selectorType:
+          $ref: '#/components/schemas/WebActionSelectorType'
+        value:
+          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
+      required:
+      - selectorType
+      - value
+    WebJourneyAndActionRules:
+      type: object
+      properties:
+        webJourneyRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+          description: List of rules for the web journey
+        actionRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebJourneyActionRules'
+          description: List of action-specific rules
+    TagProperties:
+      type: object
+      description: Tag information object containing category and tag details
+      properties:
+        tagCategoryId:
+          type: integer
+          description: Tag category ID
+        tagCategoryName:
+          type: string
+          description: Tag category name
+        tagId:
+          type: integer
+          description: Tag ID
+        tagName:
+          type: string
+          description: Tag name
+    Substitution:
+      type: object
+      required:
+      - substituteUrl
+      properties:
+        substituteUrl:
+          type: string
+        failure:
+          $ref: '#/components/schemas/RemoteFileMappingFailure'
+        tagId:
+          type: integer
+        tagName:
+          type: string
+    WebJourneyUpdateDTO:
+      type: object
+      description: Web journey data for creation or update
+      required:
+      - domainId
+      properties:
+        name:
+          type: string
+          description: Name of the web journey
+          example: E-commerce Checkout Flow
+          maxLength: 255
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Optional notes or description
+          example: Tests the complete checkout process
+        domainId:
+          type: integer
+          description: ID of the associated domain
+          example: 123
+        userId:
+          type: integer
+          description: ID of the user who created this web journey
+          example: 456
+        folderId:
+          type:
+          - integer
+          - 'null'
+          description: ID of the folder containing this web journey
+          example: 789
+        browserWidth:
+          type:
+          - integer
+          - 'null'
+          description: Browser viewport width in pixels
+          example: 1920
+          minimum: 250
+          maximum: 10000
+        browserHeight:
+          type:
+          - integer
+          - 'null'
+          description: Browser viewport height in pixels
+          example: 1080
+          minimum: 250
+          maximum: 10000
+        loadVideos:
+          type:
+          - boolean
+          - 'null'
+          description: Whether to load video content
+          example: true
+        vpnEnabled:
+          type:
+          - boolean
+          - 'null'
+          description: Whether VPN is enabled for this journey
+          example: false
+        gpcEnabled:
+          type:
+          - boolean
+          - 'null'
+          description: Whether Global Privacy Control is enabled
+          example: true
+        blockThirdPartyCookies:
+          type:
+          - boolean
+          - 'null'
+          description: Whether to block third-party cookies
+          example: false
+        frequency:
+          $ref: '#/components/schemas/WebJourneyFrequencyEnum'
+        location:
+          type:
+          - string
+          - 'null'
+          description: Geographic location for the web journey execution
+          example: US-West
+        userAgent:
+          type:
+          - string
+          - 'null'
+          description: User agent string to use
+          example: Chrome/91.0.4472.124
+        userAgentDescription:
+          type:
+          - string
+          - 'null'
+          description: Human-readable description of the user agent
+          example: Chrome Browser
+        customProxy:
+          type:
+          - string
+          - 'null'
+          description: Custom proxy server configuration
+          example: proxy.example.com:8080
+        monitoredByScriptServices:
+          type:
+          - boolean
+          - 'null'
+          description: Whether this journey is monitored by script services
+          example: true
+        nextCheck:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the next execution is scheduled
+          example: '2023-06-02T10:30:00Z'
+        schedule:
+          $ref: '#/components/schemas/BaseScheduleForCreation'
+    HarResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          minimum: 100
+          maximum: 600
+        statusText:
+          type: string
+        httpVersion:
+          type: string
+        cookies:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarCookie'
+        headers:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarHeaderOrQueryString'
+        content:
+          $ref: '#/components/schemas/HarResponseContent'
+        redirectURL:
+          type:
+          - string
+          - 'null'
+        headersSize:
+          type: integer
+          minimum: -1
+          description: Number of bytes in response headers (including ending \r\n\r\n). -1 if unavailable
+        bodySize:
+          type: integer
+          minimum: -1
+          description: Number of bytes in response body. -1 if unavailable
+        _transferSize:
+          type: integer
+          format: int64
+          minimum: 0
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    AttachmentPatchDocument_ItemDTO:
+      description: A JSONPatch document for modifying consent preference attachments
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+          - add
+          - remove
+        path:
+          type: string
+        value:
+          type: integer
+          description: id of the item to assign
+      example:
+      - op: add
+        path: /-
+        value: 1
+      - op: remove
+        path: /
+        value: 2
+    WebJourneyAndActionRulesRequest:
+      type: object
+      properties:
+        webJourneyRules:
+          type: array
+          items:
+            type: integer
+          uniqueItems: true
+          description: Set of web journey rule IDs
+        actionRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebJourneyActionRulesRequest'
+          description: List of action rule requests
+    datetime:
+      type: string
+      format: date-time
+      description: The full date and time, according to ISO-8601 (e. g. 2020-08-25T21:15:43Z)
+    UndeleteFailureCode:
+      type: string
+      enum:
+      - destination_gone
+      - already_restored
+      - error
     BaseScheduleForCreation:
       required:
       - dtStart
@@ -1684,52 +1729,6 @@ components:
         isPaused:
           type: boolean
           description: Whether the schedule is paused or not.
-    SelectorTypeEnum:
-      type: string
-      enum:
-      - Empty
-      - String
-      - UrlParameter
-      - DataLayer
-      - Tag
-    CookieBase:
-      type: object
-      required:
-      - name
-      - value
-      properties:
-        name:
-          type: string
-        value:
-          type: string
-        domain:
-          type: string
-        path:
-          type: string
-        expires:
-          type: string
-        httpOnly:
-          type: boolean
-        secure:
-          type: boolean
-        partyType:
-          $ref: '#/components/schemas/CookiePartyType'
-        sameSite:
-          $ref: '#/components/schemas/CookieSameSite'
-        partitionKey:
-          description: 'The partition key used for 3rd party cookies using CHIPS
-
-            See https://developer.mozilla.org/en-US/docs/Web/Privacy/Partitioned_cookies
-
-            '
-          type: string
-        partitionKeyOpaque:
-          description: 'True if a partition key is used, but for security reasons the partition key is not exposed
-
-            If this value is true, a cookie will be considered partitioned.
-
-            '
-          type: boolean
     RuleTagVariable:
       type: object
       properties:
@@ -1752,62 +1751,132 @@ components:
           format: int32
         selectorType:
           $ref: '#/components/schemas/SelectorTypeEnum'
-    WebJourneyId:
-      type: integer
-      format: int64
-      example: 107239
-    AttachmentPatchDocument_ItemDTO:
-      description: A JSONPatch document for modifying consent preference attachments
-      properties:
-        op:
-          type: string
-          description: The operation to be performed
-          enum:
-          - add
-          - remove
-        path:
-          type: string
-        value:
-          type: integer
-          description: id of the item to assign
-      example:
-      - op: add
-        path: /-
-        value: 1
-      - op: remove
-        path: /
-        value: 2
-    WebJourneyAndActionRules:
-      type: object
-      properties:
-        webJourneyRules:
-          type: array
-          items:
-            $ref: '#/components/schemas/Rule'
-          description: List of rules for the web journey
-        actionRules:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebJourneyActionRules'
-          description: List of action-specific rules
-    Substitution:
+    Schedule:
       type: object
       required:
-      - substituteUrl
+      - dtStart
+      - tzId
+      - recurrenceRule
+      - isPaused
+      - description
+      - presetType
+      allOf:
+      - $ref: '#/components/schemas/BaseScheduleForCreation'
+      - type: object
+        properties:
+          description:
+            type: string
+            description: A description of the schedule.
+          presetType:
+            type: string
+            description: The preset type of the schedule.
+            enum:
+            - 12_HOUR
+            - BIWEEKLY
+            - SEMI_ANNUALLY
+            - YEARLY
+            - RUN_ONCE
+            - 15_MIN
+            - HOURLY
+            - 6_HOUR
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+            - QUARTERLY
+            - CUSTOM
+            - UNSCHEDULED
+    HarPostData:
+      type:
+      - object
+      - 'null'
       properties:
-        substituteUrl:
+        mimeType:
           type: string
-        failure:
-          $ref: '#/components/schemas/RemoteFileMappingFailure'
-        tagId:
+          format: mimeType
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarPostParameter'
+        text:
+          type: string
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    WebJourneyRun_ConfigurationInfoResponseDTO:
+      type: object
+      required:
+      - browserName
+      - browserVersion
+      - width
+      - height
+      - userAgent
+      - locationId
+      - privacyConsentActions
+      - vpnEnabled
+      - gpcEnabled
+      - technologyBlockingEnabled
+      - fileSubstitutionConfigured
+      - blockThirdPartyCookies
+      - customHeadersApplied
+      properties:
+        browserName:
+          type: string
+          description: Browser name
+        browserVersion:
+          type: string
+          description: Browser version
+        width:
           type: integer
-        tagName:
+          description: Browser width in pixels
+        height:
+          type: integer
+          description: Browser height in pixels
+        userAgent:
           type: string
-    UndeleteStatus:
-      type: string
-      enum:
-      - restored
-      - failed
+          description: User agent
+        locationId:
+          type: integer
+          description: Location  ID, this maps to a location in the location table
+        customProxy:
+          type: string
+          description: Custom proxy used for the run, if supplied by the user.
+          example: http://90.90.90.90:8888
+        privacyConsentActions:
+          type: boolean
+          description: Privacy Consent Actions present in configuration or not
+        vpnEnabled:
+          type: boolean
+          description: VPN enabled or not for the run configuration
+        gpcEnabled:
+          type: boolean
+          description: GPC enabled or not
+        technologyBlockingEnabled:
+          type: boolean
+          description: Tag ID/Tag Category ID blocking enabled or not
+        fileSubstitutionConfigured:
+          type: boolean
+          description: File Substitution configured or not
+        blockThirdPartyCookies:
+          type: boolean
+          description: Block third party cookies or not
+        customHeadersApplied:
+          type: boolean
+          description: Custom HTTP headers applied or not
+    UndeleteWebJourneyRequest:
+      type: object
+      required:
+      - id
+      - folderId
+      - subFolderId
+      properties:
+        id:
+          type: integer
+          format: int64
+        folderId:
+          type: integer
+          format: int32
+        subFolderId:
+          type: integer
+          format: int32
     WebJourneyDTO:
       type: object
       description: Web journey configuration and metadata
@@ -1933,68 +2002,36 @@ components:
           example: '2023-06-02T10:30:00Z'
         schedule:
           $ref: '#/components/schemas/Schedule'
-    HarRequest:
-      type: object
-      properties:
-        method:
-          type: string
-        url:
-          type: string
-        httpVersion:
-          type: string
-        cookies:
-          type: array
-          items:
-            $ref: '#/components/schemas/HarCookie'
-        headers:
-          type: array
-          items:
-            $ref: '#/components/schemas/HarHeaderOrQueryString'
-        queryString:
-          type: array
-          items:
-            $ref: '#/components/schemas/HarHeaderOrQueryString'
-        postData:
-          $ref: '#/components/schemas/HarPostData'
-        headersSize:
-          type: integer
-          minimum: -1
-          description: Number of bytes in request headers (including ending \r\n\r\n). -1 if unavailable
-        bodySize:
-          type: integer
-          minimum: -1
-          description: Number of bytes in POST data payload. -1 if unavailable
-        comment:
-          $ref: '#/components/schemas/HarComment'
-        substitution:
-          $ref: '#/components/schemas/Substitution'
-        requestBlocking:
-          $ref: '#/components/schemas/RequestBlocking'
-    CookiePartyType:
-      type: string
-      description: 'Indicates if cookie domain is different from domain of a page it was set on.
+    WebJourneyRun_ErrorCode:
+      type: integer
+      description: 'Error codes:
 
-        `owned_3rd_party` is deprecated
+        - 10: ValidationError
+
+        - 11: MalformedRequest
+
+        - 33: AlreadyRunning
+
+        - 34: UsageLimitExceeded
 
         '
-      enum:
-      - 1st_party
-      - owned_3rd_party
-      - 3rd_party
-    WebJourneyNotificationConfig:
+    WebJourneyActionRulesRequest:
       type: object
       properties:
-        emails:
+        actionId:
+          type: integer
+          format: int64
+          description: The ID of the action
+        rules:
           type: array
           items:
-            type: string
-          description: List of email addresses for notifications
-        alerts:
-          type: boolean
-          description: Whether alerts are enabled
-        webHookUrl:
-          type: string
-          description: Webhook URL for notifications
+            type: integer
+          uniqueItems: true
+          description: Set of rule IDs for this action
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
     UndeleteWebJourneyResponse:
       type: object
       required:
@@ -2016,21 +2053,60 @@ components:
           $ref: '#/components/schemas/UndeleteFailureCode'
         reason:
           type: string
-    WebJourneyFrequencyEnum:
-      type: string
-      description: Frequency options for web journey execution
-      enum:
-      - paused
-      - once
-      - 15 minutes
-      - 1 hour
-      - 6 hours
-      - 12 hours
-      - daily
-      - weekly
-      - biweekly
-      - monthly
-      example: daily
+    CookieBase:
+      type: object
+      required:
+      - name
+      - value
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        domain:
+          type: string
+        path:
+          type: string
+        expires:
+          type: string
+        httpOnly:
+          type: boolean
+        secure:
+          type: boolean
+        partyType:
+          $ref: '#/components/schemas/CookiePartyType'
+        sameSite:
+          $ref: '#/components/schemas/CookieSameSite'
+        partitionKey:
+          description: 'The partition key used for 3rd party cookies using CHIPS
+
+            See https://developer.mozilla.org/en-US/docs/Web/Privacy/Partitioned_cookies
+
+            '
+          type: string
+        partitionKeyOpaque:
+          description: 'True if a partition key is used, but for security reasons the partition key is not exposed
+
+            If this value is true, a cookie will be considered partitioned.
+
+            '
+          type: boolean
+    HarCacheEntry:
+      type:
+      - object
+      - 'null'
+      properties:
+        expires:
+          $ref: '#/components/schemas/nullableDatetime'
+        lastAccess:
+          $ref: '#/components/schemas/datetime'
+        eTag:
+          type: string
+        hitCount:
+          type: integer
+          minimum: 0
+        comment:
+          $ref: '#/components/schemas/HarComment'
     ClauseEnum:
       type:
       - string
@@ -2039,6 +2115,76 @@ components:
       - If
       - Then
       - Else
+    RemoteFileMappingFailureType:
+      type: integer
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      x-enum-varnames:
+      - UNKNOWN
+      - FILE_SIZE_LIMIT_EXCEEDED
+      - FILE_NOT_FOUND
+      - CANNOT_GET_FILE
+    WebJourneyRunStatusObject:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The numeric status value of the web journey run
+    CookieSameSite:
+      type:
+      - string
+      - 'null'
+      enum:
+      - None
+      - Lax
+      - Strict
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
+    CookiePartyType:
+      type: string
+      description: 'Indicates if cookie domain is different from domain of a page it was set on.
+
+        `owned_3rd_party` is deprecated
+
+        '
+      enum:
+      - 1st_party
+      - owned_3rd_party
+      - 3rd_party
+    LabelResponseDTO:
+      description: DTO for get/patch labels
+      type: object
+      properties:
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+    UndeleteStatus:
+      type: string
+      enum:
+      - restored
+      - failed
+    WebJourneyRunStatusEnum:
+      type: string
+      description: Status of a web journey run
+      enum:
+      - NotChecked
+      - Ok
+      - Failure
+      - PageFailure
+      - ActionFailure
+      - RulesFailure
+      - ExecutingActions
+      - ProcessingRules
+      - DataCollectionFailure
+      example: Ok
     MatchTypeEnum:
       type:
       - string
@@ -2054,398 +2200,207 @@ components:
       - Regex
       - GreaterThanOrEqualTo
       - LessThanOrEqualTo
-    HarResponse:
+    RequestBlocking:
+      type: object
+      description: (Optional) Present if run configuration had TMS blocking enabled and request for this entry was blocked.
+      required:
+      - blockReason
+      - urlSignature
+      properties:
+        blockReason:
+          description: The configuration chosen by user. Phase 2 will include url_signature
+          type: string
+          enum:
+          - tag_id
+          - tag_category
+          - url_signature
+        urlSignature:
+          type: string
+          description: The singature used to identify requests.  Tag Signatures shall not be exposed to customers (blockReason is `tag_id` or `tag_category`).
+        tagId:
+          description: (Optional - Present when reason is `tag_id`) Allows FE to get Vendor, Category and other info as they do in tag initiators
+          type: integer
+        tagCategoryId:
+          description: (Optional) Present when reason is `tag_category`)
+          type: integer
+        failureMessage:
+          description: (Optional) Present if the request was meant to be blocked but it was not.
+          type: string
+    WebJourneyRun_ErrorResponseDTO:
       type: object
       properties:
-        status:
+        message:
+          type: string
+        code:
+          $ref: '#/components/schemas/WebJourneyRun_ErrorCode'
+      required:
+      - message
+      - code
+      example:
+        message: An error occurred
+        code: 10
+    WebJourneyRun_RunExistsResponseDTO:
+      type: object
+      description: Response when a journey is already running
+      properties:
+        currentRunId:
           type: integer
-          minimum: 100
-          maximum: 600
-        statusText:
+          format: int64
+          description: The ID of the currently running run
+        code:
+          $ref: '#/components/schemas/WebJourneyRun_ErrorCode'
+      required:
+      - currentRunId
+      - code
+      example:
+        currentRunId: 5765431
+        code: 33
+    ActionSetActionDto:
+      allOf:
+      - $ref: '#/components/schemas/SequencedAction'
+      - type: object
+        properties:
+          actionSetId:
+            type: integer
+            format: int64
+            description: ID of the action set this action belongs to. For actionType 'actionSet', this contains the referenced action set ID
+          pageFilter:
+            type: string
+            description: Page filter pattern for the action
+    WebJourneyActionRequestResponse:
+      type: object
+      properties:
+        pageref:
           type: string
-        httpVersion:
+        startedDateTime:
           type: string
-        cookies:
-          type: array
-          items:
-            $ref: '#/components/schemas/HarCookie'
-        headers:
-          type: array
-          items:
-            $ref: '#/components/schemas/HarHeaderOrQueryString'
-        content:
-          $ref: '#/components/schemas/HarResponseContent'
-        redirectURL:
+          format: date-time
+          description: The full date and time, according to ISO-8601 (e. g. 2020-08-25T21:15:43Z)
+        time:
+          type: integer
+          minimum: 0
+          description: Request's duration in milliseconds
+        request:
+          $ref: '#/components/schemas/HarRequest'
+        response:
+          $ref: '#/components/schemas/HarResponse'
+        cache:
+          $ref: '#/components/schemas/HarCache'
+        timings:
+          $ref: '#/components/schemas/HarEntryTimings'
+        serverIPAddress:
+          type: string
+        connection:
+          type: string
+        comment:
+          type: string
+        resourceType:
+          type: string
+          description: Resource type (script, xhr, image, document, font, ping, etc.)
+        locationData:
+          $ref: '#/components/schemas/LocationData'
+        tag:
+          $ref: '#/components/schemas/TagProperties'
+        tagId:
+          type: integer
+    HarPostParameter:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
           type:
           - string
           - 'null'
-        headersSize:
-          type: integer
-          minimum: -1
-          description: Number of bytes in response headers (including ending \r\n\r\n). -1 if unavailable
-        bodySize:
-          type: integer
-          minimum: -1
-          description: Number of bytes in response body. -1 if unavailable
-        _transferSize:
-          type: integer
-          format: int64
-          minimum: 0
+        fileName:
+          type:
+          - string
+          - 'null'
+          format: fileName
+        contentType:
+          type:
+          - string
+          - 'null'
+          format: mimeType
         comment:
           $ref: '#/components/schemas/HarComment'
-    WebJourneyRun_ConfigurationInfoResponseDTO:
+    PageFilter:
       type: object
-      required:
-      - browserName
-      - browserVersion
-      - width
-      - height
-      - userAgent
-      - locationId
-      - privacyConsentActions
-      - vpnEnabled
-      - gpcEnabled
-      - technologyBlockingEnabled
-      - fileSubstitutionConfigured
-      - blockThirdPartyCookies
-      - customHeadersApplied
-      properties:
-        browserName:
-          type: string
-          description: Browser name
-        browserVersion:
-          type: string
-          description: Browser version
-        width:
-          type: integer
-          description: Browser width in pixels
-        height:
-          type: integer
-          description: Browser height in pixels
-        userAgent:
-          type: string
-          description: User agent
-        locationId:
-          type: integer
-          description: Location  ID, this maps to a location in the location table
-        customProxy:
-          type: string
-          description: Custom proxy used for the run, if supplied by the user.
-          example: http://90.90.90.90:8888
-        privacyConsentActions:
-          type: boolean
-          description: Privacy Consent Actions present in configuration or not
-        vpnEnabled:
-          type: boolean
-          description: VPN enabled or not for the run configuration
-        gpcEnabled:
-          type: boolean
-          description: GPC enabled or not
-        technologyBlockingEnabled:
-          type: boolean
-          description: Tag ID/Tag Category ID blocking enabled or not
-        fileSubstitutionConfigured:
-          type: boolean
-          description: File Substitution configured or not
-        blockThirdPartyCookies:
-          type: boolean
-          description: Block third party cookies or not
-        customHeadersApplied:
-          type: boolean
-          description: Custom HTTP headers applied or not
-    RemoteFileMapping:
-      type: object
-      description: Remote file mapping configuration
-      required:
-      - id
-      - name
-      - matchType
-      - matchValue
-      - accountId
-      - createdBy
-      - createdAt
-      - updatedBy
-      - updatedAt
       properties:
         id:
           type: integer
-          format: int64
-          description: Simple surrogate key in the database for this RFM config
-          example: 123
+          format: int32
+        ruleId:
+          type: integer
+          format: int32
+        value:
+          type: string
+        type:
+          $ref: '#/components/schemas/PageFilterTypeEnum'
+        matchType:
+          $ref: '#/components/schemas/MatchTypeEnum'
+    HarHeaderOrQueryString:
+      type: object
+      properties:
         name:
           type: string
-          maxLength: 255
-          description: A user-supplied name to identify this RFM config
-          example: Google Analytics Replacement
-        fileId:
+        value:
           type:
           - string
           - 'null'
-          description: A string GUID used as the uploaded replacement file's "name" in S3
-          example: 8c59d02b-6ebc-4893-9391-9be26c6d34cc
-        fileUrl:
-          type:
-          - string
-          - 'null'
-          maxLength: 5000
-          description: The replacement URL, or else the name of the replacement file before it was uploaded
-          example: https://example.com/replacement-script.js
-        matchType:
+        comment:
+          $ref: '#/components/schemas/HarComment'
+    Rule:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
           type: string
-          enum:
-          - equals
-          - regex
-          description: Either "regex" or "equals"
-          example: equals
-        matchValue:
-          type: string
-          description: The request URL to be replaced (or the regex that matches URLs to replace)
-          example: https://www.google-analytics.com/analytics.js
         accountId:
           type: integer
-          description: Foreign key reference to accounts table. The owner of this RemoteFileMapping
-          example: 343
+          format: int32
         createdBy:
           type: integer
-          description: Foreign key reference to the users table. Who created this RFM?
-          example: 1362
+          format: int32
         createdAt:
           type: string
           format: date-time
-          description: When this RFM was created
-          example: '2024-01-01T10:15:00.000Z'
-        updatedBy:
-          type: integer
-          description: Foreign key reference to the users table. Who updated this RFM most recently?
-          example: 1362
         updatedAt:
           type: string
           format: date-time
-          description: When this RFM was last updated
-          example: '2024-01-02T10:15:00.000Z'
-    PageFilterTypeEnum:
-      type:
-      - integer
-      - 'null'
-      description: Type of the page filter.
-      enum:
-      - 1
-      - 2
-      x-enum-varnames:
-      - URL
-      - STATUSCODE
-      x-enum-descriptions:
-      - URL filter type
-      - StatusCode filter type
-    UndeleteWebJourneyRequest:
-      type: object
-      required:
-      - id
-      - folderId
-      - subFolderId
-      properties:
-        id:
-          type: integer
-          format: int64
-        folderId:
-          type: integer
-          format: int32
-        subFolderId:
-          type: integer
-          format: int32
-    WebJourneyActionRules:
-      type: object
-      properties:
-        actionId:
-          type: integer
-          format: int64
-          description: The ID of the action
-        rules:
+        recipients:
           type: array
           items:
-            $ref: '#/components/schemas/Rule'
-          description: List of rules for this action
-    WebActionSelector:
-      type: object
-      properties:
-        selectorType:
-          $ref: '#/components/schemas/WebActionSelectorType'
-        value:
-          description: Selector value - string for simple selectors (CSS, XPath, id, name) or AttributeSelectorValue object for htmlattributes selector type
-      required:
-      - selectorType
-      - value
-    WebJourneyUpdateDTO:
-      type: object
-      description: Web journey data for creation or update
-      required:
-      - domainId
-      properties:
-        name:
-          type: string
-          description: Name of the web journey
-          example: E-commerce Checkout Flow
-          maxLength: 255
-        notes:
-          type:
-          - string
-          - 'null'
-          description: Optional notes or description
-          example: Tests the complete checkout process
-        domainId:
+            type: string
+        checkTimes:
           type: integer
-          description: ID of the associated domain
-          example: 123
-        userId:
-          type: integer
-          description: ID of the user who created this web journey
-          example: 456
-        folderId:
-          type:
-          - integer
-          - 'null'
-          description: ID of the folder containing this web journey
-          example: 789
-        browserWidth:
-          type:
-          - integer
-          - 'null'
-          description: Browser viewport width in pixels
-          example: 1920
-          minimum: 250
-          maximum: 10000
-        browserHeight:
-          type:
-          - integer
-          - 'null'
-          description: Browser viewport height in pixels
-          example: 1080
-          minimum: 250
-          maximum: 10000
-        loadVideos:
-          type:
-          - boolean
-          - 'null'
-          description: Whether to load video content
-          example: true
-        vpnEnabled:
-          type:
-          - boolean
-          - 'null'
-          description: Whether VPN is enabled for this journey
-          example: false
-        gpcEnabled:
-          type:
-          - boolean
-          - 'null'
-          description: Whether Global Privacy Control is enabled
-          example: true
-        blockThirdPartyCookies:
-          type:
-          - boolean
-          - 'null'
-          description: Whether to block third-party cookies
-          example: false
-        frequency:
-          $ref: '#/components/schemas/WebJourneyFrequencyEnum'
-        location:
-          type:
-          - string
-          - 'null'
-          description: Geographic location for the web journey execution
-          example: US-West
-        userAgent:
-          type:
-          - string
-          - 'null'
-          description: User agent string to use
-          example: Chrome/91.0.4472.124
-        userAgentDescription:
-          type:
-          - string
-          - 'null'
-          description: Human-readable description of the user agent
-          example: Chrome Browser
-        customProxy:
-          type:
-          - string
-          - 'null'
-          description: Custom proxy server configuration
-          example: proxy.example.com:8080
-        monitoredByScriptServices:
-          type:
-          - boolean
-          - 'null'
-          description: Whether this journey is monitored by script services
-          example: true
-        nextCheck:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: When the next execution is scheduled
-          example: '2023-06-02T10:30:00Z'
-        schedule:
-          $ref: '#/components/schemas/BaseScheduleForCreation'
-    RemoteFileMappingFailure:
+          format: int32
+        matchAllFilters:
+          type: boolean
+        pageFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageFilter'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleTag'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+        fromTemplate:
+          type: boolean
+    LocationData:
       type: object
       required:
-      - failureType
+      - country
       properties:
-        failureType:
-          $ref: '#/components/schemas/RemoteFileMappingFailureType'
-        failureMessage:
+        country:
           type: string
-    CookieSameSite:
-      type:
-      - string
-      - 'null'
-      enum:
-      - None
-      - Lax
-      - Strict
-    nullableDatetime:
-      type:
-      - string
-      - 'null'
-      format: date-time
-      description: The full date and time, according to ISO-8601 (e. g. 2020-08-25T21:15:43Z)
-    WebJourneyRunStatusObject:
-      type: object
-      properties:
-        status:
-          type: integer
-          description: The numeric status value of the web journey run
-    TagProperties:
-      type: object
-      description: Tag information object containing category and tag details
-      properties:
-        tagCategoryId:
-          type: integer
-          description: Tag category ID
-        tagCategoryName:
-          type: string
-          description: Tag category name
-        tagId:
-          type: integer
-          description: Tag ID
-        tagName:
-          type: string
-          description: Tag name
-    HarComment:
-      type:
-      - string
-      - 'null'
   parameters:
-    WebJourneyId:
-      name: webJourneyId
-      in: path
-      required: true
-      description: Unique identification number for web journey item
-      deprecated: false
-      allowEmptyValue: false
-      schema:
-        $ref: '#/components/schemas/WebJourneyId'
     RunId:
       name: runId
       in: path
@@ -2455,6 +2410,51 @@ components:
       allowEmptyValue: false
       schema:
         $ref: '#/components/schemas/RunId'
+    WebJourneyId:
+      name: webJourneyId
+      in: path
+      required: true
+      description: Unique identification number for web journey item
+      deprecated: false
+      allowEmptyValue: false
+      schema:
+        $ref: '#/components/schemas/WebJourneyId'
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    WebJourneyRun_UnAuthorized:
+      description: Authentication failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+          example:
+            message: Unauthorized
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

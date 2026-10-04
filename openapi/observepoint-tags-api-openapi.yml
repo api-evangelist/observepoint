@@ -56,19 +56,6 @@ paths:
       - Tags
 components:
   schemas:
-    TagType:
-      type: object
-    TagVendor:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          format: int32
-          type: integer
-        name:
-          type: string
     TagCategory:
       type: object
       required:
@@ -81,6 +68,19 @@ components:
         name:
           type: string
       description: Tag category data
+    TagVendor:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+    TagType:
+      type: object
     Tag:
       type: object
       required:

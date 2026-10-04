@@ -52,25 +52,6 @@ paths:
       - API_Key: []
       description: POST /v3/usage/exports/{exportType}
 components:
-  responses:
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
     ExportResultDTO:
       type: object
@@ -79,12 +60,6 @@ components:
       properties:
         exportId:
           $ref: '#/components/schemas/ExportId'
-    AccountUsageExportTypeEnum:
-      type: string
-      description: All supported usage export types
-      enum:
-      - AUDIT_RUNS_EXPORT
-      - WEB_JOURNEY_RUNS_EXPORT
     ErrorModel:
       type: object
       properties:
@@ -97,10 +72,35 @@ components:
           type: string
         validationReport:
           type: object
+    AccountUsageExportTypeEnum:
+      type: string
+      description: All supported usage export types
+      enum:
+      - AUDIT_RUNS_EXPORT
+      - WEB_JOURNEY_RUNS_EXPORT
     ExportId:
       type: integer
       format: int64
       description: Unique ID of an export
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey

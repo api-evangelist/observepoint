@@ -81,45 +81,7 @@ paths:
       security:
       - API_Key: []
 components:
-  responses:
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    NotFound:
-      description: The object you are looking is not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    AuditLoginSequencedAction:
-      allOf:
-      - $ref: '#/components/schemas/SequencedAction'
-      - type: object
-        properties:
-          actionSetId:
-            type: integer
-            format: int64
-            description: 'ID of the action set to reference. Present for actionType: actionset'
     WebActionSelector:
       type: object
       properties:
@@ -130,6 +92,22 @@ components:
       required:
       - selectorType
       - value
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
     WebActionSelectorType:
       type: string
       enum:
@@ -203,18 +181,40 @@ components:
       required:
       - sequence
       - actionType
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
+    AuditLoginSequencedAction:
+      allOf:
+      - $ref: '#/components/schemas/SequencedAction'
+      - type: object
+        properties:
+          actionSetId:
+            type: integer
+            format: int64
+            description: 'ID of the action set to reference. Present for actionType: actionset'
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFound:
+      description: The object you are looking is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   parameters:
     AuditId:
       name: auditId

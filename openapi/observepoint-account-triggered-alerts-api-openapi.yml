@@ -122,148 +122,6 @@ paths:
       description: POST /v3/account-triggered-alerts/alerts/{alertId}
 components:
   schemas:
-    GetAccountTriggeredAlertSortColumn:
-      type: string
-      enum:
-      - RUN_DATE
-      - DATA_SOURCE_NAME
-      - PAGES_WITH_TRIGGERED_ALERTS
-    GetAccountTriggeredAlertsSortColumn:
-      type: string
-      enum:
-      - RECENTLY_TRIGGERED_DATE
-      - ALERT_NAME
-      - REPORT_METRIC
-      - PAGES_WITH_TRIGGERED_ALERTS
-      - SUBSCRIBERS
-      - DATA_SOURCES
-    AlertConfigExistsFlag:
-      type: boolean
-      description: when `true` then alert config exists and can be edited, otherwise it is deleted
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    LabelId:
-      type: integer
-      format: int64
-      description: Label identifier
-      example: 223
-      minimum: 1
-    CommonIterableResponseMetadata:
-      description: Common metadata for iterable
-      type: object
-      required:
-      - pagination
-      properties:
-        pagination:
-          $ref: '#/components/schemas/PaginationMetadata'
-    AlertAssignmentItemId:
-      type: integer
-      format: int64
-      description: ID of the item that can have assigned Alert(s) onto it. See also `AlertAssignmentTypeEnum`
-    AlertAssignmentItemTypeEnum:
-      type: string
-      enum:
-      - AUDIT
-      - WEB_JOURNEY
-    FoldersFilter:
-      type: array
-      description: non-empty array of folders with domains (subfolders), items from which will be included in response
-      minItems: 1
-      items:
-        $ref: '#/components/schemas/FoldersFilterItem'
-    AlertMetricChangeTypeEnum:
-      type: string
-      description: 'Behaviour per type:
-
-        - VALUE_CHANGE: current - previous
-
-        - VALUE_CHANGE_ABS: ABS(current - previous)
-
-        - RELATIVE_VALUE_CHANGE: 100% * (current - previous) / previous
-
-        - RELATIVE_VALUE_CHANGE: ABS(100% * (current - previous) / previous)
-
-
-        Composite metric change operators shown on ObservePoint UI should be defined as described below:
-
-        - `Changes by (∆)` = VALUE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
-
-        - `Increases by (+)` = VALUE_CHANGE + GREATER_OR_EQUAL(positive number)
-
-        - `Decreases by (-)` = VALUE_CHANGE + LESS_OR_EQUAL(negative number)
-
-        - `Any change` = VALUE_CHANGE_ABS (or VALUE_CHANGE) + NOT_EQUAL(0)
-
-        - `Changes by (∆ %)` = RELATIVE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
-
-        - `Increases by (+%)` = RELATIVE_CHANGE + GREATER_OR_EQUAL(positive number)
-
-        - `Decreases by (-%)` = RELATIVE_CHANGE + LESS_OR_EQUAL(negative number)
-
-        '
-      enum:
-      - VALUE_CHANGE
-      - VALUE_CHANGE_ABS
-      - RELATIVE_VALUE_CHANGE
-      - RELATIVE_VALUE_CHANGE_ABS
-    AccountTriggeredAlerts_DataSource:
-      allOf:
-      - $ref: '#/components/schemas/AlertResultDetails'
-      - $ref: '#/components/schemas/PagesWithTriggeredAlerts'
-      - type: object
-        required:
-        - runDate
-        - itemName
-        - itemType
-        - runId
-        - itemId
-        properties:
-          runDate:
-            $ref: '#/components/schemas/DateAndTime'
-          itemName:
-            type: string
-          itemType:
-            $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
-          runId:
-            $ref: '#/components/schemas/RunId'
-          itemId:
-            $ref: '#/components/schemas/AlertAssignmentItemId'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    AlertConfigTrait:
-      description: Core parts of alert definition
-      type: object
-      required:
-      - name
-      - metricType
-      - targetValueComparator
-      - filtersV0
-      properties:
-        name:
-          $ref: '#/components/schemas/AlertName'
-        metricType:
-          $ref: '#/components/schemas/AlertMetricTypeEnum'
-        metricChangeType:
-          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
-        targetValueComparator:
-          $ref: '#/components/schemas/AlertMetricValueComparator'
-        filtersV0:
-          type: object
-          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
-
-            '
     AccountTriggeredAlerts_Alert:
       allOf:
       - $ref: '#/components/schemas/AlertConfigTrait'
@@ -289,65 +147,6 @@ components:
             type: integer
           alertConfigExists:
             $ref: '#/components/schemas/AlertConfigExistsFlag'
-    AccountTriggeredAlerts_DataSourcesDTO:
-      type: object
-      required:
-      - metadata
-      - dataSources
-      properties:
-        metadata:
-          $ref: '#/components/schemas/CommonIterableResponseMetadata'
-        dataSources:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/AccountTriggeredAlerts_DataSource'
-    FoldersFilterItem:
-      type: object
-      required:
-      - folderId
-      properties:
-        folderId:
-          $ref: '#/components/schemas/FolderId'
-        domains:
-          type: array
-          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
-          items:
-            $ref: '#/components/schemas/DomainId'
-    PaginationMetadata:
-      type: object
-      required:
-      - totalCount
-      - totalPageCount
-      - pageSize
-      - currentPageSize
-      - currentPageNumber
-      properties:
-        totalCount:
-          description: Total number of items available from all result pages combined
-          type: integer
-        totalPageCount:
-          description: Total number of pages available
-          type: integer
-        pageSize:
-          description: Page size - number of items per result page configured by `size` query parameter or default page size
-          type: integer
-        currentPageSize:
-          description: Number of items in current result page
-          type: integer
-        currentPageNumber:
-          description: Current page number/ordinal
-          type: integer
-    PagesWithTriggeredAlerts:
-      type: object
-      required:
-      - appliedAlertPageCount
-      - triggeredAlertAffectedPageCount
-      properties:
-        appliedAlertPageCount:
-          type: integer
-        triggeredAlertAffectedPageCount:
-          type: integer
     AccountTriggeredAlerts_AlertsDTO:
       type: object
       required:
@@ -361,112 +160,12 @@ components:
           minItems: 0
           items:
             $ref: '#/components/schemas/AccountTriggeredAlerts_Alert'
-    AccountTriggeredAlerts_SummaryDTO:
-      type: object
-      required:
-      - triggeredAlertAffectedPageCount
-      - triggeredAlertsInMostRecentRunCount
-      - auditsWithTriggeredAlertCount
-      - triggeredUsageAlertCount
-      properties:
-        triggeredAlertAffectedPageCount:
-          type: integer
-        triggeredAlertsInMostRecentRunCount:
-          type: integer
-        auditsWithTriggeredAlertCount:
-          type: integer
-        triggeredUsageAlertCount:
-          type: integer
-    AlertMetricValueComparator:
-      type: object
-      description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
-
-        '
-      required:
-      - operator
-      properties:
-        operator:
-          $ref: '#/components/schemas/AlertMetricValueComparisonOperatorEnum'
-      discriminator:
-        propertyName: operator
-        mapping:
-          GREATER: '#/components/schemas/AlertMetricSpecificValueComparator'
-          GREATER_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          NOT_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          LESS_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
-          LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
-          BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
-          NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
-    AlertRunDateRange:
-      type: object
-      description: Should have `from` and/or `to` dates defined. `from` is inclusive and `to` is exclusive. `to` date should be after `from` date.
-      properties:
-        from:
-          $ref: '#/components/schemas/DateAndTime'
-        to:
-          $ref: '#/components/schemas/DateAndTime'
-    AccountTriggeredAlertsRequestDTO:
-      description: Request body with filters for Account Triggered Alerts
-      type: object
-      properties:
-        runDateRange:
-          $ref: '#/components/schemas/AlertRunDateRange'
-        metricTypes:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/AlertMetricTypeEnum'
-        alertName:
-          type: string
-          description: when populated works as "alert `name` contains given substring" filter
-        alertLabels:
-          type: array
-          description: non-empty array of labels present on an alert
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/LabelId'
-        itemName:
-          type: string
-          minLength: 1
-          description: optional "item name contains substring" filter
-        itemLabels:
-          type: array
-          description: non-empty array of labels present on an item, works as "item has all specified labels" filter
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/LabelId'
-        itemType:
-          $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
-        folders:
-          $ref: '#/components/schemas/FoldersFilter'
-        subscribedOnly:
-          type: boolean
-          description: when `false` or `null` then all alerts are returned, otherwise only alerts user is subscribed to are returned
-    AlertId:
-      type: integer
-      format: int64
-    DomainId:
-      type: integer
-      format: int32
-      description: ID of a domain
-      example: 123
-    AlertMetricValueComparisonOperatorEnum:
-      type: string
-      enum:
-      - GREATER
-      - GREATER_OR_EQUAL
-      - EQUAL
-      - NOT_EQUAL
-      - LESS_OR_EQUAL
-      - LESS
-      - BETWEEN
-      - NOT_BETWEEN
-    FolderId:
-      type: integer
-      format: int32
-      description: ID of a folder
-      example: 123
+    FoldersFilter:
+      type: array
+      description: non-empty array of folders with domains (subfolders), items from which will be included in response
+      minItems: 1
+      items:
+        $ref: '#/components/schemas/FoldersFilterItem'
     AlertMetricTypeEnum:
       type: string
       description: "Deprecated metric types:\n  - ACCOUNT_USAGE_THIS_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_AUDIT_PAGE_SCANNED_COUNT\n  - ACCOUNT_USAGE_12_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_THIS_MONTH_WJ_RUN_COUNT\n  - ACCOUNT_USAGE_LAST_30_DAYS_LOGIN_USER_COUNT\n  - PAGE_SUMMARY_FAILED_RULE_COUNT\n"
@@ -560,25 +259,20 @@ components:
       - RULE_RESULTS_FAILED_RULE_PAGE_COUNT
       - RULE_RESULTS_PASSED_RULE_PAGE_COUNT
       - RULE_RESULTS_NOT_APPLIED_RULE_PAGE_COUNT
-    AlertResultDetails:
-      type: object
-      required:
-      - status
-      properties:
-        status:
-          $ref: '#/components/schemas/AlertResultStatusEnum'
-        actualValue:
-          description: Value of the computed metric or its change.
-          type: number
-          format: double
-        currentRunValue:
-          description: Value of computed metric for current run. Present when alert is configured on metric change, not on single run metric value
-          type: number
-          format: double
-        previousRunValue:
-          description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
-          type: number
-          format: double
+    AlertMetricValueComparisonOperatorEnum:
+      type: string
+      enum:
+      - GREATER
+      - GREATER_OR_EQUAL
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_OR_EQUAL
+      - LESS
+      - BETWEEN
+      - NOT_BETWEEN
+    AlertConfigExistsFlag:
+      type: boolean
+      description: when `true` then alert config exists and can be edited, otherwise it is deleted
     AccountTriggeredAlertsSpecificAlertRequestDTO:
       type: object
       properties:
@@ -598,6 +292,70 @@ components:
           $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
         folders:
           $ref: '#/components/schemas/FoldersFilter'
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    DomainId:
+      type: integer
+      format: int32
+      description: ID of a domain
+      example: 123
+    GetAccountTriggeredAlertsSortColumn:
+      type: string
+      enum:
+      - RECENTLY_TRIGGERED_DATE
+      - ALERT_NAME
+      - REPORT_METRIC
+      - PAGES_WITH_TRIGGERED_ALERTS
+      - SUBSCRIBERS
+      - DATA_SOURCES
+    AccountTriggeredAlerts_DataSource:
+      allOf:
+      - $ref: '#/components/schemas/AlertResultDetails'
+      - $ref: '#/components/schemas/PagesWithTriggeredAlerts'
+      - type: object
+        required:
+        - runDate
+        - itemName
+        - itemType
+        - runId
+        - itemId
+        properties:
+          runDate:
+            $ref: '#/components/schemas/DateAndTime'
+          itemName:
+            type: string
+          itemType:
+            $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+          runId:
+            $ref: '#/components/schemas/RunId'
+          itemId:
+            $ref: '#/components/schemas/AlertAssignmentItemId'
+    AlertName:
+      type: string
+      minLength: 1
+      description: User-defined name of the alert
+    FoldersFilterItem:
+      type: object
+      required:
+      - folderId
+      properties:
+        folderId:
+          $ref: '#/components/schemas/FolderId'
+        domains:
+          type: array
+          description: null or empty array of domains (subfolders) present on an item, works as "null or empty if entire folder (all domains in a folder), otherwise specific domain IDs"
+          items:
+            $ref: '#/components/schemas/DomainId'
     DateAndTime:
       type: string
       format: date-time
@@ -616,10 +374,148 @@ components:
 
         '
       example: '2016-08-18T17:33:00Z'
-    AlertName:
+    AlertMetricValueComparator:
+      type: object
+      description: 'Subtypes: - AlertMetricSpecificValueComparator - AlertMetricValueInRangeComparator - AlertMetricValueNotInRangeComparator
+
+        '
+      required:
+      - operator
+      properties:
+        operator:
+          $ref: '#/components/schemas/AlertMetricValueComparisonOperatorEnum'
+      discriminator:
+        propertyName: operator
+        mapping:
+          GREATER: '#/components/schemas/AlertMetricSpecificValueComparator'
+          GREATER_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          NOT_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS_OR_EQUAL: '#/components/schemas/AlertMetricSpecificValueComparator'
+          LESS: '#/components/schemas/AlertMetricSpecificValueComparator'
+          BETWEEN: '#/components/schemas/AlertMetricValueInRangeComparator'
+          NOT_BETWEEN: '#/components/schemas/AlertMetricValueNotInRangeComparator'
+    AlertConfigTrait:
+      description: Core parts of alert definition
+      type: object
+      required:
+      - name
+      - metricType
+      - targetValueComparator
+      - filtersV0
+      properties:
+        name:
+          $ref: '#/components/schemas/AlertName'
+        metricType:
+          $ref: '#/components/schemas/AlertMetricTypeEnum'
+        metricChangeType:
+          $ref: '#/components/schemas/AlertMetricChangeTypeEnum'
+        targetValueComparator:
+          $ref: '#/components/schemas/AlertMetricValueComparator'
+        filtersV0:
+          type: object
+          description: 'Filters to be applied before computing the alert. Exact type depends on `metricType`, see mapping in `AlertMetricTypeToFilterMapping`
+
+            '
+    AccountTriggeredAlerts_DataSourcesDTO:
+      type: object
+      required:
+      - metadata
+      - dataSources
+      properties:
+        metadata:
+          $ref: '#/components/schemas/CommonIterableResponseMetadata'
+        dataSources:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/AccountTriggeredAlerts_DataSource'
+    AlertMetricChangeTypeEnum:
       type: string
-      minLength: 1
-      description: User-defined name of the alert
+      description: 'Behaviour per type:
+
+        - VALUE_CHANGE: current - previous
+
+        - VALUE_CHANGE_ABS: ABS(current - previous)
+
+        - RELATIVE_VALUE_CHANGE: 100% * (current - previous) / previous
+
+        - RELATIVE_VALUE_CHANGE: ABS(100% * (current - previous) / previous)
+
+
+        Composite metric change operators shown on ObservePoint UI should be defined as described below:
+
+        - `Changes by (∆)` = VALUE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+)` = VALUE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-)` = VALUE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        - `Any change` = VALUE_CHANGE_ABS (or VALUE_CHANGE) + NOT_EQUAL(0)
+
+        - `Changes by (∆ %)` = RELATIVE_CHANGE_ABS + GREATER_OR_EQUAL(positive number)
+
+        - `Increases by (+%)` = RELATIVE_CHANGE + GREATER_OR_EQUAL(positive number)
+
+        - `Decreases by (-%)` = RELATIVE_CHANGE + LESS_OR_EQUAL(negative number)
+
+        '
+      enum:
+      - VALUE_CHANGE
+      - VALUE_CHANGE_ABS
+      - RELATIVE_VALUE_CHANGE
+      - RELATIVE_VALUE_CHANGE_ABS
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    FolderId:
+      type: integer
+      format: int32
+      description: ID of a folder
+      example: 123
+    CommonIterableResponseMetadata:
+      description: Common metadata for iterable
+      type: object
+      required:
+      - pagination
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+    PaginationMetadata:
+      type: object
+      required:
+      - totalCount
+      - totalPageCount
+      - pageSize
+      - currentPageSize
+      - currentPageNumber
+      properties:
+        totalCount:
+          description: Total number of items available from all result pages combined
+          type: integer
+        totalPageCount:
+          description: Total number of pages available
+          type: integer
+        pageSize:
+          description: Page size - number of items per result page configured by `size` query parameter or default page size
+          type: integer
+        currentPageSize:
+          description: Number of items in current result page
+          type: integer
+        currentPageNumber:
+          description: Current page number/ordinal
+          type: integer
+    AlertAssignmentItemId:
+      type: integer
+      format: int64
+      description: ID of the item that can have assigned Alert(s) onto it. See also `AlertAssignmentTypeEnum`
+    LabelId:
+      type: integer
+      format: int64
+      description: Label identifier
+      example: 223
+      minimum: 1
     AlertResultStatusEnum:
       type: string
       description: 'All statuses except `TRIGGERED` and `NOT_TRIGGERED` mean that alert/metric could not be computed. Statuses:
@@ -643,15 +539,119 @@ components:
       - NO_VALUE
       - PREVIOUS_RUN_NOT_FOUND
       - PREVIOUS_RUN_NO_VALUE
+    AlertRunDateRange:
+      type: object
+      description: Should have `from` and/or `to` dates defined. `from` is inclusive and `to` is exclusive. `to` date should be after `from` date.
+      properties:
+        from:
+          $ref: '#/components/schemas/DateAndTime'
+        to:
+          $ref: '#/components/schemas/DateAndTime'
+    PagesWithTriggeredAlerts:
+      type: object
+      required:
+      - appliedAlertPageCount
+      - triggeredAlertAffectedPageCount
+      properties:
+        appliedAlertPageCount:
+          type: integer
+        triggeredAlertAffectedPageCount:
+          type: integer
+    GetAccountTriggeredAlertSortColumn:
+      type: string
+      enum:
+      - RUN_DATE
+      - DATA_SOURCE_NAME
+      - PAGES_WITH_TRIGGERED_ALERTS
+    AlertResultDetails:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          $ref: '#/components/schemas/AlertResultStatusEnum'
+        actualValue:
+          description: Value of the computed metric or its change.
+          type: number
+          format: double
+        currentRunValue:
+          description: Value of computed metric for current run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+        previousRunValue:
+          description: Value of computed metric for previous run. Present when alert is configured on metric change, not on single run metric value
+          type: number
+          format: double
+    AlertAssignmentItemTypeEnum:
+      type: string
+      enum:
+      - AUDIT
+      - WEB_JOURNEY
+    AccountTriggeredAlertsRequestDTO:
+      description: Request body with filters for Account Triggered Alerts
+      type: object
+      properties:
+        runDateRange:
+          $ref: '#/components/schemas/AlertRunDateRange'
+        metricTypes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AlertMetricTypeEnum'
+        alertName:
+          type: string
+          description: when populated works as "alert `name` contains given substring" filter
+        alertLabels:
+          type: array
+          description: non-empty array of labels present on an alert
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        itemName:
+          type: string
+          minLength: 1
+          description: optional "item name contains substring" filter
+        itemLabels:
+          type: array
+          description: non-empty array of labels present on an item, works as "item has all specified labels" filter
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LabelId'
+        itemType:
+          $ref: '#/components/schemas/AlertAssignmentItemTypeEnum'
+        folders:
+          $ref: '#/components/schemas/FoldersFilter'
+        subscribedOnly:
+          type: boolean
+          description: when `false` or `null` then all alerts are returned, otherwise only alerts user is subscribed to are returned
+    AlertId:
+      type: integer
+      format: int64
+    AccountTriggeredAlerts_SummaryDTO:
+      type: object
+      required:
+      - triggeredAlertAffectedPageCount
+      - triggeredAlertsInMostRecentRunCount
+      - auditsWithTriggeredAlertCount
+      - triggeredUsageAlertCount
+      properties:
+        triggeredAlertAffectedPageCount:
+          type: integer
+        triggeredAlertsInMostRecentRunCount:
+          type: integer
+        auditsWithTriggeredAlertCount:
+          type: integer
+        triggeredUsageAlertCount:
+          type: integer
   responses:
-    BadRequest:
-      description: The request cannot be accepted
+    UnAuthorized:
+      description: Your token is invalid.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
-    UnAuthorized:
-      description: Your token is invalid.
+    BadRequest:
+      description: The request cannot be accepted
       content:
         application/json:
           schema:
@@ -663,13 +663,15 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorModel'
   parameters:
-    PathParamAlertId:
-      name: alertId
-      in: path
-      required: true
-      allowEmptyValue: false
+    pageParam:
+      name: page
+      in: query
+      required: false
       schema:
-        $ref: '#/components/schemas/AlertId'
+        type: integer
+        minimum: 0
+        default: 0
+      description: Page number, starts with 0
     SortDescendingParam:
       name: sortDesc
       in: query
@@ -688,15 +690,13 @@ components:
         maximum: 1000
         default: 50
         minimum: 50
-    pageParam:
-      name: page
-      in: query
-      required: false
+    PathParamAlertId:
+      name: alertId
+      in: path
+      required: true
+      allowEmptyValue: false
       schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Page number, starts with 0
+        $ref: '#/components/schemas/AlertId'
   securitySchemes:
     API_Key:
       type: apiKey

@@ -43,51 +43,7 @@ paths:
       - API_Key: []
       description: POST /v3/email-inbox-message-alerts
 components:
-  responses:
-    UnAuthorized:
-      description: Your token is invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    BadRequest:
-      description: The request cannot be accepted
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
-    Forbidden:
-      description: You don't have enough rights to access this resource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorModel'
   schemas:
-    AuditId:
-      type: integer
-      format: int64
-      example: 107239
-    EmailInboxMessageAlertsRequestDTO:
-      type: object
-      required:
-      - emailInboxId
-      - messageIds
-      properties:
-        emailInboxId:
-          type: integer
-        messageIds:
-          type: array
-          description: Message IDs list cannot be empty
-          minItems: 1
-          maxItems: 200
-          items:
-            $ref: '#/components/schemas/ReceivedEmailMessageId'
-    RunId:
-      type: integer
-      format: int64
-      example: 33010
-    ReceivedEmailMessageId:
-      type: integer
     EmailInboxMessageAlertsResponse_AuditItem:
       type: object
       description: '`assignedAlertCount` is the number of alerts computed for completed run,
@@ -116,6 +72,53 @@ components:
           type: integer
         triggeredAlertCount:
           type: integer
+    AuditId:
+      type: integer
+      format: int64
+      example: 107239
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        validationReport:
+          type: object
+    ReceivedEmailMessageId:
+      type: integer
+    EmailInboxMessageAlertsResponseDTO:
+      type: object
+      required:
+      - messages
+      properties:
+        messages:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/EmailInboxMessageAlertsResponse_MessageItem'
+    RunId:
+      type: integer
+      format: int64
+      example: 33010
+    EmailInboxMessageAlertsRequestDTO:
+      type: object
+      required:
+      - emailInboxId
+      - messageIds
+      properties:
+        emailInboxId:
+          type: integer
+        messageIds:
+          type: array
+          description: Message IDs list cannot be empty
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/ReceivedEmailMessageId'
     EmailInboxMessageAlertsResponse_MessageItem:
       type: object
       required:
@@ -129,28 +132,25 @@ components:
           minItems: 0
           items:
             $ref: '#/components/schemas/EmailInboxMessageAlertsResponse_AuditItem'
-    ErrorModel:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        validationReport:
-          type: object
-    EmailInboxMessageAlertsResponseDTO:
-      type: object
-      required:
-      - messages
-      properties:
-        messages:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/EmailInboxMessageAlertsResponse_MessageItem'
+  responses:
+    UnAuthorized:
+      description: Your token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    Forbidden:
+      description: You don't have enough rights to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    BadRequest:
+      description: The request cannot be accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
   securitySchemes:
     API_Key:
       type: apiKey
