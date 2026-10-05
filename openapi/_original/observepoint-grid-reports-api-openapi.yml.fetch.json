@@ -1,0 +1,12 @@
+{
+ "url": "https://api-docs.observepoint.com/_bundle/openapi/GRID-API.openapi.json?download",
+ "requested_url": "https://api-docs.observepoint.com/_bundle/openapi/GRID-API.openapi.json?download",
+ "status": 200,
+ "content_type": "application/json",
+ "bytes": 180713,
+ "sha256": "f6acaca21a938282a16490e20f3fe22ffc1bb000c7633e85d6ce56fa7b480adc",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 1.0), but the bytes differ, so the archive is an earlier or reformatted copy."
+}

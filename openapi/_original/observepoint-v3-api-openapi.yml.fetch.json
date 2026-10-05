@@ -1,0 +1,12 @@
+{
+ "url": "https://api-docs.observepoint.com/_bundle/openapi/combined.openapi.json?download",
+ "requested_url": "https://api-docs.observepoint.com/_bundle/openapi/combined.openapi.json?download",
+ "status": 200,
+ "content_type": "application/json",
+ "bytes": 1101488,
+ "sha256": "7ac84890203e29783fb0c7a6e8b20985b57a5b387d5f9bce79641b82e879e976",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 0.936), but the bytes differ, so the archive is an earlier or reformatted copy."
+}
