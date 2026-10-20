@@ -3,23 +3,6 @@ method: searched
 checked:
 - https://github.com/marketplace?type=apps
 marketplace_apps: []
-edges:
-- partner_name: GitHub Marketplace (apps)
-  partner: github
-  partner_match: aggregator
-  type: marketplace
-  marketplace: github-apps
-  channel: partner-built
-  relationship: platform-app
-  direction: third-party
-  evidence: https://github.com/marketplace/observepoint-integration
-  listing_count: 1
-  apps:
-  - ObservePoint Integration
-  publisher_name: ObservePoint
-  badges:
-  - Verified domain
-  detected_by: sweep-devtools.py
-  detected: '2026-10-14'
+edges: []
 source:
 - https://github.com/marketplace?type=apps
