@@ -1,8 +1,43 @@
 generated: '2026-10-14'
-method: none
+method: searched
 checked:
 - https://github.com/marketplace?type=apps
+- https://github.com/w3c/wai-evaluation-tools-list
+- https://www.accessibilityassociation.org/organizational-directory
+- https://www.dhs.gov/trusted-tester
+- https://www.itic.org/policy/accessibility/vpat
+- https://www.section508.gov/
+- https://www.w3.org/WAI/test-evaluate/tools/list/
 marketplace_apps: []
-edges: []
+edges:
+- partner_name: W3C WAI Web Accessibility Evaluation Tools List
+  partner: w3c
+  partner_match: register
+  type: register
+  channel: standard-directory
+  relationship: standard-participant
+  direction: partner-built
+  evidence: https://www.w3.org/WAI/test-evaluate/tools/list/
+  category: accessibility evaluation tool listing
+  contract_reference:
+    register: W3C WAI Web Accessibility Evaluation Tools List (w3.org/WAI/test-evaluate/tools/list/, built from
+      github.com/w3c/wai-evaluation-tools-list)
+    standard: WCAG (W3C Web Content Accessibility Guidelines)
+    spec_file: null
+    role: wai-evaluation-tool-vendor
+    registered_name: ObservePoint
+    register_id: 4a592800-26ad-11f0-a625-73260650036f.json
+    matched_domain: observepoint.com
+    matched_by: domain
+    listed_tools:
+    - ObservePoint Page Audits
+    listed_tool_types:
+    - Website
+    signal_note: 'listing only: the WAI tools list is self-submitted and W3C states it does not endorse or certify
+      any tool; no certified_products. Tool types are context, never counted'
+    detected_by: sweep-digital-accessibility-certification.py
+    detected: '2026-10-21'
+  detected_by: sweep-digital-accessibility-certification.py
+  first_seen: '2026-10-21'
 source:
 - https://github.com/marketplace?type=apps
