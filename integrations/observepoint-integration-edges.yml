@@ -8,6 +8,7 @@ checked:
 - https://www.itic.org/policy/accessibility/vpat
 - https://www.section508.gov/
 - https://www.w3.org/WAI/test-evaluate/tools/list/
+- github/integrations/github-integration-edges.yml
 marketplace_apps: []
 edges:
 - partner_name: W3C WAI Web Accessibility Evaluation Tools List
@@ -39,5 +40,25 @@ edges:
     detected: '2026-10-21'
   detected_by: sweep-digital-accessibility-certification.py
   first_seen: '2026-10-21'
+- partner_name: GitHub (own)
+  partner: github
+  partner_match: mirror
+  mirror_match: domain
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: own
+  evidence: https://github.com/marketplace/observepoint-integration
+  mirror_of: github/integrations/github-integration-edges.yml
+  apps:
+  - ObservePoint Integration
+  listing_count: 1
+  detected: '2026-10-21'
+  detected_by: mirror-platform-listings.py
+  badges:
+  - Verified domain
+  publisher_verified:
+  - Verified domain
 source:
 - https://github.com/marketplace?type=apps
