@@ -1245,3 +1245,9 @@ components:
         Example: `Authorization: abc123...def456`
 
         '
+x-provenance:
+  method: harvested
+  publisher: ObservePoint
+  source: https://api-docs.observepoint.com/_bundle/openapi/GRID-API.openapi.json?download
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
